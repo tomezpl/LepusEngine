@@ -18,6 +18,18 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Material\Material.cpp" />
+    <ClCompile Include="Source\Shader\Shader.cpp" />
+    <ClCompile Include="Source\Shader\SLProgram.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Material.h" />
+    <ClInclude Include="Source\Material\MaterialAttrib.h" />
+    <ClInclude Include="Source\Shader.h" />
+    <ClInclude Include="Source\Shader\SLProgram.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{95CE93BD-A8B6-411B-9EB9-8158AD9BE6B2}</ProjectGuid>
     <RootNamespace>Lepus3D</RootNamespace>
@@ -68,26 +80,63 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SFML_DIR32)\include\;$(GLEW_DIR)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glew32.lib;freetype.lib;jpeg.lib;opengl32.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SFML_DIR32)\lib;$(GLEW_DIR32)\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Message>Copy DLLs</Message>
+      <Command>copy "$(SFML_DIR32)\bin\*-d-2.dll" "$(TargetDir)" /y
+copy "$(GLEW_DIR)\bin\Release\Win32\glew32.dll" "$(TargetDir)" /y</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>mkdir "$(TargetDir)../../GLSL"
+xcopy "$(ProjectDir)\Source\GLSL" "$(TargetDir)../../GLSL" /C /Y</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy GLSL shaders</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SFML_DIR)\include\;$(GLEW_DIR)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glew32.lib;freetype.lib;jpeg.lib;opengl32.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SFML_DIR)\lib;$(GLEW_DIR)\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Message>Copy DLLs</Message>
+      <Command>copy "$(SFML_DIR)\bin\*-d-2.dll" "$(TargetDir)" /y
+copy "$(GLEW_DIR)\bin\Release\x64\glew32.dll" "$(TargetDir)" /y</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>mkdir "$(TargetDir)../../GLSL"
+xcopy "$(ProjectDir)\Source\GLSL" "$(TargetDir)../../GLSL" /C /Y</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy GLSL shaders</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -96,12 +145,28 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SFML_DIR32)\include\;$(GLEW_DIR)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glew32.lib;freetype.lib;jpeg.lib;opengl32.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SFML_DIR32)\lib;$(GLEW_DIR32)\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Message>Copy DLLs</Message>
+      <Command>copy "$(SFML_DIR32)\bin\sfml-*-2.dll" "$(TargetDir)" /y
+del "$(TargetDir)\sfml-*-d-2.dll"
+copy "$(GLEW_DIR)\bin\Release\Win32\glew32.dll" "$(TargetDir)" /y</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>mkdir "$(TargetDir)../../GLSL"
+xcopy "$(ProjectDir)\Source\GLSL" "$(TargetDir)../../GLSL" /C /Y</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy GLSL shaders</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -110,15 +175,29 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SFML_DIR)\include\;$(GLEW_DIR)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glew32.lib;freetype.lib;jpeg.lib;opengl32.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SFML_DIR)\lib;$(GLEW_DIR)\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Message>Copy DLLs</Message>
+      <Command>copy "$(SFML_DIR)\bin\sfml-*-2.dll" "$(TargetDir)" /y
+del "$(TargetDir)\sfml-*-d-2.dll"
+copy "$(GLEW_DIR)\bin\Release\x64\glew32.dll" "$(TargetDir)" /y</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>mkdir "$(TargetDir)../../GLSL"
+xcopy "$(ProjectDir)\Source\GLSL" "$(TargetDir)../../GLSL" /C /Y</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy GLSL shaders</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
