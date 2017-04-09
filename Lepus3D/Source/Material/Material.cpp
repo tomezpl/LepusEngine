@@ -243,3 +243,13 @@ void Material::Use()
 		glUniform2f(m_Vec2Attributes[i].location, m_Vec2Attributes[i].value[0], m_Vec2Attributes[i].value[1]);
 	}
 }
+
+void Material::Destroy()
+{
+	m_Shader.Unload();
+}
+
+Material::~Material()
+{
+	this->Destroy();
+}

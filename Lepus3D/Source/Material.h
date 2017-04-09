@@ -34,6 +34,8 @@ namespace LepusEngine
 			GLfloat* GetAttributeVec3(char* attributeName);
 			GLfloat* GetAttributeVec2(char* attributeName);
 			void Use();
+			void Destroy();
+			~Material();
 		};
 	}
 }
