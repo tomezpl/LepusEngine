@@ -1,13 +1,14 @@
 #include "SLProgram.h"
-#include <iostream>
+#include "LepusEngine\Source\Logger.h"
 
 using namespace LepusEngine::Lepus3D;
 
 SLProgram::SLProgram(char* name)
 {
 #ifdef _DEBUG
-	if(name == "")
-		std::cout << "SLProgram(name): warning, program name is null, needs to be passed while loading" << std::endl;
+	if (name == "")
+		//std::cout << "SLProgram(name): warning, program name is null, needs to be passed while loading" << std::endl;
+		Logger::LogWarning("SLProgram", "SLProgram", "program name is null, need to pass while loading", "name");
 #endif
 	this->LoadShader(name);
 }
@@ -27,8 +28,10 @@ bool SLProgram::_LoadFile(char* fileName)
 	if (!(fs.is_open()))
 	{
 #ifdef _DEBUG
-		std::cout << "SLProgram::_LoadFile(fileName): error, filestream is not open!" << std::endl;
+		//std::cout << "SLProgram::_LoadFile(fileName): error, filestream is not open!" << std::endl;
+		Logger::LogError("SLProgram", "_LoadFile", "filestream is not open", "fileName");
 #endif
+		return false;
 	}
 	if (fs.bad())
 		return false;
@@ -40,6 +43,7 @@ bool SLProgram::_LoadFile(char* fileName)
 			line += "\n";
 		m_ProgramStr.append(line);
 	}
+	Logger::LogInfo("SLProgram", "_LoadFile", "file loaded successfully", "fileName");
 	return true;
 }
 
