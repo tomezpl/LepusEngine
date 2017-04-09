@@ -44,49 +44,8 @@ void render(Lepus3D::Material material)
 	}
 	glBindVertexArray(0); // unbind VAO (vArr)
 
-	/*// Shading
-	Lepus3D::Shader shader("Unlit");
-
-	GLint success;
-	GLchar infoLog[512];
-
-	GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
-	const GLchar* vShaderSource = shader.VShaderSrc();
-	glShaderSource(vShader, 1, &vShaderSource, NULL);
-	glCompileShader(vShader);
-	glGetShaderiv(vShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vShader, 512, NULL, infoLog);
-		std::cout << "Compile VShader: " << infoLog << std::endl;
-	}
-
-
-	/*GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
-	const GLchar* fShaderSource = shader.FShaderSrc();
-	glShaderSource(fShader, 1, &fShaderSource, NULL);
-	glCompileShader(fShader);
-	glGetShaderiv(fShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fShader, 512, NULL, infoLog);
-		std::cout << "Compile FShader: " << infoLog << std::endl;
-	}
-
-	GLuint shaderProg = glCreateProgram();
-	glAttachShader(shaderProg, vShader);
-	glAttachShader(shaderProg, fShader);
-	glLinkProgram(shaderProg);
-
-	glGetProgramiv(shaderProg, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderProg, 512, NULL, infoLog);
-		std::cout << "Link shader program: " << infoLog << std::endl;
-	}
-
-	glUseProgram(shaderProg);*/
 	material.Use();
+
 	glBindVertexArray(vArr);
 	{
 		glDrawElements(GL_TRIANGLES, sizeof(verts) / sizeof(GLfloat), GL_UNSIGNED_INT, 0);
@@ -94,7 +53,7 @@ void render(Lepus3D::Material material)
 	glBindVertexArray(0);
 }
 
-int main()
+/*int main()
 {
 	sf::Window window(sf::VideoMode(1280, 720), "Lepus3D", sf::Style::Default);
 
@@ -136,4 +95,4 @@ int main()
 	}
 
 	return 0;
-}
+}*/
