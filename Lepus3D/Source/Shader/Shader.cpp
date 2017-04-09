@@ -128,5 +128,6 @@ void Shader::Unload()
 {
 	glDeleteShader(m_VShader.m_Program);
 	glDeleteShader(m_FShader.m_Program);
+	glDeleteProgram(m_Compiled);
 	m_Ready = false;
 }
