@@ -14,7 +14,7 @@ namespace LepusEngine
 		{
 		private:
 			sf::Window m_Window;
-			GLuint m_VBO, m_IBO, m_VAO, m_eCount;
+			GLuint m_VBO, m_IBO, m_VAO, m_vCount, m_iCount;
 			struct { 
 				bool 
 					window, 
