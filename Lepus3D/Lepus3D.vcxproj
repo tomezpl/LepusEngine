@@ -27,9 +27,21 @@
   <ItemGroup>
     <ClInclude Include="Source\Material.h" />
     <ClInclude Include="Source\Material\MaterialAttrib.h" />
+    <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\RenderEngine.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\Shader\SLProgram.h" />
+    <ClInclude Include="Source\Vertex.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\GLSL\PerVertexUnlit.frag" />
+    <None Include="Source\GLSL\PerVertexUnlit.vert" />
+    <None Include="Source\GLSL\Unlit.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Source\GLSL\Unlit.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{95CE93BD-A8B6-411B-9EB9-8158AD9BE6B2}</ProjectGuid>

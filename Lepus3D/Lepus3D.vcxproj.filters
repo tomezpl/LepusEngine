@@ -54,5 +54,25 @@
     <ClInclude Include="Source\RenderEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\GLSL\Unlit.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Source\GLSL\Unlit.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Source\GLSL\PerVertexUnlit.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Source\GLSL\PerVertexUnlit.frag">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
