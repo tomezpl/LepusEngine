@@ -22,12 +22,12 @@ namespace LepusEngine
 			Material(char* materialName, char* shaderName);
 			bool SetShader(char* shaderName);
 			// Location will only be modified if it's >= 0
-			bool SetAttributeI(char* attributeName, GLint value, GLint location = -1);
-			bool SetAttributeF(char* attributeName, GLfloat value, GLint location = -1);
-			bool SetAttributeF4(char* attributeName, GLfloat value[4], GLint location = -1);
-			bool SetAttributeF3(char* attributeName, GLfloat value[3], GLint location = -1);
-			bool SetAttributeF2(char* attributeName, GLfloat value[2], GLint location = -1);
-			bool SetAttributeFP(char* attributeName, GLfloat* value, GLint location = -1);
+			bool SetAttributeI(char* attributeName, GLint value, GLint location = 0);
+			bool SetAttributeF(char* attributeName, GLfloat value, GLint location = 0);
+			bool SetAttributeF4(char* attributeName, GLfloat value[4], GLint location = 0);
+			bool SetAttributeF3(char* attributeName, GLfloat value[3], GLint location = 0);
+			bool SetAttributeF2(char* attributeName, GLfloat value[2], GLint location = 0);
+			bool SetAttributeFP(char* attributeName, GLfloat* value, GLint location = 0);
 			GLint GetAttributeI(char* attributeName);
 			GLfloat GetAttributeF(char* attributeName);
 			GLfloat* GetAttributeVec4(char* attributeName);

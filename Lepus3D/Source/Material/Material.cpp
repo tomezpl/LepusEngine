@@ -32,14 +32,14 @@ bool Material::SetAttributeI(char* attributeName, GLint value, GLint location)
 	{
 		m_IntAttributes[index].value = value;
 		if (location >= 0)
-			m_FloatAttributes[index].location = location;
+			m_FloatAttributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 	}
 	else
 	{
 		m_IntAttributes.push_back(MaterialAttrib<GLint>(attributeName));
 		m_IntAttributes[m_IntAttributes.size() - 1].value = value;
 		if (location >= 0)
-			m_FloatAttributes[m_IntAttributes.size() - 1].location = location;
+			m_FloatAttributes[m_IntAttributes.size() - 1].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 		return false;
 	}
 
@@ -60,14 +60,14 @@ bool Material::SetAttributeF(char* attributeName, GLfloat value, GLint location)
 	{
 		m_FloatAttributes[index].value = value;
 		if (location >= 0)
-			m_FloatAttributes[index].location = location;
+			m_FloatAttributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 	}
 	else
 	{
 		m_FloatAttributes.push_back(MaterialAttrib<GLfloat>(attributeName));
 		m_FloatAttributes[m_FloatAttributes.size() - 1].value = value;
 		if (location >= 0)
-			m_FloatAttributes[m_FloatAttributes.size() - 1].location = location;
+			m_FloatAttributes[m_FloatAttributes.size() - 1].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 		return false;
 	}
 
@@ -91,7 +91,7 @@ bool Material::SetAttributeF4(char* attributeName, GLfloat value[4], GLint locat
 		m_Vec4Attributes[index].value[2] = value[2];
 		m_Vec4Attributes[index].value[3] = value[3];
 		if (location >= 0)
-			m_Vec4Attributes[index].location = location;
+			m_Vec4Attributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 	}
 	else
 	{
@@ -102,7 +102,7 @@ bool Material::SetAttributeF4(char* attributeName, GLfloat value[4], GLint locat
 		m_Vec4Attributes[index].value[2] = value[2];
 		m_Vec4Attributes[index].value[3] = value[3];
 		if (location >= 0)
-			m_Vec4Attributes[index].location = location;
+			m_Vec4Attributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 		return false;
 	}
 
@@ -125,7 +125,7 @@ bool Material::SetAttributeF3(char* attributeName, GLfloat value[3], GLint locat
 		m_Vec3Attributes[index].value[1] = value[1];
 		m_Vec3Attributes[index].value[2] = value[2];
 		if (location >= 0)
-			m_Vec3Attributes[index].location = location;
+			m_Vec3Attributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 	}
 	else
 	{
@@ -135,7 +135,7 @@ bool Material::SetAttributeF3(char* attributeName, GLfloat value[3], GLint locat
 		m_Vec3Attributes[index].value[1] = value[1];
 		m_Vec3Attributes[index].value[2] = value[2];
 		if (location >= 0)
-			m_Vec3Attributes[index].location = location;
+			m_Vec3Attributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 		return false;
 	}
 
@@ -157,7 +157,7 @@ bool Material::SetAttributeF2(char* attributeName, GLfloat value[2], GLint locat
 		m_Vec2Attributes[index].value[0] = value[0];
 		m_Vec2Attributes[index].value[1] = value[1];
 		if (location >= 0)
-			m_Vec2Attributes[index].location = location;
+			m_Vec2Attributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 	}
 	else
 	{
@@ -166,7 +166,7 @@ bool Material::SetAttributeF2(char* attributeName, GLfloat value[2], GLint locat
 		m_Vec2Attributes[index].value[0] = value[0];
 		m_Vec2Attributes[index].value[1] = value[1];
 		if (location >= 0)
-			m_Vec2Attributes[index].location = location;
+			m_Vec2Attributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 		return false;
 	}
 

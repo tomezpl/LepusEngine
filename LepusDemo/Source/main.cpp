@@ -17,7 +17,7 @@ int main()
 		1, 3, 2 };
 
 	Lepus3D::Material testMat("Test material", "Unlit");
-	testMat.SetAttributeF4("Color", new float[4]{ 0.75f, 0.75f, 0.75f, 1.0f }, 1);
+	testMat.SetAttributeF4("_Color", new float[4]{ 0.75f, 0.75f, 0.75f, 1.0f });
 
 	bool running = true;
 	while (running)
