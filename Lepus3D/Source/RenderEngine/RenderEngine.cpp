@@ -19,7 +19,7 @@ bool RenderEngine::Init(char* name, unsigned short width, unsigned short height)
 
 bool RenderEngine::Init()
 {
-	m_vCount = 0;
+	m_eCount = 0;
 	m_CurrentMat = nullptr;
 
 	if (!m_Ready.window)
@@ -43,22 +43,38 @@ bool RenderEngine::Init()
 	return true;
 }
 
-void RenderEngine::DrawVertices(GLfloat* vD, GLuint vC, GLuint* iD, GLuint iC, Material& mat)
+void RenderEngine::DrawVertices(Vertex* vD, GLuint vDS, GLuint* iD, GLuint iC, Material& mat)
 {
 	m_CurrentMat = &mat;
-	m_vCount = vC;
+	m_eCount = iC;
+
+	GLfloat* vArr = new GLfloat[vDS / sizeof(GLfloat)];
+	for (unsigned short i = 0, j = 0; i < vDS / sizeof(GLfloat); i += sizeof(vD[i]) / sizeof(GLfloat), j++)
+	{
+		vArr[i] = vD[j].x;
+		vArr[i+1] = vD[j].y;
+		vArr[i+2] = vD[j].z;
+		vArr[i+3] = vD[j].r;
+		vArr[i+4] = vD[j].g;
+		vArr[i+5] = vD[j].b;
+	}
 
 	// bind VAO to VBO
 	glBindVertexArray(m_VAO);
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, vC * sizeof(GLfloat), vD, GL_STATIC_DRAW); // pass vertices to GPU
+		glBufferData(GL_ARRAY_BUFFER, vDS, vArr, GL_STATIC_DRAW); // pass vertices to GPU
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, iC * sizeof(GLuint), iD, GL_STATIC_DRAW); // pass elements/indices to GPU
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		// Set vertex positions
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
+
+		// Set vertex colours
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
 	}
 	glBindVertexArray(0); // unbind VAO
 }
@@ -86,7 +102,7 @@ bool RenderEngine::Update()
 
 	glBindVertexArray(m_VAO);
 	{
-		glDrawElements(GL_TRIANGLES, m_vCount, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
 	}
 	glBindVertexArray(0);
 

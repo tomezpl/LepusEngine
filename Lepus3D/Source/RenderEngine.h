@@ -5,6 +5,7 @@
 #include <SFML\OpenGL.hpp>
 
 #include "Material.h"
+#include "Vertex.h"
 
 namespace LepusEngine
 {
@@ -14,7 +15,7 @@ namespace LepusEngine
 		{
 		private:
 			sf::Window m_Window;
-			GLuint m_VBO, m_IBO, m_VAO, m_vCount, m_iCount;
+			GLuint m_VBO, m_IBO, m_VAO, m_eCount;
 			struct { 
 				bool 
 					window, 
@@ -26,7 +27,7 @@ namespace LepusEngine
 			RenderEngine(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
 			bool Init();
 			bool Init(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
-			void DrawVertices(GLfloat* vertexData, GLuint vertexCount, GLuint* indices, GLuint indexCount, Material& material);
+			void DrawVertices(Vertex* vertexData, GLuint vertexDataSize, GLuint* indices, GLuint indexCount, Material& material);
 			
 			// Runs the window's event loop, returns false if window was closed
 			// Draws the current vertex buffer to the screen
