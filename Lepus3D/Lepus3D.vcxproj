@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Material\Material.cpp" />
+    <ClCompile Include="Source\Mesh\Mesh.cpp" />
     <ClCompile Include="Source\RenderEngine\RenderEngine.cpp" />
     <ClCompile Include="Source\Shader\Shader.cpp" />
     <ClCompile Include="Source\Shader\SLProgram.cpp" />
@@ -127,8 +128,8 @@
 copy "$(GLEW_DIR)\bin\Release\Win32\glew32.dll" "$(TargetDir)" /y</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>mkdir "$(TargetDir)../../GLSL"
-xcopy "$(ProjectDir)\Source\GLSL" "$(TargetDir)../../GLSL" /C /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Copy GLSL shaders</Message>
@@ -155,8 +156,8 @@ xcopy "$(ProjectDir)\Source\GLSL" "$(TargetDir)../../GLSL" /C /Y</Command>
 copy "$(GLEW_DIR)\bin\Release\x64\glew32.dll" "$(TargetDir)" /y</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>mkdir "$(TargetDir)../../GLSL"
-xcopy "$(ProjectDir)\Source\GLSL" "$(TargetDir)../../GLSL" /C /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Copy GLSL shaders</Message>
@@ -188,8 +189,8 @@ del "$(TargetDir)\sfml-*-d-2.dll"
 copy "$(GLEW_DIR)\bin\Release\Win32\glew32.dll" "$(TargetDir)" /y</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>mkdir "$(TargetDir)../../GLSL"
-xcopy "$(ProjectDir)\Source\GLSL" "$(TargetDir)../../GLSL" /C /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Copy GLSL shaders</Message>
@@ -221,8 +222,8 @@ del "$(TargetDir)\sfml-*-d-2.dll"
 copy "$(GLEW_DIR)\bin\Release\x64\glew32.dll" "$(TargetDir)" /y</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>mkdir "$(TargetDir)../../GLSL"
-xcopy "$(ProjectDir)\Source\GLSL" "$(TargetDir)../../GLSL" /C /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Copy GLSL shaders</Message>

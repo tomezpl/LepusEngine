@@ -100,6 +100,10 @@
       <Command>copy "$(SFML_DIR32)\bin\*-d-2.dll" "$(TargetDir)" /y
 copy "$(GLEW_DIR)\bin\Release\$(Platform)\glew32.dll" "$(TargetDir)" /y</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>mkdir "$(TargetDir)../../GLSL"
+xcopy "$(SolutionDir)\Lepus3D\Source\GLSL" "$(TargetDir)\..\..\GLSL"/C /Y</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -117,6 +121,10 @@ copy "$(GLEW_DIR)\bin\Release\$(Platform)\glew32.dll" "$(TargetDir)" /y</Command
       <Command>copy "$(SFML_DIR)\bin\*-d-2.dll" "$(TargetDir)" /y
 copy "$(GLEW_DIR)\bin\Release\$(Platform)\glew32.dll" "$(TargetDir)" /y</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>mkdir "$(TargetDir)../../GLSL"
+xcopy "$(SolutionDir)\Lepus3D\Source\GLSL" "$(TargetDir)\..\..\GLSL"/C /Y</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -139,6 +147,10 @@ copy "$(GLEW_DIR)\bin\Release\$(Platform)\glew32.dll" "$(TargetDir)" /y</Command
 del "$(TargetDir)\sfml-*-d-2.dll"
 copy "$(GLEW_DIR)\bin\Release\$(Platform)\glew32.dll" "$(TargetDir)" /y</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>mkdir "$(TargetDir)../../GLSL"
+xcopy "$(SolutionDir)\Lepus3D\Source\GLSL" "$(TargetDir)\..\..\GLSL"/C /Y</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -161,6 +173,10 @@ copy "$(GLEW_DIR)\bin\Release\$(Platform)\glew32.dll" "$(TargetDir)" /y</Command
 del "$(TargetDir)\sfml-*-d-2.dll"
 copy "$(GLEW_DIR)\bin\Release\$(Platform)\glew32.dll" "$(TargetDir)" /y</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>mkdir "$(TargetDir)../../GLSL"
+xcopy "$(SolutionDir)\Lepus3D\Source\GLSL" "$(TargetDir)\..\..\GLSL"/C /Y</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
