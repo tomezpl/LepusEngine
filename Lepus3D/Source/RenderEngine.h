@@ -24,6 +24,7 @@ namespace LepusEngine
 			} m_Ready;
 			Mesh* m_CurrentMesh;
 			Material* m_CurrentMat;
+			GLuint m_TextureSet[16];
 		public:
 			RenderEngine() { m_Ready = { false, false }; };
 			RenderEngine(char* windowName, unsigned short windowWidth, unsigned short windowHeight);

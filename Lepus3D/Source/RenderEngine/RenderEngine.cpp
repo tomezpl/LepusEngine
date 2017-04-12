@@ -38,6 +38,7 @@ bool RenderEngine::Init()
 	glGenBuffers(1, &m_VBO);
 	glGenBuffers(1, &m_IBO);
 	glGenVertexArrays(1, &m_VAO);
+	glGenTextures(sizeof(m_TextureSet) / sizeof(GLuint), m_TextureSet);
 
 	m_Ready.renderer = true;
 	
@@ -62,8 +63,33 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material)
 		vArr[i+3] = vD[j].r;
 		vArr[i+4] = vD[j].g;
 		vArr[i+5] = vD[j].b;
+		vArr[i+6] = vD[j].s;
+		vArr[i+7] = vD[j].t;
 	}
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	auto textureCount = m_CurrentMat->m_TexAttributes.size();
+
+	if (textureCount > sizeof(m_TextureSet) / sizeof(GLuint))
+	{
+		Logger::LogWarning("RenderEngine", "DrawMesh", "texture count is bigger than the texture set size!", "mesh, material");
+	}
+
+	for (auto i = 0; i < textureCount; i++)
+	{
+		glBindTexture(GL_TEXTURE_2D, m_TextureSet[i]);
+		{
+			auto currentTex = m_CurrentMat->m_TexAttributes[i].value;
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, currentTex.GetWidth(), currentTex.GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, currentTex.GetData());
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 	// bind VAO to VBO
 	glBindVertexArray(m_VAO);
 	{
@@ -80,6 +106,10 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material)
 		// Set vertex colours
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(1);
+
+		// Set texture coords
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(6 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(2);
 	}
 	glBindVertexArray(0); // unbind VAO
 }
@@ -104,7 +134,15 @@ bool RenderEngine::Update()
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	m_CurrentMat->Use();
+	
+	auto textureCount = m_CurrentMat->m_TexAttributes.size();
 
+	for (auto i = 0; i < textureCount; i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, m_TextureSet[i]);
+		glUniform1i(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, m_CurrentMat->m_TexAttributes[i].name), i);
+	}
 	glBindVertexArray(m_VAO);
 	{
 		glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);

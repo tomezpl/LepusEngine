@@ -8,10 +8,10 @@ namespace LepusEngine
 		class Vertex
 		{
 		public:
-			float x, y, z, r, g, b;
-			Vertex(float X = 0.f, float Y = 0.f, float Z = 0.f, float R = 0.f, float G = 0.f, float B = 0.f) { x = X; y = Y; z = Z; r = R; g = G; b = B; };
-			Vertex operator=(Vertex& rs) { x = rs.x; y = rs.y; z = rs.z; r = rs.r; g = rs.g; b = rs.b; return *this;  };
-			bool operator==(Vertex& rs) { return x == rs.x && y == rs.y && z == rs.z && r == rs.r && g == rs.g && b == rs.b; };
+			float x, y, z, r, g, b, s, t;
+			Vertex(float X = 0.f, float Y = 0.f, float Z = 0.f, float R = 0.f, float G = 0.f, float B = 0.f, float S = 0.f, float T = 0.f) { x = X; y = Y; z = Z; r = R; g = G; b = B; s = S; t = T; };
+			Vertex operator=(Vertex& rs) { x = rs.x; y = rs.y; z = rs.z; r = rs.r; g = rs.g; b = rs.b; s = rs.s; t = rs.t; return *this; };
+			bool operator==(Vertex& rs) { return x == rs.x && y == rs.y && z == rs.z && r == rs.r && g == rs.g && b == rs.b && s == rs.s && t == rs.t; };
 			bool operator!=(Vertex& rs) { return !(*this == rs); };
 		};
 
