@@ -8,6 +8,7 @@ namespace LepusEngine
 	{
 		class Shader {
 			friend class Material;
+			friend class Mesh;
 		private:
 			char* m_ShaderName;
 			VShader m_VShader;
@@ -15,7 +16,7 @@ namespace LepusEngine
 			GLuint m_Compiled;
 			bool m_Ready;
 		public:
-			Shader() {};
+			Shader() { m_ShaderName = ""; m_Ready = false; };
 			Shader(char* name);
 			bool Load(char* name = "");
 			const char* VShaderSrc();
