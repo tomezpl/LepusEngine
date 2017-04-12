@@ -20,6 +20,7 @@ bool RenderEngine::Init(char* name, unsigned short width, unsigned short height)
 bool RenderEngine::Init()
 {
 	m_eCount = 0;
+	m_CurrentMesh = nullptr;
 	m_CurrentMat = nullptr;
 
 	if (!m_Ready.window)
@@ -43,10 +44,14 @@ bool RenderEngine::Init()
 	return true;
 }
 
-void RenderEngine::DrawVertices(Vertex* vD, GLuint vDS, GLuint* iD, GLuint iC, Material& mat)
+void RenderEngine::DrawMesh(Mesh& mesh, Material& material)
 {
-	m_CurrentMat = &mat;
-	m_eCount = iC;
+	m_CurrentMesh = &mesh;
+	m_CurrentMat = &material;
+	unsigned int* iD = m_CurrentMesh->GetIndexBuffer(m_eCount);
+	VertexPack vP = m_CurrentMesh->GetVertexBuffer();
+	Vertex* vD = vP.data;
+	unsigned int vDS = vP.size() * sizeof(Vertex);
 
 	GLfloat* vArr = new GLfloat[vDS / sizeof(GLfloat)];
 	for (unsigned short i = 0, j = 0; i < vDS / sizeof(GLfloat); i += sizeof(vD[i]) / sizeof(GLfloat), j++)
@@ -66,7 +71,7 @@ void RenderEngine::DrawVertices(Vertex* vD, GLuint vDS, GLuint* iD, GLuint iC, M
 		glBufferData(GL_ARRAY_BUFFER, vDS, vArr, GL_STATIC_DRAW); // pass vertices to GPU
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, iC * sizeof(GLuint), iD, GL_STATIC_DRAW); // pass elements/indices to GPU
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_eCount * sizeof(GLuint), iD, GL_STATIC_DRAW); // pass elements/indices to GPU
 
 		// Set vertex positions
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
