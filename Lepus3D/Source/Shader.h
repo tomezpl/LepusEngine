@@ -9,6 +9,7 @@ namespace LepusEngine
 		class Shader {
 			friend class Material;
 			friend class Mesh;
+			friend class RenderEngine;
 		private:
 			char* m_ShaderName;
 			VShader m_VShader;
