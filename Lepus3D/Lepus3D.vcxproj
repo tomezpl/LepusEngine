@@ -24,6 +24,7 @@
     <ClCompile Include="Source\RenderEngine\RenderEngine.cpp" />
     <ClCompile Include="Source\Shader\Shader.cpp" />
     <ClCompile Include="Source\Shader\SLProgram.cpp" />
+    <ClCompile Include="Source\Texture\Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Material.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="Source\RenderEngine.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\Shader\SLProgram.h" />
+    <ClInclude Include="Source\Texture.h" />
     <ClInclude Include="Source\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
