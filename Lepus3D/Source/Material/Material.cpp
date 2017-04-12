@@ -15,7 +15,13 @@ Material::Material(char* name, char* shaderName) : Material(name)
 
 bool Material::SetShader(char* shaderName)
 {
-	return m_Shader.Load(shaderName);
+	if (!m_Shader.m_Ready)
+	{
+		bool result = m_Shader.Load(shaderName);
+		return result;
+	}
+	else
+		return true;
 }
 
 bool Material::SetAttributeI(char* attributeName, GLint value, GLint location)
