@@ -168,11 +168,40 @@ bool Material::SetAttributeF2(char* attributeName, GLfloat value[2], GLint locat
 	else
 	{
 		m_Vec2Attributes.push_back(MaterialAttrib<GLfloat[2]>(attributeName));
-		index = m_Vec3Attributes.size() - 1;
+		index = m_Vec2Attributes.size() - 1;
 		m_Vec2Attributes[index].value[0] = value[0];
 		m_Vec2Attributes[index].value[1] = value[1];
 		if (location >= 0)
 			m_Vec2Attributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
+		return false;
+	}
+
+	return true;
+}
+
+bool Material::SetAttributeTex(char* attributeName, Texture2D value, int location)
+{
+	short index = -1;
+
+	for (short i = 0; i < m_TexAttributes.size() && index < 0; i++)
+	{
+		if (m_TexAttributes[i].name == attributeName)
+			index = i;
+	}
+
+	if (index >= 0)
+	{
+		m_TexAttributes[index].value = value;
+		if (location >= 0)
+			m_TexAttributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
+	}
+	else
+	{
+		m_TexAttributes.push_back(MaterialAttrib<Texture2D>(attributeName));
+		index = m_TexAttributes.size() - 1;
+		m_TexAttributes[index].value = value;
+		if (location >= 0)
+			m_TexAttributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 		return false;
 	}
 
@@ -220,6 +249,50 @@ GLfloat Material::GetAttributeF(char* attributeName)
 		if (m_FloatAttributes[i].name == attributeName)
 		{
 			return m_FloatAttributes[i].value;
+		}
+	}
+}
+
+float* Material::GetAttributeVec4(char* attributeName)
+{
+	for (unsigned short i = 0; i < m_Vec4Attributes.size(); i++)
+	{
+		if (m_Vec4Attributes[i].name == attributeName)
+		{
+			return m_Vec4Attributes[i].value;
+		}
+	}
+}
+
+float* Material::GetAttributeVec3(char* attributeName)
+{
+	for (unsigned short i = 0; i < m_Vec3Attributes.size(); i++)
+	{
+		if (m_Vec3Attributes[i].name == attributeName)
+		{
+			return m_Vec3Attributes[i].value;
+		}
+	}
+}
+
+float* Material::GetAttributeVec2(char* attributeName)
+{
+	for (unsigned short i = 0; i < m_Vec2Attributes.size(); i++)
+	{
+		if (m_Vec2Attributes[i].name == attributeName)
+		{
+			return m_Vec2Attributes[i].value;
+		}
+	}
+}
+
+Texture2D Material::GetAttributeTex(char* attributeName)
+{
+	for (unsigned short i = 0; i < m_TexAttributes.size(); i++)
+	{
+		if (m_TexAttributes[i].name == attributeName)
+		{
+			return m_TexAttributes[i].value;
 		}
 	}
 }
