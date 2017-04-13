@@ -27,6 +27,7 @@ __RenderEngine__ also creates and updates a GL context and window.
 An example app using the engine would look like this:
 
 '''
+
 #include "../../Lepus3D/Source/RenderEngine.h"
 
 using namespace LepusEngine;
@@ -45,6 +46,7 @@ int main()
 	engine.Shutdown();
 	return 0;
 }
+
 '''
 
 Check the header files to see how things work. [RenderEngine.h](https://github.com/tomezpl/LepusEngine/blob/master/Lepus3D/Source/RenderEngine.h) is usually a good place to start.
