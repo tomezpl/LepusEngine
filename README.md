@@ -47,7 +47,7 @@ int main()
 }
 '''
 
-Check the header files to see how things work. [RenderEngine.h](http://github.com/tomezpl/LepusEngine/Lepus3D/Source/RenderEngine.h) is usually a good place to start.
+Check the header files to see how things work. [RenderEngine.h](https://github.com/tomezpl/LepusEngine/blob/master/Lepus3D/Source/RenderEngine.h) is usually a good place to start.
 
 ### Contributing
 I myself am focused on creating the renderer. However, I plan on making this a full game engine, and any help would be appreciated.
@@ -57,4 +57,4 @@ If you have any questions you can contact me at **tomaszzlc@gmail.com**. If ther
 ### Licensing
 LepusEngine is licensed under the MIT license. This means you are free to use LepusEngine in any way you want, but you must include the copyright notice and the permission notice.
 
-Read the [LICENSE](http://github.com/tomezpl/LepusEngine/LICENSE) file for more details.
+Read the [LICENSE](https://github.com/tomezpl/LepusEngine/blob/master/LICENSE) file for more details.
