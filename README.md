@@ -8,14 +8,14 @@ The renderer uses a programmable pipeline and as a result comes with a bundled s
 ### Building
 The project comes with a MS VC++ solution set up and it should be ready to build. You will however need to set the following environment variables:
 * SFML_DIR
-	* Points to the root directory of a 64-bit SFML package for MSVC++ (folder name usually '''SFML-x.x.x-windows-vc1x-64-bit''').
-	* For example, '''$(SFML_DIR)/lib/''' should point to the '''lib''' folder in your 64-bit SFML directory
+	* Points to the root directory of a 64-bit SFML package for MSVC++ (folder name usually *SFML-x.x.x-windows-vc1x-64-bit*).
+	* For example, *$(SFML_DIR)/lib/* should point to the *lib* folder in your 64-bit SFML directory
 * SFML_DIR32
-	* Points to the root directory of a 32-bit SFML package for MSVC++ (folder name usually '''SFML-x.x.x-windows-vc1x-32-bit''').
-	* For example, '''$(SFML_DIR32)/lib/''' should point to the '''lib''' folder in your 32-bit SFML directory
+	* Points to the root directory of a 32-bit SFML package for MSVC++ (folder name usually '''SFML-x.x.x-windows-vc1x-32-bit*).
+	* For example, *$(SFML_DIR32)/lib/* should point to the *lib* folder in your 32-bit SFML directory
 * GLEW_DIR
-	* Points to the root directory of a GLEW package for Win32 (folder name usually '''glew-x.x.x-win32''')
-	* For example, '''$(GLEW_DIR)/lib/''' should point to the '''lib''' folder in your GLEW directory
+	* Points to the root directory of a GLEW package for Win32 (folder name usually *glew-x.x.x-win32*).
+	* For example, *$(GLEW_DIR)/lib/* should point to the *lib* folder in your GLEW directory
 
 As for GNU/Linux builds, a Makefile will be put together at some point.
 
