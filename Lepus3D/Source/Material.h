@@ -2,7 +2,7 @@
 
 #include "Shader.h"
 #include "Texture.h"
-#include "Material\MaterialAttrib.h"
+#include "Material/MaterialAttrib.h"
 #include <vector>
 
 namespace LepusEngine
