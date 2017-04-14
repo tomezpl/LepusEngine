@@ -16,6 +16,7 @@ namespace LepusEngine
 		};
 
 		typedef std::vector<Vertex> VertexArray;
+		typedef std::vector<unsigned int> IndexArray;
 
 		class VertexPack
 		{
