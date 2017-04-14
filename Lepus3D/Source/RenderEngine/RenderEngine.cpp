@@ -1,6 +1,7 @@
 #include "../RenderEngine.h"
 #include <iostream>
-#include "LepusEngine\Source\Logger.h"
+#include "LepusEngine/Source/Logger.h"
+#include "../Transform.h"
 
 using namespace LepusEngine::Lepus3D;
 
@@ -12,6 +13,7 @@ RenderEngine::RenderEngine(char* name, unsigned short width, unsigned short heig
 bool RenderEngine::Init(char* name, unsigned short width, unsigned short height)
 {
 	m_Ready = { false, false };
+	m_WindowName = name;
 	m_Window.create(sf::VideoMode(width, height), name, sf::Style::Default);
 	m_Ready.window = m_Window.isOpen();
 	return this->Init();
@@ -22,6 +24,11 @@ bool RenderEngine::Init()
 	m_eCount = 0;
 	m_CurrentMesh = nullptr;
 	m_CurrentMat = nullptr;
+	m_CurrentTrans = nullptr;
+
+	m_LastFrameTime = 0.f;
+
+	m_Clock.restart();
 
 	if (!m_Ready.window)
 	{
@@ -45,10 +52,11 @@ bool RenderEngine::Init()
 	return true;
 }
 
-void RenderEngine::DrawMesh(Mesh& mesh, Material& material)
+void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform)
 {
 	m_CurrentMesh = &mesh;
 	m_CurrentMat = &material;
+	m_CurrentTrans = &transform;
 	unsigned int* iD = m_CurrentMesh->GetIndexBuffer(m_eCount);
 	VertexPack vP = m_CurrentMesh->GetVertexBuffer();
 	Vertex* vD = vP.data;
@@ -116,6 +124,15 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material)
 
 bool RenderEngine::Update()
 {
+	std::string newWndName = m_WindowName;
+	newWndName.append(" - FPS: ");
+	float currentTime = m_Clock.getElapsedTime().asSeconds();
+	newWndName.append(std::to_string((int)(1.f / (currentTime - m_LastFrameTime))));
+	m_LastFrameTime = currentTime;
+	if ((int)(glm::round(currentTime)) % 3 == 0)
+	{
+		m_Window.setTitle(newWndName);
+	}
 	sf::Event ev;
 	while (m_Window.pollEvent(ev))
 	{
@@ -143,6 +160,9 @@ bool RenderEngine::Update()
 		glBindTexture(GL_TEXTURE_2D, m_TextureSet[i]);
 		glUniform1i(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, m_CurrentMat->m_TexAttributes[i].name), i);
 	}
+
+	glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "transform"), 1, GL_FALSE, glm::value_ptr(m_CurrentTrans->GetMatrix()));
+
 	glBindVertexArray(m_VAO);
 	{
 		glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
