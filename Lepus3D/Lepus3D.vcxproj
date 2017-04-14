@@ -25,6 +25,7 @@
     <ClCompile Include="Source\Shader\Shader.cpp" />
     <ClCompile Include="Source\Shader\SLProgram.cpp" />
     <ClCompile Include="Source\Texture\Texture2D.cpp" />
+    <ClCompile Include="Source\Transform\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Material.h" />
@@ -34,6 +35,8 @@
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\Shader\SLProgram.h" />
     <ClInclude Include="Source\Texture.h" />
+    <ClInclude Include="Source\Transform.h" />
+    <ClInclude Include="Source\Transform\Vector.h" />
     <ClInclude Include="Source\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
@@ -99,18 +102,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)\lib\$(Configuration)$(PlatformArchitecture)\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(Configuration)$(PlatformArchitecture)\$(ProjectName)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/include/</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)\lib\$(Configuration)$(PlatformArchitecture)\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(Configuration)$(PlatformArchitecture)\$(ProjectName)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/include/</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)\lib\$(Configuration)$(PlatformArchitecture)\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(Configuration)$(PlatformArchitecture)\$(ProjectName)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/include/</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)\lib\$(Configuration)$(PlatformArchitecture)\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(Configuration)$(PlatformArchitecture)\$(ProjectName)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/include/</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
