@@ -28,6 +28,7 @@
     <ClCompile Include="Source\Transform\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\Material.h" />
     <ClInclude Include="Source\Material\MaterialAttrib.h" />
     <ClInclude Include="Source\Mesh.h" />

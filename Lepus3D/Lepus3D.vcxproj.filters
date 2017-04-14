@@ -78,6 +78,9 @@
     <ClInclude Include="Source\Transform\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\GLSL\Unlit.frag">
