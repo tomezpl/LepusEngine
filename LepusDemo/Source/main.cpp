@@ -19,7 +19,7 @@ int main()
 
 	Lepus3D::Material testMat("Test material", "PerVertexUnlit");
 	//Lepus3D::Mesh testMesh(verts, true);
-	Lepus3D::PlaneMesh testMesh;
+	Lepus3D::BoxMesh testMesh;
 	//std::vector<unsigned int> indices = { 2, 0, 3, 0, 1, 3 };
 	//testMesh.SetIndices(indices);
 
@@ -36,8 +36,7 @@ int main()
 	{
 		float timeSeconds = timer.getElapsedTime().asSeconds();
 		testMat.SetAttributeF("_Time", timeSeconds);
-		transform.SetPosition(Vector3(0.5f, -0.5f, 0.f));
-		transform.SetRotation(Vector3(0.f, 0.f, timeSeconds * 50.f));
+		transform.SetRotation(Vector3(-50.f, timeSeconds * 25.f, 0.f));
 		engine.DrawMesh(testMesh, testMat, transform);
 		running = engine.Update();
 	}
