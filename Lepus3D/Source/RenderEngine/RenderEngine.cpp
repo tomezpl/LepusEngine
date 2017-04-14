@@ -14,7 +14,10 @@ bool RenderEngine::Init(char* name, unsigned short width, unsigned short height)
 {
 	m_Ready = { false, false };
 	m_WindowName = name;
-	m_Window.create(sf::VideoMode(width, height), name, sf::Style::Default);
+	sf::ContextSettings settings;
+	settings.depthBits = 24;
+	settings.stencilBits = 8;
+	m_Window.create(sf::VideoMode(width, height), name, sf::Style::Default, settings);
 	m_Ready.window = m_Window.isOpen();
 	return this->Init();
 }
@@ -168,12 +171,14 @@ bool RenderEngine::Update()
 		glm::mat4 model, view, projection;
 		model = m_CurrentTrans->GetMatrix();
 		view = glm::translate(view, glm::vec3(0.f, 0.f, -2.f));
-		projection = glm::perspective(45.f, (float)m_Window.getSize().x / (float)m_Window.getSize().y, 1.25f, 100.f);
+		projection = glm::perspective(45.f, (float)m_Window.getSize().x / (float)m_Window.getSize().y, 0.01f, 100.f);
 
 		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		
+
+		glEnable(GL_DEPTH_TEST);
+
 		glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
 	}
 	glBindVertexArray(0);
