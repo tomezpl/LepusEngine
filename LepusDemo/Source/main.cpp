@@ -36,7 +36,6 @@ int main()
 	{
 		float timeSeconds = timer.getElapsedTime().asSeconds();
 		testMat.SetAttributeF("_Time", timeSeconds);
-		transform.SetRotation(Vector3(-50.f, timeSeconds * 25.f, 0.f));
 		engine.DrawMesh(testMesh, testMat, transform);
 		running = engine.Update();
 	}
