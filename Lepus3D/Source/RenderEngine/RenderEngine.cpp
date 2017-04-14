@@ -48,6 +48,10 @@ bool RenderEngine::Init()
 	glGenTextures(sizeof(m_TextureSet) / sizeof(GLuint), m_TextureSet);
 
 	m_Ready.renderer = true;
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
+	glDepthFunc(GL_LESS);
 	
 	return true;
 }
@@ -148,7 +152,7 @@ bool RenderEngine::Update()
 	}
 
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	m_CurrentMat->Use();
 	
