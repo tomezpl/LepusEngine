@@ -42,16 +42,14 @@ bool RenderEngine::Init()
 
 	glViewport(0, 0, m_Window.getSize().x, m_Window.getSize().y);
 
+	glEnable(GL_DEPTH_TEST);
+
 	glGenBuffers(1, &m_VBO);
 	glGenBuffers(1, &m_IBO);
 	glGenVertexArrays(1, &m_VAO);
 	glGenTextures(sizeof(m_TextureSet) / sizeof(GLuint), m_TextureSet);
 
 	m_Ready.renderer = true;
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_FALSE);
-	glDepthFunc(GL_LESS);
 	
 	return true;
 }
@@ -165,10 +163,17 @@ bool RenderEngine::Update()
 		glUniform1i(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, m_CurrentMat->m_TexAttributes[i].name), i);
 	}
 
-	glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "transform"), 1, GL_FALSE, glm::value_ptr(m_CurrentTrans->GetMatrix()));
-
 	glBindVertexArray(m_VAO);
 	{
+		glm::mat4 model, view, projection;
+		model = m_CurrentTrans->GetMatrix();
+		view = glm::translate(view, glm::vec3(0.f, 0.f, -2.f));
+		projection = glm::perspective(45.f, (float)m_Window.getSize().x / (float)m_Window.getSize().y, 1.25f, 100.f);
+
+		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		
 		glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
 	}
 	glBindVertexArray(0);
