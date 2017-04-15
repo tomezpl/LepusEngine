@@ -19,7 +19,7 @@ int main()
 
 	Lepus3D::Material testMat("Test material", "PerVertexUnlit");
 	//Lepus3D::Mesh testMesh(verts, true);
-	Lepus3D::BoxMesh testMesh;
+	Lepus3D::BoxMesh testMesh, testMesh2;
 	//std::vector<unsigned int> indices = { 2, 0, 3, 0, 1, 3 };
 	//testMesh.SetIndices(indices);
 
@@ -27,7 +27,7 @@ int main()
 	Lepus3D::Texture2D firstTx("container.jpg"); // Loads from Solution/Content/
 	testMat.SetAttributeTex("_Texture1", firstTx);
 
-	Lepus3D::Transform transform;
+	Lepus3D::Transform transform, transform2;
 
 	sf::Clock timer;
 
@@ -36,7 +36,20 @@ int main()
 	{
 		float timeSeconds = timer.getElapsedTime().asSeconds();
 		testMat.SetAttributeF("_Time", timeSeconds);
+		engine.Update(); // Update window events etc.
+		engine.StartScene(); // Start drawing (clear buffers etc.)
+
+		transform.SetRotation(Vector3(timeSeconds * 25.f, timeSeconds * 50.f, 0.f));
+		transform.SetScale(sin(timeSeconds));
+		transform.SetPosition(Vector3(-0.5f, 0.f, 0.f));
 		engine.DrawMesh(testMesh, testMat, transform);
+
+		transform2.SetRotation(Vector3(timeSeconds * 25.f, timeSeconds * 50.f, 0.f));
+		transform2.SetScale(sin(timeSeconds));
+		transform2.SetPosition(Vector3(0.5f, 0.f, 0.f));
+		engine.DrawMesh(testMesh2, testMat, transform2);
+
+		engine.EndScene(); // Finish drawing (display in window)
 		running = engine.Update();
 	}
 	engine.Shutdown();

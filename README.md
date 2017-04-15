@@ -30,17 +30,35 @@ An example app using the engine would look like this:
 #include "../../Lepus3D/Source/RenderEngine.h"
 
 using namespace LepusEngine;
+using namespace Lepus3D;
 
 int main()
 {
-	Lepus3D::RenderEngine engine("Example app", 800, 600);
+	Lepus3D::RenderEngine engine("LepusDemo", 800, 600);
+
+	Lepus3D::Material testMat("Test material", "PerVertexUnlit");
+	Lepus3D::BoxMesh testMesh;
+
+	// Be sure to get your own images, these are not provided with the Git repository
+	Lepus3D::Texture2D firstTx("container.jpg"); // Loads from Solution/Content/
+	testMat.SetAttributeTex("_Texture1", firstTx);
+
+	Lepus3D::Transform transform;
+
+	sf::Clock timer;
 
 	bool running = true;
 	while (running)
 	{
-		// TODO:
-		// Draw something, update game logic etc.
-		running = engine.Update(); // update window status
+		float timeSeconds = timer.getElapsedTime().asSeconds();
+		testMat.SetAttributeF("_Time", timeSeconds);
+		transform.SetRotation(Vector3(timeSeconds * 25.f, timeSeconds * 50.f, 0.f));
+		transform.SetScale(sin(timeSeconds));
+		engine.Update(); // Update window events etc.
+		engine.StartScene(); // Start drawing (clear buffers etc.)
+		engine.DrawMesh(testMesh, testMat, transform);
+		engine.EndScene(); // Finish drawing (display in window)
+		running = engine.Update();
 	}
 	engine.Shutdown();
 	return 0;
