@@ -25,9 +25,6 @@ bool RenderEngine::Init(char* name, unsigned short width, unsigned short height)
 bool RenderEngine::Init()
 {
 	m_eCount = 0;
-	m_CurrentMesh = nullptr;
-	m_CurrentMat = nullptr;
-	m_CurrentTrans = nullptr;
 
 	m_LastFrameTime = 0.f;
 
@@ -65,11 +62,8 @@ void RenderEngine::StartScene()
 
 void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform)
 {
-	m_CurrentMesh = &mesh;
-	m_CurrentMat = &material;
-	m_CurrentTrans = &transform;
-	unsigned int* iD = m_CurrentMesh->GetIndexBuffer(m_eCount);
-	VertexPack vP = m_CurrentMesh->GetVertexBuffer();
+	unsigned int* iD = mesh.GetIndexBuffer(m_eCount);
+	VertexPack vP = mesh.GetVertexBuffer();
 	Vertex* vD = vP.data;
 	unsigned int vDS = vP.size() * sizeof(Vertex);
 
@@ -92,7 +86,7 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	auto textureCount = m_CurrentMat->m_TexAttributes.size();
+	auto textureCount = material.m_TexAttributes.size();
 
 	if (textureCount > sizeof(m_TextureSet) / sizeof(GLuint))
 	{
@@ -103,7 +97,7 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	{
 		glBindTexture(GL_TEXTURE_2D, m_TextureSet[i]);
 		{
-			auto currentTex = m_CurrentMat->m_TexAttributes[i].value;
+			auto currentTex = material.m_TexAttributes[i].value;
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, currentTex.GetWidth(), currentTex.GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, currentTex.GetData());
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
@@ -132,31 +126,33 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	}
 	glBindVertexArray(0); // unbind VAO
 
-	m_CurrentMat->Use();
+	material.Use();
 
 	for (auto i = 0; i < textureCount; i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, m_TextureSet[i]);
-		glUniform1i(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, m_CurrentMat->m_TexAttributes[i].name), i);
+		glUniform1i(glGetUniformLocation(material.m_Shader.m_Compiled, material.m_TexAttributes[i].name), i);
 	}
 
 	glBindVertexArray(m_VAO);
 	{
 		glm::mat4 model, view, projection;
-		model = m_CurrentTrans->GetMatrix();
+		model = transform.GetMatrix();
 		view = glm::translate(view, glm::vec3(0.f, 0.f, -2.f));
 		projection = glm::perspective(45.f, (float)m_Window.getSize().x / (float)m_Window.getSize().y, 0.01f, 100.f);
 
-		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-
-		glEnable(GL_DEPTH_TEST);
+		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 		glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
 	}
 	glBindVertexArray(0);
+
+	delete vD;
+	delete iD;
+	delete vArr;
 }
 
 bool RenderEngine::Update()

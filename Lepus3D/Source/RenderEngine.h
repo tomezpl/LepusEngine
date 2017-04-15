@@ -24,9 +24,6 @@ namespace LepusEngine
 					window, 
 					renderer; 
 			} m_Ready;
-			Mesh* m_CurrentMesh;
-			Material* m_CurrentMat;
-			Transform* m_CurrentTrans;
 			GLuint m_TextureSet[16];
 			sf::Clock m_Clock; // will be used for FPS counter and such
 			float m_LastFrameTime;
