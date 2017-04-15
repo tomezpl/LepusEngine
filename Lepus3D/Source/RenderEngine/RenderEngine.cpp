@@ -57,6 +57,12 @@ bool RenderEngine::Init()
 	return true;
 }
 
+void RenderEngine::StartScene()
+{
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform)
 {
 	m_CurrentMesh = &mesh;
@@ -125,6 +131,32 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		glEnableVertexAttribArray(2);
 	}
 	glBindVertexArray(0); // unbind VAO
+
+	m_CurrentMat->Use();
+
+	for (auto i = 0; i < textureCount; i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, m_TextureSet[i]);
+		glUniform1i(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, m_CurrentMat->m_TexAttributes[i].name), i);
+	}
+
+	glBindVertexArray(m_VAO);
+	{
+		glm::mat4 model, view, projection;
+		model = m_CurrentTrans->GetMatrix();
+		view = glm::translate(view, glm::vec3(0.f, 0.f, -2.f));
+		projection = glm::perspective(45.f, (float)m_Window.getSize().x / (float)m_Window.getSize().y, 0.01f, 100.f);
+
+		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+		glEnable(GL_DEPTH_TEST);
+
+		glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
+	}
+	glBindVertexArray(0);
 }
 
 bool RenderEngine::Update()
@@ -152,40 +184,12 @@ bool RenderEngine::Update()
 		}
 	}
 
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	m_CurrentMat->Use();
-	
-	auto textureCount = m_CurrentMat->m_TexAttributes.size();
-
-	for (auto i = 0; i < textureCount; i++)
-	{
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, m_TextureSet[i]);
-		glUniform1i(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, m_CurrentMat->m_TexAttributes[i].name), i);
-	}
-
-	glBindVertexArray(m_VAO);
-	{
-		glm::mat4 model, view, projection;
-		model = m_CurrentTrans->GetMatrix();
-		view = glm::translate(view, glm::vec3(0.f, 0.f, -2.f));
-		projection = glm::perspective(45.f, (float)m_Window.getSize().x / (float)m_Window.getSize().y, 0.01f, 100.f);
-
-		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(m_CurrentMat->m_Shader.m_Compiled, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-
-		glEnable(GL_DEPTH_TEST);
-
-		glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
-	}
-	glBindVertexArray(0);
-
-	m_Window.display();
-
 	return true;
+}
+
+void RenderEngine::EndScene()
+{
+	m_Window.display();
 }
 
 void RenderEngine::Shutdown()

@@ -35,8 +35,10 @@ namespace LepusEngine
 			RenderEngine(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
 			bool Init();
 			bool Init(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
+			void StartScene();
 			void DrawMesh(Mesh& mesh, Material& material, Transform& transform);
-			
+			void EndScene();
+
 			// Runs the window's event loop, returns false if window was closed
 			// Draws the current vertex buffer to the screen
 			bool Update();
