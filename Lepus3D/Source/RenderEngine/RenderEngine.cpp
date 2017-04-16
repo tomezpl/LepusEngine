@@ -26,7 +26,7 @@ bool RenderEngine::Init()
 {
 	m_eCount = 0;
 
-	m_LastFrameTime = 0.f;
+	m_LastFPSUpdateTime = m_LastFrameTime = 0.f;
 
 	m_Clock.restart();
 
@@ -161,11 +161,12 @@ bool RenderEngine::Update()
 	newWndName.append(" - FPS: ");
 	float currentTime = m_Clock.getElapsedTime().asSeconds();
 	newWndName.append(std::to_string((int)(1.f / (currentTime - m_LastFrameTime))));
-	m_LastFrameTime = currentTime;
-	if ((int)(glm::round(currentTime)) % 3 == 0)
+	if (currentTime - m_LastFPSUpdateTime >= 1.f)
 	{
 		m_Window.setTitle(newWndName);
+		m_LastFPSUpdateTime = currentTime;
 	}
+	m_LastFrameTime = currentTime;
 	sf::Event ev;
 	while (m_Window.pollEvent(ev))
 	{

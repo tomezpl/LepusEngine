@@ -26,7 +26,7 @@ namespace LepusEngine
 			} m_Ready;
 			GLuint m_TextureSet[16];
 			sf::Clock m_Clock; // will be used for FPS counter and such
-			float m_LastFrameTime;
+			float m_LastFrameTime, m_LastFPSUpdateTime;
 		public:
 			RenderEngine() { m_Ready = { false, false }; };
 			RenderEngine(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
