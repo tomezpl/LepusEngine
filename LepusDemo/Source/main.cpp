@@ -7,7 +7,7 @@ int main()
 {
 	Lepus3D::RenderEngine engine("LepusDemo", 800, 600);
 
-	VertexArray verts = 
+	/*VertexArray verts = 
 	{
 				// Positions			// Colours		 // Texture 
 														 // coords
@@ -15,11 +15,11 @@ int main()
 		Vertex(0.5f, -0.5f, 0.0f,	1.0f, 1.0f, 1.0f,	1.0f, 0.0f), // Bottom-right corner
 		Vertex(-0.5f, 0.5f, 0.0f,	1.0f, 1.0f, 1.0f,	0.0f, 1.0f), // Top-left corner
 		Vertex(-0.5f, -0.5f, 0.0f,	1.0f, 1.0f, 1.0f,	0.0f, 0.0f)  // Bottom-left corner
-	};
+	};*/
 
 	Lepus3D::Material testMat("Test material", "PerVertexUnlit");
 	//Lepus3D::Mesh testMesh(verts, true);
-	Lepus3D::BoxMesh testMesh, testMesh2;
+	Lepus3D::BoxMesh testMesh, testMesh2, testMesh3, testMesh4;
 	//std::vector<unsigned int> indices = { 2, 0, 3, 0, 1, 3 };
 	//testMesh.SetIndices(indices);
 
@@ -27,7 +27,7 @@ int main()
 	Lepus3D::Texture2D firstTx("container.jpg"); // Loads from Solution/Content/
 	testMat.SetAttributeTex("_Texture1", firstTx);
 
-	Lepus3D::Transform transform, transform2;
+	Lepus3D::Transform transform, transform2, transform3, transform4;
 
 	sf::Clock timer;
 
@@ -48,6 +48,16 @@ int main()
 		transform2.SetScale(sin(timeSeconds));
 		transform2.SetPosition(Vector3(0.5f, 0.f, 0.f));
 		engine.DrawMesh(testMesh2, testMat, transform2);
+
+		transform3.SetRotation(Vector3(timeSeconds * 25.f, timeSeconds * 50.f, 0.f));
+		transform3.SetScale(sin(timeSeconds));
+		transform3.SetPosition(Vector3(0.f, -0.5f, 0.f));
+		engine.DrawMesh(testMesh3, testMat, transform3);
+
+		transform4.SetRotation(Vector3(timeSeconds * 25.f, timeSeconds * 50.f, 0.f));
+		transform4.SetScale(sin(timeSeconds));
+		transform4.SetPosition(Vector3(0.f, 0.5f, 0.f));
+		engine.DrawMesh(testMesh4, testMat, transform4);
 
 		engine.EndScene(); // Finish drawing (display in window)
 		running = engine.Update();
