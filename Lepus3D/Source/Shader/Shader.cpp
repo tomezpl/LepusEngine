@@ -1,6 +1,6 @@
 #include "../Shader.h"
 #include <iostream>
-#include <GL\glew.h>
+#include <GL/glew.h>
 
 using namespace LepusEngine::Lepus3D;
 

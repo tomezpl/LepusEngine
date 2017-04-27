@@ -2,7 +2,7 @@
 
 #include <fstream>
 #include <string>
-#include <GL\glew.h>
+#include <GL/glew.h>
 
 namespace LepusEngine
 {
@@ -14,7 +14,7 @@ namespace LepusEngine
 			friend class Shader;
 		protected:
 			std::string m_ProgramStr, m_ProgramName;
-			virtual bool _LoadShader() = 0;
+			virtual bool _LoadShader() {return false;};
 			bool _LoadFile(char* fileName);
 			GLuint m_Program;
 		public:

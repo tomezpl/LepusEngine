@@ -6,18 +6,28 @@ LepusEngine is a game engine developed in C++ and modern OpenGL (versions >= 3.3
 The renderer uses a programmable pipeline and as a result comes with a bundled set of GLSL shaders.
 
 ### Building
+#### Windows
 The project comes with a MS VC++ solution set up and it should be ready to build. You will however need to set the following environment variables:
 * SFML_DIR
 	* Points to the root directory of a 64-bit SFML package for MSVC++ (folder name usually *SFML-x.x.x-windows-vc1x-64-bit*).
 	* For example, *$(SFML_DIR)/lib/* should point to the *lib* folder in your 64-bit SFML directory
 * SFML_DIR32
-	* Points to the root directory of a 32-bit SFML package for MSVC++ (folder name usually '''SFML-x.x.x-windows-vc1x-32-bit*).
+	* Points to the root directory of a 32-bit SFML package for MSVC++ (folder name usually *SFML-x.x.x-windows-vc1x-32-bit*).
 	* For example, *$(SFML_DIR32)/lib/* should point to the *lib* folder in your 32-bit SFML directory
 * GLEW_DIR
 	* Points to the root directory of a GLEW package for Win32 (folder name usually *glew-x.x.x-win32*).
 	* For example, *$(GLEW_DIR)/lib/* should point to the *lib* folder in your GLEW directory
 
-As for GNU/Linux builds, a Makefile will be put together at some point.
+#### GNU/Linux
+You'll need to install G++, GNU make, as well as dependencies: *libgl1-mesa-dev*, *libsfml-dev* and *libglew-dev*.
+
+On Ubuntu, you can run:
+
+```bash
+sudo apt-get install g++ make libgl1-mesa-dev libsfml-dev libglew-dev
+```
+
+A Makefile is provided in the root folder. Run ```make all``` to build the full engine along with the demo app.
 
 ### Usage
 The __RenderEngine__ class (from the _LepusEngine_::_Lepus3D_ namespace) is responsible for drawing pretty much anything to your screen.
