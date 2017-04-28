@@ -27,36 +27,36 @@ int main()
 	Lepus3D::Texture2D firstTx("container.jpg"); // Loads from Solution/Content/
 	testMat.SetAttributeTex("_Texture1", firstTx);
 
-	Lepus3D::Transform transform, transform2, transform3, transform4;
+	Lepus3D::Transform transform, transform2, transform3, transform4, camTransform;
+	Lepus3D::Camera camera(camTransform);
 
 	sf::Clock timer;
 
 	bool running = true;
 	while (running)
 	{
+		// Radius of the circle for the camera to rotate around
+		const float circleRadius = 3.f;
+
 		float timeSeconds = timer.getElapsedTime().asSeconds();
 		testMat.SetAttributeF("_Time", timeSeconds);
 		engine.Update(); // Update window events etc.
-		engine.StartScene(); // Start drawing (clear buffers etc.)
 
-		transform.SetRotation(Vector3(timeSeconds * 25.f, timeSeconds * 50.f, 0.f));
-		transform.SetScale(sin(timeSeconds));
-		transform.SetPosition(Vector3(-0.5f, 0.f, 0.f));
+		camTransform.SetPosition(Vector3(sin(timeSeconds) * circleRadius, 0.f, cos(timeSeconds) * circleRadius));
+		camera.SetTransform(camTransform);
+
+		engine.StartScene(&camera); // Start drawing (clear buffers etc.)
+
+		transform.SetPosition(Vector3(-1.f, 0.f, 0.f));
 		engine.DrawMesh(testMesh, testMat, transform);
 
-		transform2.SetRotation(Vector3(timeSeconds * 25.f, timeSeconds * 50.f, 0.f));
-		transform2.SetScale(sin(timeSeconds));
-		transform2.SetPosition(Vector3(0.5f, 0.f, 0.f));
+		transform2.SetPosition(Vector3(1.f, 0.f, 0.f));
 		engine.DrawMesh(testMesh2, testMat, transform2);
 
-		transform3.SetRotation(Vector3(timeSeconds * 25.f, timeSeconds * 50.f, 0.f));
-		transform3.SetScale(sin(timeSeconds));
-		transform3.SetPosition(Vector3(0.f, -0.5f, 0.f));
+		transform3.SetPosition(Vector3(0.f, -1.f, 0.f));
 		engine.DrawMesh(testMesh3, testMat, transform3);
 
-		transform4.SetRotation(Vector3(timeSeconds * 25.f, timeSeconds * 50.f, 0.f));
-		transform4.SetScale(sin(timeSeconds));
-		transform4.SetPosition(Vector3(0.f, 0.5f, 0.f));
+		transform4.SetPosition(Vector3(0.f, 1.f, 0.f));
 		engine.DrawMesh(testMesh4, testMat, transform4);
 
 		engine.EndScene(); // Finish drawing (display in window)

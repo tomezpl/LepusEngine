@@ -12,6 +12,7 @@ RenderEngine::RenderEngine(char* name, unsigned short width, unsigned short heig
 
 bool RenderEngine::Init(char* name, unsigned short width, unsigned short height)
 {
+	m_Cam = nullptr;
 	m_Ready = { false, false };
 	m_WindowName = name;
 	sf::ContextSettings settings;
@@ -54,8 +55,9 @@ bool RenderEngine::Init()
 	return true;
 }
 
-void RenderEngine::StartScene()
+void RenderEngine::StartScene(Camera* cam)
 {
+	m_Cam = cam;
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -139,7 +141,8 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	{
 		glm::mat4 model, view, projection;
 		model = transform.GetMatrix();
-		view = glm::translate(view, glm::vec3(0.f, 0.f, -2.f));
+		//view = glm::translate(view, glm::vec3(0.f, 0.f, -2.f));
+		view = m_Cam->GetView();
 		projection = glm::perspective(45.f, (float)m_Window.getSize().x / (float)m_Window.getSize().y, 0.01f, 100.f);
 
 		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "model"), 1, GL_FALSE, glm::value_ptr(model));

@@ -8,6 +8,7 @@
 #include "Vertex.h"
 #include "Mesh.h"
 #include "Transform.h"
+#include "Camera.h"
 
 namespace LepusEngine
 {
@@ -27,12 +28,13 @@ namespace LepusEngine
 			GLuint m_TextureSet[16];
 			sf::Clock m_Clock; // will be used for FPS counter and such
 			float m_LastFrameTime, m_LastFPSUpdateTime;
+			Camera* m_Cam;
 		public:
 			RenderEngine() { m_Ready = { false, false }; };
 			RenderEngine(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
 			bool Init();
 			bool Init(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
-			void StartScene();
+			void StartScene(Camera* camera);
 			void DrawMesh(Mesh& mesh, Material& material, Transform& transform);
 			void EndScene();
 
