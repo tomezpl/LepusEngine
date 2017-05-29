@@ -25,6 +25,8 @@ namespace LepusEngine
 		void SetRotation(Vector3 rotation);
 		void SetScale(Vector3 scale);
 		void SetScale(float scale);
+		void Move(Vector3 translation);
+		void Rotate(Vector3 rotation);
 		Vector3 GetPosition();
 		Vector3 GetRotation();
 		Vector3 GetScale();

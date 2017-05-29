@@ -49,6 +49,21 @@ void Transform::SetScale(float s)
 	SetScale(Vector3(s, s, s));
 }
 
+void Transform::Move(Vector3 translation)
+{
+	m_Pos.x += translation.x;
+	m_Pos.y += translation.y;
+	m_Pos.z += translation.z;
+}
+
+void Transform::Rotate(Vector3 rotation)
+{
+	rotation.x += m_Rot.x;
+	rotation.y += m_Rot.y;
+	rotation.z += m_Rot.z;
+	SetRotation(rotation);
+}
+
 Vector3 Transform::GetPosition()
 {
 	return Vector3(m_Pos.x, m_Pos.y, m_Pos.z);
