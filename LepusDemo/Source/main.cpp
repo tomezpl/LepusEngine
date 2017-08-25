@@ -1,4 +1,5 @@
 #include "../../Lepus3D/Source/RenderEngine.h"
+#include "../../Lepus3D/Source/Camera/FPPCamera.h"
 
 using namespace LepusEngine;
 using namespace Lepus3D;
@@ -28,22 +29,30 @@ int main()
 	testMat.SetAttributeTex("_Texture1", firstTx);
 
 	Lepus3D::Transform transform, transform2, transform3, transform4, camTransform;
-	Lepus3D::Camera camera(camTransform);
+	Lepus3D::FPPCamera camera(camTransform);
+	camera.SetWindow(engine.GetWindowPtr());
+
+	camTransform.SetPosition(Vector3(0.f, 0.f, -2.0f));
+	camera.SetTransform(camTransform);
 
 	sf::Clock timer;
 
 	bool running = true;
+	float deltaTime = 0.0f;
+	sf::Clock deltaTimer;
+
 	while (running)
 	{
 		// Radius of the circle for the camera to rotate around
 		const float circleRadius = 3.f;
 
 		float timeSeconds = timer.getElapsedTime().asSeconds();
+		deltaTime = deltaTimer.restart().asSeconds();
+
 		testMat.SetAttributeF("_Time", timeSeconds);
 		engine.Update(); // Update window events etc.
 
-		camTransform.SetPosition(Vector3(sin(timeSeconds) * circleRadius, 0.f, cos(timeSeconds) * circleRadius));
-		camera.SetTransform(camTransform);
+		camera.ProcessInput(deltaTime);
 
 		engine.StartScene(&camera); // Start drawing (clear buffers etc.)
 
