@@ -1,7 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
-#include <SFML/Window.hpp>
+#include "Window.h"
 #include <SFML/OpenGL.hpp>
 
 #include "Material.h"
@@ -17,7 +17,7 @@ namespace LepusEngine
 		class RenderEngine
 		{
 		private:
-			sf::Window m_Window;
+			Window m_Window;
 			char* m_WindowName;
 			GLuint m_VBO, m_IBO, m_VAO, m_eCount;
 			struct { 
@@ -36,6 +36,7 @@ namespace LepusEngine
 			bool Init(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
 			void StartScene(Camera* camera);
 			void DrawMesh(Mesh& mesh, Material& material, Transform& transform);
+			Window* GetWindowPtr() { return &m_Window; };
 			void EndScene();
 
 			// Runs the window's event loop, returns false if window was closed
