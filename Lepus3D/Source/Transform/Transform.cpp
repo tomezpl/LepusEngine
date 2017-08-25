@@ -35,10 +35,12 @@ void Transform::SetRotation(Vector3 r)
 		maxAngle = r.y;
 	else if (r.z >= r.x && r.z >= r.y)
 		maxAngle = r.z;
-	m_Rot = { r.x / maxAngle, r.y / maxAngle, r.z / maxAngle };
-	m_RotAngle = maxAngle;
+	if (maxAngle != 0.f)
+	{
+		m_Rot = { r.x / maxAngle, r.y / maxAngle, r.z / maxAngle };
+		m_RotAngle = maxAngle;
+	}
 }
-
 void Transform::SetScale(Vector3 s)
 {
 	m_Scale = s.vec3();
