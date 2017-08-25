@@ -38,8 +38,17 @@ glm::mat4 Camera::GetView()
 {
 	this->_CalcVectors();
 	auto camPos = m_Transform.GetPosition().vec3();
-	auto target = m_Target.vec3();
+	//auto target = m_Target.vec3();
+	auto rotation = m_Transform.GetRotation().vec3();
+	Vector3 target(
+		cos(glm::radians(rotation.x)) * cos(glm::radians(rotation.y)),
+		sin(glm::radians(rotation.x)), 
+		cos(glm::radians(rotation.x)) * sin(glm::radians(rotation.y)));
+	auto normTarget = glm::normalize(target.vec3());
+	m_Target.x = normTarget.x;
+	m_Target.y = normTarget.y;
+	m_Target.z = normTarget.z;
 	auto up = m_Up.vec3();
-	glm::mat4 ret = glm::lookAt(camPos, target, up);
+	glm::mat4 ret = glm::lookAt(camPos, camPos + normTarget, up);
 	return ret;
 }

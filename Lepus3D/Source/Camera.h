@@ -8,7 +8,7 @@ namespace LepusEngine
 	{
 		class Camera
 		{
-		private:
+		protected:
 			Transform m_Transform;
 			Vector3 m_Target, m_Right, m_Up;
 			void _CalcVectors();
