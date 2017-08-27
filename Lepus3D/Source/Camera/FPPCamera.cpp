@@ -60,17 +60,22 @@ void FPPCamera::ProcessInput(float deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		rotation.y -= 0.25f;
+		if (rotation.y <= 0.0f)
+			rotation.y += 360.0f; // quick fix for issue #2 (negative rotation not supported)
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		rotation.y += 0.25f;
 	}
-	if (rotation.x > 89.0f)
-		rotation.x = 89.0f;
-	if (rotation.x < -89.0f)
-		rotation.x = -89.0f;
+	// quick fix for issue #2 (no negative rotation)
+	if (rotation.x <= 0.0f)
+		rotation.x = 360.0f;
+	if (rotation.x > 449.9f)
+		rotation.x = 449.9f;
+	if (rotation.x < 360.0f - 89.9f)
+		rotation.x = 360.0f - 89.9f; // I was lazy to do the maths lol
 	m_Transform.SetRotation(rotation);
 	//m_Target = m_Transform.GetPosition();
 	//m_Target.z += 1.0f;
-	Logger::LogInfo("FPPCamera", "ProcessInput", (char*)(std::to_string(m_Transform.GetRotation().x).c_str()));
+	Logger::LogInfo("FPPCamera", "ProcessInput", (char*)(m_Transform.ToString().c_str()));
 }
