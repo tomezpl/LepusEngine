@@ -68,15 +68,32 @@ void Transform::Rotate(Vector3 rotation)
 
 Vector3 Transform::GetPosition()
 {
-	return Vector3(m_Pos.x, m_Pos.y, m_Pos.z);
+	auto ret = Vector3::Create(m_Pos.x, m_Pos.y, m_Pos.z);
+	return ret;
 }
 
 Vector3 Transform::GetRotation()
 {
-	return Vector3(m_Rot.x * m_RotAngle, m_Rot.y * m_RotAngle, m_Rot.z * m_RotAngle);
+	return Vector3::Create(m_Rot.x * m_RotAngle, m_Rot.y * m_RotAngle, m_Rot.z * m_RotAngle);
 }
 
 Vector3 Transform::GetScale()
 {
 	return Vector3(m_Scale.x, m_Scale.y, m_Scale.z);
+}
+
+std::string Transform::ToString()
+{
+	Vector3 p = this->GetPosition();
+	Vector3 r = this->GetRotation();
+	Vector3 s = this->GetScale();
+
+	std::string ret = "P ";
+	ret += p.ToString();
+	ret += ", R ";
+	ret += r.ToString();
+	ret += ", S ";
+	ret += s.ToString();
+	
+	return ret;
 }

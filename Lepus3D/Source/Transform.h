@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Transform/Vector.h"
+#include <string>
 
 namespace LepusEngine
 {
@@ -30,6 +31,7 @@ namespace LepusEngine
 		Vector3 GetPosition();
 		Vector3 GetRotation();
 		Vector3 GetScale();
+		std::string ToString();
 	};
 	}
 }

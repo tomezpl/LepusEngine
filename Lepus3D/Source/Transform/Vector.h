@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <string>
 
 namespace LepusEngine
 {
@@ -16,6 +17,13 @@ namespace LepusEngine
 			static Vector2 Create(float X = 0.f, float Y = 0.f) { Vector2 ret(X, Y); return ret; }
 			void Set(float X = 0.f, float Y = 0.f) { x = X; y = Y; };
 			static Vector2 Zero() { return Vector2(); };
+			std::string ToString() { std::string ret = "("; 
+				ret += std::to_string(x);
+				ret += ", ";
+				ret += std::to_string(y);
+				ret += ")";
+				return ret;
+			};
 		};
 		
 		class Vector3 : public Vector2 {
@@ -28,6 +36,18 @@ namespace LepusEngine
 			static Vector3 Create(float X = 0.f, float Y = 0.f, float Z = 0.f) { Vector3 ret(X, Y, Z); return ret; }
 			void Set(float X = 0.f, float Y = 0.f, float Z = 0.f) { x = X; y = Y; z = Z; };
 			static Vector3 Zero() { return Vector3(); };
+			std::string ToString() {
+				std::string ret = "(";
+				// Convert floats to strings and reduce number of zeroes
+				auto trimmed = [](float num) { auto ret = std::to_string(num); ret = ret.substr(0, ret.length() - 4); return ret; };
+				ret += trimmed(x);
+				ret += ", ";
+				ret += trimmed(y);
+				ret += ", ";
+				ret += trimmed(z);
+				ret += ")";
+				return ret;
+			};
 		};
 
 		class Vector4 : public Vector3 {
@@ -40,6 +60,18 @@ namespace LepusEngine
 			static Vector4 Create(float X = 0.f, float Y = 0.f, float Z = 0.f, float W = 0.f) { Vector4 ret(X, Y, Z, W); return ret; }
 			void Set(float X = 0.f, float Y = 0.f, float Z = 0.f, float W = 0.f) { x = X; y = Y; z = Z; w = W; };
 			static Vector4 Zero() { return Vector4(); };
+			std::string ToString() {
+				std::string ret = "(";
+				ret += std::to_string(x);
+				ret += ", ";
+				ret += std::to_string(y);
+				ret += ", ";
+				ret += std::to_string(z);
+				ret += ", ";
+				ret += std::to_string(w);
+				ret += ")";
+				return ret;
+			};
 		};
 	}
 }
