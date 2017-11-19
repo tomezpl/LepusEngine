@@ -11,12 +11,14 @@ namespace LepusEngine
 		private:
 			VertexArray m_Vertices;
 			std::vector<unsigned int> m_Indices;
+			bool m_Indexed;
 		public:
 			Mesh();
 			Mesh(VertexArray vertices, bool ignoreIndexing = false);
 			VertexPack GetVertexBuffer();
 			unsigned int* GetIndexBuffer(unsigned int& indexCount);
 			void SetIndices(std::vector<unsigned int> indices);
+			bool IsIndexed();
 		};
 
 		class PlaneMesh : public Mesh {
@@ -73,6 +75,63 @@ namespace LepusEngine
 					16,17,18,17,19,18,
 					20,21,22,21,23,22
 				});
+			};
+		};
+
+		class BoxMeshUnindexed : public Mesh {
+		public:
+			BoxMeshUnindexed() : Mesh(VertexArray{
+				// Front
+				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
+				Vertex(0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f), // Bottom-right
+				// Right
+				Vertex(0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f), // Bottom-right
+				// Bottom
+				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
+				Vertex(0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f), // Bottom-right
+				// Back
+				Vertex(-0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f), // Bottom-right
+				// Top
+				Vertex(-0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f), // Bottom-right
+				// Left
+				Vertex(-0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
+				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
+				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f) // Bottom-right
+			}, true) {
+				/*this->SetIndices(IndexArray{
+					0,1,2,1,3,2,
+					4,5,6,5,7,6,
+					8,9,10,9,11,10,
+					12,13,14,13,15,14,
+					16,17,18,17,19,18,
+					20,21,22,21,23,22
+				});*/
 			};
 		};
 	}

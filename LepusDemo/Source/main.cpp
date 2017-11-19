@@ -20,7 +20,8 @@ int main()
 
 	Lepus3D::Material testMat("Test material", "PerVertexUnlit");
 	//Lepus3D::Mesh testMesh(verts, true);
-	Lepus3D::BoxMesh testMesh, testMesh2, testMesh3, testMesh4;
+	//Lepus3D::BoxMesh testMesh, testMesh2, testMesh3, testMesh4;
+	Lepus3D::BoxMeshUnindexed testMesh, testMesh2, testMesh3, testMesh4;
 	//std::vector<unsigned int> indices = { 2, 0, 3, 0, 1, 3 };
 	//testMesh.SetIndices(indices);
 

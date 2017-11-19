@@ -64,7 +64,11 @@ void RenderEngine::StartScene(Camera* cam)
 
 void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform)
 {
-	unsigned int* iD = mesh.GetIndexBuffer(m_eCount);
+	bool useIndexing = mesh.IsIndexed();
+
+	unsigned int* iD = nullptr;
+	if(useIndexing)
+		iD = mesh.GetIndexBuffer(m_eCount);
 	VertexPack vP = mesh.GetVertexBuffer();
 	Vertex* vD = vP.data;
 	unsigned int vDS = vP.size() * sizeof(Vertex);
@@ -111,8 +115,11 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 		glBufferData(GL_ARRAY_BUFFER, vDS, vArr, GL_STATIC_DRAW); // pass vertices to GPU
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_eCount * sizeof(GLuint), iD, GL_STATIC_DRAW); // pass elements/indices to GPU
+		if (useIndexing)
+		{
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_eCount * sizeof(GLuint), iD, GL_STATIC_DRAW); // pass elements/indices to GPU
+		}
 
 		// Set vertex positions
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
@@ -149,10 +156,14 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-		glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
+		if (useIndexing)
+			glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
+		else
+			glDrawArrays(GL_TRIANGLES, 0, vP.size());
 	}
 	glBindVertexArray(0);
 
+	// Release resources
 	delete vD;
 	delete iD;
 	delete vArr;

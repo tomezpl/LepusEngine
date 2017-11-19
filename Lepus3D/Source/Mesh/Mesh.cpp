@@ -4,7 +4,7 @@ using namespace LepusEngine::Lepus3D;
 
 Mesh::Mesh()
 {
-
+	m_Indexed = false;
 }
 
 Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
@@ -29,6 +29,7 @@ Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
 		}
 		repeated = false;
 	}
+	m_Indexed = !ignoreIndexing;
 }
 
 VertexPack Mesh::GetVertexBuffer()
@@ -52,4 +53,10 @@ unsigned int* Mesh::GetIndexBuffer(unsigned int& indexCount)
 void Mesh::SetIndices(std::vector<unsigned int> indices)
 {
 	m_Indices = indices;
+	m_Indexed = true;
+}
+
+bool Mesh::IsIndexed()
+{
+	return m_Indexed;
 }
