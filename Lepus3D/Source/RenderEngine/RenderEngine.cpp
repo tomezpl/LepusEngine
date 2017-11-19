@@ -198,6 +198,15 @@ bool RenderEngine::Update()
 	return true;
 }
 
+void RenderEngine::DrawScene(Scene& sc)
+{
+	int length = sc.GetSize();
+	for (int i = 0; i < length; i++)
+	{
+		DrawMesh(sc.m_MeshArr[i], *(sc.m_MeshArr[i].m_Mat), sc.m_TransfArr[i]);
+	}
+}
+
 void RenderEngine::EndScene()
 {
 	m_Window.display();

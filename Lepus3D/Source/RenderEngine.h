@@ -9,6 +9,7 @@
 #include "Mesh.h"
 #include "Transform.h"
 #include "Camera.h"
+#include "Scene.h"
 
 namespace LepusEngine
 {
@@ -36,6 +37,7 @@ namespace LepusEngine
 			bool Init(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
 			void StartScene(Camera* camera);
 			void DrawMesh(Mesh& mesh, Material& material, Transform& transform);
+			void DrawScene(Scene& scene);
 			Window* GetWindowPtr() { return &m_Window; };
 			void EndScene();
 

@@ -24,6 +24,7 @@
     <ClCompile Include="Source\Material\Material.cpp" />
     <ClCompile Include="Source\Mesh\Mesh.cpp" />
     <ClCompile Include="Source\RenderEngine\RenderEngine.cpp" />
+    <ClCompile Include="Source\Scene\Scene.cpp" />
     <ClCompile Include="Source\Shader\Shader.cpp" />
     <ClCompile Include="Source\Shader\SLProgram.cpp" />
     <ClCompile Include="Source\Texture\Texture2D.cpp" />
@@ -36,6 +37,7 @@
     <ClInclude Include="Source\Material\MaterialAttrib.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\RenderEngine.h" />
+    <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\Shader\SLProgram.h" />
     <ClInclude Include="Source\Texture.h" />
