@@ -5,6 +5,7 @@ using namespace LepusEngine::Lepus3D;
 Mesh::Mesh()
 {
 	m_Indexed = false;
+	m_Mat = new Material("Default", "PerVertexUnlit");
 }
 
 Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
