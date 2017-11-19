@@ -9,9 +9,9 @@ namespace LepusEngine::Lepus3D {
 	class FPPCamera : public Camera {
 	protected:
 		Window* m_Wnd;
-		unsigned short m_LastX, m_LastY;
+		float m_LastX, m_LastY;
 	public:
-		FPPCamera() : Camera() { m_LastX = m_LastY = 0; };
+		FPPCamera() : Camera() { m_LastX = m_LastY = 0.5f; };
 		FPPCamera(Transform transform) : Camera(transform) { };
 		FPPCamera(Window* window);
 		// Process input

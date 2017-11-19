@@ -11,8 +11,10 @@ FPPCamera::FPPCamera(Window* wnd)
 void FPPCamera::SetWindow(Window* wnd)
 {
 	m_Wnd = wnd;
-	m_LastX = m_Wnd->getSize().x / 2;
-	m_LastY = m_Wnd->getSize().y / 2;
+	m_LastX = 0.5f;
+	m_LastY = 0.5f;
+	m_Wnd->setMouseCursorGrabbed(true);
+	m_Wnd->setMouseCursorVisible(false);
 }
 
 glm::mat4 FPPCamera::Run()
@@ -22,6 +24,7 @@ glm::mat4 FPPCamera::Run()
 
 void FPPCamera::ProcessInput(float deltaTime)
 {
+	const float lookSensitivity = 250.f;
 	auto position = m_Transform.GetPosition().vec3();
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
@@ -49,6 +52,7 @@ void FPPCamera::ProcessInput(float deltaTime)
 	}
 	m_Transform.SetPosition(Vector3(position.x, position.y, position.z));
 	Vector3 rotation = m_Transform.GetRotation();
+	/* LEGACY CODE FOR KEYBOARD ROTATION
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 		rotation.x += 0.25f;
@@ -67,6 +71,22 @@ void FPPCamera::ProcessInput(float deltaTime)
 	{
 		rotation.y += 0.25f;
 	}
+	*/
+	auto mouseInput = sf::Mouse::getPosition(*m_Wnd);
+	Vector2 mouseInputF(mouseInput.x, mouseInput.y);
+	auto wndSize = m_Wnd->getSize();
+	bool mouseGood = false;
+	if (mouseInput.x >= 0 && mouseInput.x <= wndSize.x && mouseInput.y >= 0 && mouseInput.y <= wndSize.y)
+	{
+		mouseGood = true;
+		mouseInputF.x /= wndSize.x;
+		mouseInputF.y /= wndSize.y;
+		Vector2 mouseRot(mouseInputF.x - m_LastX, mouseInputF.y - m_LastY);
+		rotation.y += mouseRot.x * lookSensitivity;
+		if (rotation.y <= 0.0f)
+			rotation.y += 360.0f; // quick fix for issue #2 (negative rotation not supported)
+		rotation.x -= mouseRot.y * lookSensitivity;
+	}
 	// quick fix for issue #2 (no negative rotation)
 	if (rotation.x <= 0.0f)
 		rotation.x = 360.0f;
@@ -78,4 +98,9 @@ void FPPCamera::ProcessInput(float deltaTime)
 	//m_Target = m_Transform.GetPosition();
 	//m_Target.z += 1.0f;
 	Logger::LogInfo("FPPCamera", "ProcessInput", (char*)(m_Transform.ToString().c_str()));
+	if (mouseGood)
+	{
+		m_LastX = mouseInputF.x;
+		m_LastY = mouseInputF.y;
+	}
 }
