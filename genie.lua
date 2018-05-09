@@ -17,6 +17,8 @@ project "LepusEngine"
 
 	if string.startswith(_ACTION, "vs") then
 		buildoptions { "/std:c++latest"}
+	elseif string.startswith(_ACTION, "gmake") then
+		buildoptions { "-std=c++17" }
 	end
 
 	files {
@@ -46,6 +48,8 @@ project "Lepus3D"
 
 	if string.startswith(_ACTION, "vs") then
 		buildoptions { "/std:c++latest"}
+	elseif string.startswith(_ACTION, "gmake") then
+		buildoptions { "-std=c++17" }
 	end
 
 	files {
@@ -56,9 +60,18 @@ project "Lepus3D"
 	includedirs {
 		PROJ_DIR,
 		path.join(PROJ_DIR, "include"),
-		path.join(os.getenv("SFML_DIR"), "include"),
-		path.join(os.getenv("GLEW_DIR"), "include"),
 	}
+
+	configuration "windows"
+		includedirs {
+			path.join(os.getenv("SFML_DIR"), "include"),
+			path.join(os.getenv("GLEW_DIR"), "include"),
+		}
+
+	configuration "linux" 
+		includedirs {
+			os.outputof("pkg-config --cflags glew | sed s/-I//"),
+		}
 
 	configuration { "Debug", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Debug32/Lepus3D/"))
@@ -83,6 +96,8 @@ project "LepusDemo"
 
 	if string.startswith(_ACTION, "vs") then
 		buildoptions { "/std:c++latest"}
+	elseif string.startswith(_ACTION, "gmake") then
+		buildoptions { "-std=c++17" }
 	end
 
 	files {
@@ -98,6 +113,9 @@ project "LepusDemo"
 	}
 
 	links { "Lepus3D", "LepusEngine" }
+
+	configuration "linux"
+		buildoptions { os.outputof("pkg-config --libs sfml-all"), os.outputof("pkg-config --cflags glew"), os.outputof("pkg-config --libs glew") }
 
 	configuration { "windows", "x32" }
 		libdirs {
