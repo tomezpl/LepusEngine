@@ -16,7 +16,7 @@ project "LepusEngine"
 	kind "StaticLib"
 
 	if string.startswith(_ACTION, "vs") then
-		buildoptions { "/std:c++17"}
+		buildoptions { "/std:c++latest"}
 	end
 
 	files {
@@ -45,7 +45,7 @@ project "Lepus3D"
 	kind "StaticLib"
 
 	if string.startswith(_ACTION, "vs") then
-		buildoptions { "/std:c++17"}
+		buildoptions { "/std:c++latest"}
 	end
 
 	files {
@@ -82,7 +82,7 @@ project "LepusDemo"
 	kind "ConsoleApp"
 
 	if string.startswith(_ACTION, "vs") then
-		buildoptions { "/std:c++17"}
+		buildoptions { "/std:c++latest"}
 	end
 
 	files {
