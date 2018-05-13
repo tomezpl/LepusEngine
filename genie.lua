@@ -9,6 +9,7 @@ solution "LepusAll"
 		"Native",
 	}
 	language "C++"
+	startproject "LepusDemo"
 
 PROJ_DIR = path.getabsolute(".")
 
