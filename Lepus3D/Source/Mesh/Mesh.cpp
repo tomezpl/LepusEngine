@@ -57,6 +57,11 @@ void Mesh::SetIndices(std::vector<unsigned int> indices)
 	m_Indexed = true;
 }
 
+void Mesh::SetMaterial(Material& mat)
+{
+	m_Mat = &mat;
+}
+
 bool Mesh::IsIndexed()
 {
 	return m_Indexed;

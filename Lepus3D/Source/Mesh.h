@@ -21,6 +21,7 @@ namespace LepusEngine
 			VertexPack GetVertexBuffer();
 			unsigned int* GetIndexBuffer(unsigned int& indexCount);
 			void SetIndices(std::vector<unsigned int> indices);
+			void SetMaterial(Material& mat);
 			bool IsIndexed();
 		};
 
