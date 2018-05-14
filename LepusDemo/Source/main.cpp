@@ -19,6 +19,10 @@ int main()
 	float dTime;
 
 	Lepus3D::BoxMeshUnindexed mesh;
+	Lepus3D::Material mat("Material", "PerVertexUnlit");
+	Lepus3D::Texture2D tex("wood.jpg");
+	mat.SetAttributeTex("_Texture1", tex);
+	mesh.SetMaterial(mat);
 
 	scene.AddMesh(mesh);
 
@@ -32,7 +36,7 @@ int main()
 		engine.EndScene();
 		isRunning = engine.Update();
 	}
-	
+
 	engine.Shutdown();
 
 	return 0;
