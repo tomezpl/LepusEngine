@@ -68,10 +68,8 @@ project "Lepus3D"
 			path.join(os.getenv("GLEW_DIR"), "include"),
 		}
 
-	configuration "linux" 
-		includedirs {
-			os.outputof("pkg-config --cflags glew | sed s/-I//"),
-		}
+	configuration "linux"
+		links { "sfml-window", "sfml-system", "sfml-graphics", "sfml-audio", "sfml-network", "GLEW", "GLU", "GL" }
 
 	configuration { "Debug", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Debug32/Lepus3D/"))
@@ -115,7 +113,7 @@ project "LepusDemo"
 	links { "Lepus3D", "LepusEngine" }
 
 	configuration "linux"
-		buildoptions { os.outputof("pkg-config --libs sfml-all"), os.outputof("pkg-config --cflags glew"), os.outputof("pkg-config --libs glew") }
+		links { "sfml-window", "sfml-system", "sfml-graphics", "sfml-audio", "sfml-network", "GLEW", "GLU", "GL" }
 
 	configuration { "windows", "x32" }
 		libdirs {
