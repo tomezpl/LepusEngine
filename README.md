@@ -6,8 +6,32 @@ LepusEngine is a game engine developed in C++ and modern OpenGL (versions >= 3.3
 The renderer uses a programmable pipeline and as a result comes with a bundled set of GLSL shaders.
 
 ### Building
+The engine now uses Branimir Karadžić's [GENie project generator tool](https://github.com/bkaradzic/GENie).
+
+For the most part, using GENie is limited to running this command
+
+```
+genie <build-system>
+```
+
+_For example_, if you want to build with __Visual Studio 2017__, you run
+
+```
+genie vs2017
+```
+
+or, if you want to build with GNU Make using a Makefile, you run
+
+```
+genie gmake
+```
+
+Check out the GENie scripting reference if you need, it's quite compact and shouldn't take you longer than a few minutes to understand.
+
 #### Windows
-The project comes with a MS VC++ solution set up and it should be ready to build. You will however need to set the following environment variables:
+The GENie script on Windows is optimised specifically for building with Visual Studio. VS2013, 2015 and 2017 should work, and so should any newer releases.
+
+You will need to download the third-party libraries used (SFML and GLEW). In addition, you'll need to set up the following environment variables in your system settings:
 * SFML_DIR
 	* Points to the root directory of a 64-bit SFML package for MSVC++ (folder name usually *SFML-x.x.x-windows-vc1x-64-bit*).
 	* For example, *$(SFML_DIR)/lib/* should point to the *lib* folder in your 64-bit SFML directory
@@ -19,7 +43,7 @@ The project comes with a MS VC++ solution set up and it should be ready to build
 	* For example, *$(GLEW_DIR)/lib/* should point to the *lib* folder in your GLEW directory
 
 #### GNU/Linux
-You'll need to install G++, GNU make, as well as dependencies: *libgl1-mesa-dev*, *libsfml-dev* and *libglew-dev*.
+You'll need to install G++, pkg-config, g++-multilib, GNU make, as well as dependencies: *libgl1-mesa-dev*, *libsfml-dev* and *libglew-dev*. 
 
 On Ubuntu, you can run:
 
@@ -27,7 +51,7 @@ On Ubuntu, you can run:
 sudo apt-get install g++ make libgl1-mesa-dev libsfml-dev libglew-dev
 ```
 
-A Makefile is provided in the root folder. Run ```make all``` to build the full engine along with the demo app.
+The GENie script on Linux was written with GNU Make in mind, but it is not tested or maintained as regularly as the Windows build tools, so please report any issues and try fixing them where possible. Run ```make LepusDemo``` to build the full engine along with the demo app. You can also append build type and platform to that command, like ```make LepusDemo config='debug64'```. Advised if you're running into "skipping library because incompatible" issues with GCC.
 
 ### Usage
 The __RenderEngine__ class (from the _LepusEngine_::_Lepus3D_ namespace) is responsible for drawing pretty much anything to your screen.
