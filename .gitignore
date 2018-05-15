@@ -248,3 +248,10 @@ ModelManifest.xml
 *.vcxproj
 *.filters
 *.sln
+
+# Makefiles
+Lepus*.make
+Makefile
+
+# GENIe exec
+genie
