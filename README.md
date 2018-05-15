@@ -43,7 +43,7 @@ You will need to download the third-party libraries used (SFML and GLEW). In add
 	* For example, *$(GLEW_DIR)/lib/* should point to the *lib* folder in your GLEW directory
 
 #### GNU/Linux
-You'll need to install G++, GNU make, as well as dependencies: *libgl1-mesa-dev*, *libsfml-dev* and *libglew-dev*.
+You'll need to install G++, pkg-config, g++-multilib, GNU make, as well as dependencies: *libgl1-mesa-dev*, *libsfml-dev* and *libglew-dev*.
 
 On Ubuntu, you can run:
 
@@ -51,7 +51,7 @@ On Ubuntu, you can run:
 sudo apt-get install g++ make libgl1-mesa-dev libsfml-dev libglew-dev
 ```
 
-The GENie script on Linux was written with GNU Make in mind, but it is not tested or maintained as regularly as the Windows build tools, so please report any issues and try fixing them where possible. Run ```make LepusEngine && make Lepus3D && make LepusDemo``` to build the full engine along with the demo app.
+The GENie script on Linux was written with GNU Make in mind, but it is not tested or maintained as regularly as the Windows build tools, so please report any issues and try fixing them where possible. Run ```make LepusDemo``` to build the full engine along with the demo app. You can also append build type and platform to that command, like ```make LepusDemo config='debug64'```. Advised if you're running into "skipping library because incompatible" issues with GCC.
 
 ### Usage
 The __RenderEngine__ class (from the _LepusEngine_::_Lepus3D_ namespace) is responsible for drawing pretty much anything to your screen.

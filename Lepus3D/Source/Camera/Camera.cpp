@@ -10,7 +10,8 @@ Camera::Camera()
 
 void Camera::_Init()
 {
-	m_Target = Vector3::Zero();
+	Vector3 tmp = Vector3::Zero();
+	m_Target = tmp;
 	this->_CalcVectors();
 }
 
@@ -19,8 +20,8 @@ void Camera::_CalcVectors()
 	m_Up.Set(0.f, 1.f, 0.f);
 	// this might break because Up is not always gonna be normalised
 	auto camPos = m_Transform.GetPosition().vec3();
-	m_Right = Vector3(glm::normalize(glm::cross(m_Up.vec3(), glm::normalize(camPos - m_Target.vec3()))));
-	m_Right = m_Right;
+	Vector3 tmp = Vector3(glm::normalize(glm::cross(m_Up.vec3(), glm::normalize(camPos - m_Target.vec3()))));
+	m_Right = tmp;
 }
 
 Camera::Camera(Transform transform) : Camera()
