@@ -141,7 +141,7 @@ project "LepusDemo"
 		debugdir (path.join(PROJ_DIR, "bin/Release32/"))
 
 	configuration "windows"
-		postbuildcommands { "mkdir \"$(TargetDir)../../GLSL\"", "xcopy \"$(SolutionDir)\\Lepus3D\\Source\\GLSL\" \"$(TargetDir)\\..\\..\\GLSL\"/C /Y", "copy \"$(SFML_DIR)\\bin\\*.dll\" \"$(TargetDir)\\\" /y", "copy \"$(GLEW_DIR)\\bin\\Release\\$(Platform)\\glew32.dll\" \"$(TargetDir)\" /y" }
+		postbuildcommands { "mkdir \"$(TargetDir)../../Content/GLSL\"", "xcopy \"$(SolutionDir)\\Lepus3D\\Source\\GLSL\" \"$(TargetDir)\\..\\..\\Content\\GLSL\"/C /Y", "copy \"$(SFML_DIR)\\bin\\*.dll\" \"$(TargetDir)\\\" /y", "copy \"$(GLEW_DIR)\\bin\\Release\\$(Platform)\\glew32.dll\" \"$(TargetDir)\" /y" }
 
 	configuration "not windows"
-		postbuildcommands { "mkdir -p ./bin/Debug32/GLSL", "mkdir -p ./bin/Debug64/GLSL", "mkdir -p ./bin/Release32/GLSL", "mkdir -p ./bin/Release64/GLSL", "cp GLSL/* ./bin/Debug32/GLSL/", "cp GLSL/* ./bin/Debug64/GLSL/", "cp GLSL/* ./bin/Release32/GLSL/", "cp GLSL/* ./bin/Release64/GLSL/" }
+		postbuildcommands { "mkdir -p ./Content/GLSL", "cp ./Lepus3D/Source/GLSL/* ./Content/GLSL/" }

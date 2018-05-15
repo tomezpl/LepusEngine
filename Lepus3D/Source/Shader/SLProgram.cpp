@@ -49,7 +49,7 @@ bool SLProgram::_LoadFile(char* fileName)
 
 bool VShader::_LoadShader()
 {
-	std::string fileName = "../../GLSL/";
+	std::string fileName = "../../Content/GLSL/";
 	fileName += m_ProgramName;
 	fileName += ".vert";
 	return this->_LoadFile((char*)fileName.c_str());
@@ -57,7 +57,7 @@ bool VShader::_LoadShader()
 
 bool FShader::_LoadShader()
 {
-	std::string fileName = "../../GLSL/";
+	std::string fileName = "../../Content/GLSL/";
 	fileName += m_ProgramName;
 	fileName += ".frag";
 	return this->_LoadFile((char*)fileName.c_str());
