@@ -24,7 +24,6 @@ bld/
 [Ll]ib/
 
 # Content directories
-GLSL/
 Content/
 
 # Visual Studio 2015 cache/options directory
