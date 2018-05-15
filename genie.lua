@@ -66,10 +66,12 @@ project "Lepus3D"
 		includedirs {
 			path.join(os.getenv("SFML_DIR"), "include"),
 			path.join(os.getenv("GLEW_DIR"), "include"),
+			path.join(PROJ_DIR, "include\\glm-windows"),
 		}
 
 	configuration "linux"
 		links { "sfml-window", "sfml-system", "sfml-graphics", "sfml-audio", "sfml-network", "GLEW", "GLU", "GL" }
+		includedirs { path.join(PROJ_DIR, "include/glm-linux") }
 
 	configuration { "Debug", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Debug32/Lepus3D/"))
@@ -114,6 +116,10 @@ project "LepusDemo"
 
 	configuration "linux"
 		links { "sfml-window", "sfml-system", "sfml-graphics", "sfml-audio", "sfml-network", "GLEW", "GLU", "GL" }
+		includedirs { path.join(PROJ_DIR, "include/glm-linux") }
+
+	configuration "windows"
+		includedirs { path.join(PROJ_DIR, "include/glm-windows") }
 
 	configuration { "windows", "x32" }
 		libdirs {
