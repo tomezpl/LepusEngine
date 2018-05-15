@@ -19,9 +19,12 @@ int main()
 	float dTime;
 
 	Lepus3D::BoxMeshUnindexed mesh;
-	Lepus3D::Material mat("Material", "PerVertexUnlit");
+	Lepus3D::Material mat("Material", "Diffuse");
 	Lepus3D::Texture2D tex("wood.jpg");
 	mat.SetAttributeTex("_Texture1", tex);
+	mat.SetAttributeF("_AmbientStrength", 0.1f);
+	GLfloat lightCol[3] = {1.0f, 1.0f, 1.0f};
+	mat.SetAttributeF3("_LightColor", lightCol);
 	mesh.SetMaterial(mat);
 
 	scene.AddMesh(mesh);
