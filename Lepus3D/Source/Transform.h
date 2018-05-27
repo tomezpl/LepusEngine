@@ -33,5 +33,17 @@ namespace LepusEngine
 		Vector3 GetScale();
 		std::string ToString();
 	};
+
+	class Transformable {
+	protected:
+		Transform mTransform;
+	public:
+		void SetPosition(Vector3 position) { mTransform.SetPosition(position); }
+		void SetRotation(Vector3 rotation) { mTransform.SetRotation(rotation); }
+		void SetScale(Vector3 scale) { mTransform.SetScale(scale); }
+		void SetScale(float scale) { mTransform.SetScale(scale); }
+		void Move(Vector3 translation) { mTransform.Move(translation); }
+		void Rotate(Vector3 rotation) { mTransform.Rotate(rotation); }
+	};
 	}
 }
