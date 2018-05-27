@@ -51,7 +51,7 @@ bool RenderEngine::Init()
 	glGenTextures(sizeof(m_TextureSet) / sizeof(GLuint), m_TextureSet);
 
 	m_Ready.renderer = true;
-	
+
 	return true;
 }
 
@@ -76,14 +76,17 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	GLfloat* vArr = new GLfloat[vDS / sizeof(GLfloat)];
 	for (unsigned short i = 0, j = 0; i < vDS / sizeof(GLfloat); i += sizeof(vD[i]) / sizeof(GLfloat), j++)
 	{
-		vArr[i] = vD[j].x;
-		vArr[i+1] = vD[j].y;
-		vArr[i+2] = vD[j].z;
-		vArr[i+3] = vD[j].r;
-		vArr[i+4] = vD[j].g;
-		vArr[i+5] = vD[j].b;
-		vArr[i+6] = vD[j].s;
-		vArr[i+7] = vD[j].t;
+		vArr[i] = vD[j].x; // vertex model space position (X coord)
+		vArr[i+1] = vD[j].y; // vertex model space position (Y coord)
+		vArr[i+2] = vD[j].z; // vertex model space position (Z coord)
+		vArr[i+3] = vD[j].r; // vertex colour (red)
+		vArr[i+4] = vD[j].g; // vertex colour (green)
+		vArr[i+5] = vD[j].b; // vertex colour (blue)
+		vArr[i+6] = vD[j].s; // texture coord S
+		vArr[i+7] = vD[j].t; // texture coord T
+		vArr[i+8] = vD[j].nX; // normal vector X
+		vArr[i+9] = vD[j].nY; // normal vector Y
+		vArr[i+10] = vD[j].nZ; // normal vector Z
 	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
@@ -132,6 +135,10 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		// Set texture coords
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(6 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(2);
+
+		// Set normal vectors
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(8 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(3);
 	}
 	glBindVertexArray(0); // unbind VAO
 
