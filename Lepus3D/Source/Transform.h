@@ -23,7 +23,7 @@ namespace LepusEngine
 		Transform(Vector3 position, Vector3 rotation, Vector3 scale);
 		glm::mat4 GetMatrix(); // calculate a transformation matrix
 		void SetPosition(Vector3 position);
-		void SetRotation(Vector3 rotation);
+		void SetRotation(Vector3 rotation); // rotation in degrees
 		void SetScale(Vector3 scale);
 		void SetScale(float scale);
 		void Move(Vector3 translation);
