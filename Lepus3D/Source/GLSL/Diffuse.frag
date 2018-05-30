@@ -21,5 +21,5 @@ void main()
 	float diff = max(dot(norm, lightDir), 0.0f);
 	vec3 diffuse = diff * _LightColor;
 
-	color = vec4((ambient + diffuse) * VertColor, 1.0);
+	color = vec4((ambient + diffuse) * VertColor, 1.0f);
 }
