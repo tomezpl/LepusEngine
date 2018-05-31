@@ -39,11 +39,6 @@ float Light::GetIntensity()
 	return mIntensity;
 }
 
-void Light::SetPosition(Vector3 pos)
-{
-	mTransform.SetPosition(pos);
-}
-
 void Light::SetColor(Color col)
 {
 	mCol = col;

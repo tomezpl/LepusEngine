@@ -35,15 +35,18 @@ namespace LepusEngine
 	};
 
 	class Transformable {
+	friend class RenderEngine;
 	protected:
 		Transform mTransform;
 	public:
+		Transformable() { }
 		void SetPosition(Vector3 position) { mTransform.SetPosition(position); }
 		void SetRotation(Vector3 rotation) { mTransform.SetRotation(rotation); }
 		void SetScale(Vector3 scale) { mTransform.SetScale(scale); }
 		void SetScale(float scale) { mTransform.SetScale(scale); }
 		void Move(Vector3 translation) { mTransform.Move(translation); }
 		void Rotate(Vector3 rotation) { mTransform.Rotate(rotation); }
+		Transform GetTransform() { return mTransform; }
 	};
 	}
 }

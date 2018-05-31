@@ -6,7 +6,7 @@
 
 namespace LepusEngine {
 	namespace Lepus3D {
-		class Light : Transformable {
+		class Light : public Transformable {
 		private:
 			Color mCol;
 			float mIntensity;
@@ -16,7 +16,6 @@ namespace LepusEngine {
 			Vector3 GetPosition();
 			Color GetColor();
 			float GetIntensity();
-			void SetPosition(Vector3 position);
 			void SetColor(Color color);
 			void SetIntensity(float intensity);
 		};

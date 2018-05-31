@@ -5,24 +5,28 @@ using namespace Lepus3D;
 
 Scene::Scene()
 {
-	m_MeshArr.clear();
-	m_TransfArr.clear();
+	m_ObjArr.clear();
 }
 
 int Scene::AddMesh(Mesh m, Transform t)
 {
-	m_MeshArr.push_back(m);
-	m_TransfArr.push_back(t);
+	Renderable* obj = new Renderable(m);
+	obj->mTransform = t;
+	return this->AddMesh(obj);
+}
+
+int Scene::AddMesh(Renderable* renderable)
+{
+	m_ObjArr.push_back(renderable);
 	return GetSize() - 1;
 }
 
 int Scene::GetSize()
 {
-	return m_MeshArr.size();
+	return m_ObjArr.size();
 }
 
 void Scene::RemoveMesh(int index)
 {
-	m_MeshArr.erase(m_MeshArr.begin() + (index - 1));
-	m_TransfArr.erase(m_TransfArr.begin() + (index - 1));
+	m_ObjArr.erase(m_ObjArr.begin() + (index - 1));
 }
