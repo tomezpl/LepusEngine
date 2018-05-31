@@ -42,7 +42,7 @@ glm::mat4 Camera::GetView()
 	auto rotation = m_Transform.GetRotation().vec3();
 	Vector3 target(
 		cos(glm::radians(rotation.x)) * cos(glm::radians(rotation.y)),
-		sin(glm::radians(rotation.x)), 
+		sin(glm::radians(rotation.x)),
 		cos(glm::radians(rotation.x)) * sin(glm::radians(rotation.y)));
 	auto normTarget = glm::normalize(target.vec3());
 	m_Target.x = normTarget.x;
@@ -51,4 +51,14 @@ glm::mat4 Camera::GetView()
 	auto up = m_Up.vec3();
 	glm::mat4 ret = glm::lookAt(camPos, camPos + normTarget, up);
 	return ret;
+}
+
+Vector3 Camera::GetViewVector()
+{
+	return this->m_Target;
+}
+
+Transform Camera::GetTransform()
+{
+	return this->m_Transform;
 }
