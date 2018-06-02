@@ -38,14 +38,14 @@ bool Material::SetAttributeI(char* attributeName, GLint value, GLint location)
 	{
 		m_IntAttributes[index].value = value;
 		if (location >= 0)
-			m_FloatAttributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
+			m_IntAttributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 	}
 	else
 	{
 		m_IntAttributes.push_back(MaterialAttrib<GLint>(attributeName));
 		m_IntAttributes[m_IntAttributes.size() - 1].value = value;
 		if (location >= 0)
-			m_FloatAttributes[m_IntAttributes.size() - 1].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
+			m_IntAttributes[m_IntAttributes.size() - 1].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 		return false;
 	}
 
