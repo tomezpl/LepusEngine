@@ -14,21 +14,22 @@ uniform float _SpecularStrength;
 uniform vec3 _LightColor;
 uniform vec3 _LightPos;
 uniform vec3 _DiffColor;
+uniform int _SpecularShininess;
 
 void main()
 {
-	vec3 ambient = _AmbientStrength * _AmbientColor * _DiffColor;
+	vec3 ambient = _AmbientStrength * _AmbientColor;
 
 	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(_LightPos - FragPos);
 
 	float diff = max(dot(norm, lightDir), 0.0f);
-	vec3 diffuse = diff * _LightColor * _DiffColor;
+	vec3 diffuse = diff * _LightColor;
 
 	vec3 viewDir = normalize(ViewPos - FragPos); // view direction based on current fragment and camera position
 	vec3 lightReflect = reflect(-lightDir, norm); // light reflection vector
 	float specAngle = max(dot(viewDir, lightReflect), 0.0f);
-	vec3 specular = vec3(specAngle * _SpecularStrength, specAngle * _SpecularStrength, specAngle * _SpecularStrength);
+	vec3 specular = _LightColor * _SpecularStrength * pow(specAngle, _SpecularShininess);
 
-	color = vec4((ambient + diffuse + specular) * VertColor, 1.0f);
+	color = vec4((ambient + diffuse + specular) * _DiffColor, 1.0f);
 }
