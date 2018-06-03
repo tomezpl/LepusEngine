@@ -135,6 +135,10 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	}
 	glBindVertexArray(0); // unbind VAO
 
+	// Set View position for lighting
+
+	material.SetAttributeF3("_ViewPos", m_Cam->GetTransform().GetPosition());
+
 	material.Use();
 
 	for (auto i = 0; i < textureCount; i++)
@@ -200,10 +204,17 @@ bool RenderEngine::Update()
 
 void RenderEngine::DrawScene(Scene& sc)
 {
-	int length = sc.GetSize();
+	int length = sc.GetRenderableCount();
 	for (int i = 0; i < length; i++)
 	{
 		Mesh* mesh = sc.m_ObjArr[i]->GetMesh();
+		if(sc.GetLightCount() > 0 && sc.m_LightArr[0] != nullptr)
+		{
+			mesh->m_Mat->SetAttributeF3("_LightPos", sc.m_LightArr[0]->GetPosition());
+			mesh->m_Mat->SetAttributeF3("_LightColor", sc.m_LightArr[0]->GetColor().GetVector3());
+		}
+		mesh->m_Mat->SetAttributeF3("_AmbientColor", sc.m_AmbientColor.GetVector3());
+		mesh->m_Mat->SetAttributeF("_AmbientStrength", sc.m_AmbientIntensity);
 		DrawMesh(*mesh, *(mesh->m_Mat), sc.m_ObjArr[i]->mTransform);
 	}
 }
