@@ -8,10 +8,10 @@ namespace LepusEngine
 		class Vertex
 		{
 		public:
-			float x, y, z, r, g, b, s, t, nX, nY, nZ;
-			Vertex(float X = 0.f, float Y = 0.f, float Z = 0.f, float R = 0.f, float G = 0.f, float B = 0.f, float S = 0.f, float T = 0.f, float normX = 0.f, float normY = 0.f, float normZ = 0.f) { x = X; y = Y; z = Z; r = R; g = G; b = B; s = S; t = T; nX = normX; nY = normY; nZ = normZ; };
-			Vertex operator=(Vertex& rs) { x = rs.x; y = rs.y; z = rs.z; r = rs.r; g = rs.g; b = rs.b; s = rs.s; t = rs.t; nX = rs.nX; nY = rs.nY; nZ = rs.nZ; return *this; };
-			bool operator==(Vertex& rs) { return x == rs.x && y == rs.y && z == rs.z && r == rs.r && g == rs.g && b == rs.b && s == rs.s && t == rs.t && nX == rs.nX && nY == rs.nY && nZ == rs.nZ; };
+			float x, y, z, s, t, nX, nY, nZ;
+			Vertex(float X = 0.f, float Y = 0.f, float Z = 0.f, float S = 0.f, float T = 0.f, float normX = 0.f, float normY = 0.f, float normZ = 0.f) { x = X; y = Y; z = Z; s = S; t = T; nX = normX; nY = normY; nZ = normZ; };
+			Vertex operator=(Vertex& rs) { x = rs.x; y = rs.y; z = rs.z; s = rs.s; t = rs.t; nX = rs.nX; nY = rs.nY; nZ = rs.nZ; return *this; };
+			bool operator==(Vertex& rs) { return x == rs.x && y == rs.y && z == rs.z && s == rs.s && t == rs.t && nX == rs.nX && nY == rs.nY && nZ == rs.nZ; };
 			bool operator!=(Vertex& rs) { return !(*this == rs); };
 		};
 

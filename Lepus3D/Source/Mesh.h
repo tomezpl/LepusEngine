@@ -29,10 +29,10 @@ namespace LepusEngine
 		class PlaneMesh : public Mesh {
 		public:
 			PlaneMesh() : Mesh(VertexArray {
-				Vertex(-0.5f, 0.5f, 0.f, 1.f, 1.f, 1.f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f), // Top-left
-				Vertex(0.5f, 0.5f, 0.f, 1.f, 1.f, 1.f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f), // Top-right
-				Vertex(-0.5f, -0.5f, 0.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f), // Bottom-left
-				Vertex(0.5f, -0.5f, 0.f, 1.f, 1.f, 1.f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f) // Bottom-right
+				Vertex(-0.5f, 0.5f, 0.f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f), // Top-left
+				Vertex(0.5f, 0.5f, 0.f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, 0.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f), // Bottom-left
+				Vertex(0.5f, -0.5f, 0.f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f) // Bottom-right
 			}) {
 				this->SetIndices(std::vector<unsigned int>{0, 1, 2, 1, 3, 2});
 			};
@@ -42,35 +42,35 @@ namespace LepusEngine
 		public:
 			BoxMesh() : Mesh(VertexArray{
 				// Front
-				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
-				Vertex(0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
-				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
-				Vertex(0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f), // Bottom-right
+				Vertex(-0.5f, 0.5f, 0.5f, 0.f, 1.f), // Top-left
+				Vertex(0.5f, 0.5f, 0.5f, 1.0f, 1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, 0.5f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, -0.5f, 0.5f, 1.0f, 0.0f), // Bottom-right
 				// Right
-				Vertex(0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
-				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
-				Vertex(0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
-				Vertex(0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f), // Bottom-right
+				Vertex(0.5f, 0.5f, 0.5f, 0.f, 1.f), // Top-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.0f, 1.0f), // Top-right
+				Vertex(0.5f, -0.5f, 0.5f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, -0.5f, -0.5f, 1.0f, 0.0f), // Bottom-right
 				// Bottom
-				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
-				Vertex(0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
-				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
-				Vertex(0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f), // Bottom-right
+				Vertex(-0.5f, -0.5f, -0.5f, 0.f, 1.f), // Top-left
+				Vertex(0.5f, -0.5f, -0.5f, 1.0f, 1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, 0.5f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, -0.5f, 0.5f, 1.0f, 0.0f), // Bottom-right
 				// Back
-				Vertex(-0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
-				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
-				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
-				Vertex(0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f), // Bottom-right
+				Vertex(-0.5f, 0.5f, -0.5f, 0.f, 1.f), // Top-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.0f, 1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, -0.5f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, -0.5f, -0.5f, 1.0f, 0.0f), // Bottom-right
 				// Top
-				Vertex(-0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
-				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
-				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
-				Vertex(0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f), // Bottom-right
+				Vertex(-0.5f, 0.5f, -0.5f, 0.f, 1.f), // Top-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.0f, 1.0f), // Top-right
+				Vertex(-0.5f, 0.5f, 0.5f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, 0.5f, 0.5f, 1.0f, 0.0f), // Bottom-right
 				// Left
-				Vertex(-0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f), // Top-left
-				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f), // Top-right
-				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f), // Bottom-left
-				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f) // Bottom-right
+				Vertex(-0.5f, 0.5f, -0.5f, 0.f, 1.f), // Top-left
+				Vertex(-0.5f, 0.5f, 0.5f, 1.0f, 1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, -0.5f, 0.0f, 0.0f), // Bottom-left
+				Vertex(-0.5f, -0.5f, 0.5f, 1.0f, 0.0f) // Bottom-right
 			}, true) {
 				this->SetIndices(IndexArray{
 					0,1,2,1,3,2,
@@ -87,47 +87,47 @@ namespace LepusEngine
 		public:
 			BoxMeshUnindexed() : Mesh(VertexArray{
 				// Front
-				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 0.f, 1.f, 0.0f, 0.0f, 1.0f), // Top-left
-				Vertex(0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f), // Top-right
-				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f), // Bottom-left
-				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f), // Bottom-left
-				Vertex(0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f), // Top-right
-				Vertex(0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f), // Bottom-right
+				Vertex(-0.5f, 0.5f, 0.5f, 0.f, 1.f, 0.0f, 0.0f, 1.0f), // Top-left
+				Vertex(0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f), // Bottom-left
+				Vertex(-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f), // Bottom-left
+				Vertex(0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f), // Top-right
+				Vertex(0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f), // Bottom-right
 				// Right
-				Vertex(0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 0.f, 1.f, 1.0f, 0.0f, 0.0f), // Top-left
-				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f), // Top-right
-				Vertex(0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f), // Bottom-left
-				Vertex(0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f), // Bottom-left
-				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f), // Top-right
-				Vertex(0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f), // Bottom-right
+				Vertex(0.5f, 0.5f, 0.5f, 0.f, 1.f, 1.0f, 0.0f, 0.0f), // Top-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f), // Top-right
+				Vertex(0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f), // Top-right
+				Vertex(0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f), // Bottom-right
 				// Bottom
-				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f, 0.0f, -1.0f, 0.0f), // Top-left
-				Vertex(0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f), // Top-right
-				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f), // Bottom-left
-				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f), // Bottom-left
-				Vertex(0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f), // Top-right
-				Vertex(0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f), // Bottom-right
+				Vertex(-0.5f, -0.5f, -0.5f, 0.f, 1.f, 0.0f, -1.0f, 0.0f), // Top-left
+				Vertex(0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f), // Top-right
+				Vertex(-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f), // Bottom-left
+				Vertex(-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f), // Top-right
+				Vertex(0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f), // Bottom-right
 				// Back
-				Vertex(-0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f, 0.0f, 0.0f, -1.0f), // Top-left
-				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f), // Top-right
-				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f), // Bottom-left
-				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f), // Bottom-left
-				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f), // Top-right
-				Vertex(0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f), // Bottom-right
+				Vertex(-0.5f, 0.5f, -0.5f, 0.f, 1.f, 0.0f, 0.0f, -1.0f), // Top-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f), // Top-right
+				Vertex(-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f), // Bottom-left
+				Vertex(-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f), // Bottom-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f), // Top-right
+				Vertex(0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f), // Bottom-right
 				// Top
-				Vertex(-0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f, 0.0f, 1.0f, 0.0f), // Top-left
-				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f), // Top-right
-				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f), // Bottom-left
-				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f), // Bottom-left
-				Vertex(0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f), // Top-right
-				Vertex(0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f), // Bottom-right
+				Vertex(-0.5f, 0.5f, -0.5f, 0.f, 1.f, 0.0f, 1.0f, 0.0f), // Top-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f), // Top-right
+				Vertex(-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f), // Bottom-left
+				Vertex(-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f), // Bottom-left
+				Vertex(0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f), // Top-right
+				Vertex(0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f), // Bottom-right
 				// Left
-				Vertex(-0.5f, 0.5f, -0.5f, 1.f, 1.f, 1.f, 0.f, 1.f, -1.0f, 0.0f, 0.0f), // Top-left
-				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f), // Top-right
-				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f), // Bottom-left
-				Vertex(-0.5f, -0.5f, -0.5f, 1.f, 1.f, 1.f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f), // Bottom-left
-				Vertex(-0.5f, 0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f), // Top-right
-				Vertex(-0.5f, -0.5f, 0.5f, 1.f, 1.f, 1.f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f) // Bottom-right
+				Vertex(-0.5f, 0.5f, -0.5f, 0.f, 1.f, -1.0f, 0.0f, 0.0f), // Top-left
+				Vertex(-0.5f, 0.5f, 0.5f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f), // Top-right
+				Vertex(-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f), // Bottom-left
+				Vertex(-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f), // Bottom-left
+				Vertex(-0.5f, 0.5f, 0.5f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f), // Top-right
+				Vertex(-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f) // Bottom-right
 			}, true) {
 
 			};

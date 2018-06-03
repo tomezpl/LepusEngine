@@ -2,7 +2,6 @@
 in vec3 Normal;
 in vec2 TexCoord;
 in vec3 FragPos;
-in vec3 VertColor;
 in vec3 ViewPos;
 
 out vec4 color;

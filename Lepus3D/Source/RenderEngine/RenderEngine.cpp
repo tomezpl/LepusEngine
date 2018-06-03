@@ -79,14 +79,11 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		vArr[i] = vD[j].x; // vertex model space position (X coord)
 		vArr[i+1] = vD[j].y; // vertex model space position (Y coord)
 		vArr[i+2] = vD[j].z; // vertex model space position (Z coord)
-		vArr[i+3] = vD[j].r; // vertex colour (red)
-		vArr[i+4] = vD[j].g; // vertex colour (green)
-		vArr[i+5] = vD[j].b; // vertex colour (blue)
-		vArr[i+6] = vD[j].s; // texture coord S
-		vArr[i+7] = vD[j].t; // texture coord T
-		vArr[i+8] = vD[j].nX; // normal vector X
-		vArr[i+9] = vD[j].nY; // normal vector Y
-		vArr[i+10] = vD[j].nZ; // normal vector Z
+		vArr[i+3] = vD[j].s; // texture coord S
+		vArr[i+4] = vD[j].t; // texture coord T
+		vArr[i+5] = vD[j].nX; // normal vector X
+		vArr[i+6] = vD[j].nY; // normal vector Y
+		vArr[i+7] = vD[j].nZ; // normal vector Z
 	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
@@ -128,17 +125,13 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
 
-		// Set vertex colours
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
+		// Set texture coords
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(1);
 
-		// Set texture coords
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(6 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(2);
-
 		// Set normal vectors
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(8 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(5 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(2);
 	}
 	glBindVertexArray(0); // unbind VAO
 
