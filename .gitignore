@@ -24,7 +24,11 @@ bld/
 [Ll]ib/
 
 # Content directories
-Content/
+## GLSL is copied on build
+Content/GLSL/
+## Textures can take a lot of space
+Content/Textures/
+## At the moment Models are stored in Wavefront OBJ files which are relatively small, so allow them
 
 # Visual Studio 2015 cache/options directory
 .vs/
