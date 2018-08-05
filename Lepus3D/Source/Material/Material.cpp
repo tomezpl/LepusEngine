@@ -33,19 +33,19 @@ bool Material::SetAttributeI(char* attributeName, GLint value, GLint location)
 		if (m_IntAttributes[i].name == attributeName)
 			index = i;
 	}
-	
+
 	if (index >= 0)
 	{
 		m_IntAttributes[index].value = value;
 		if (location >= 0)
-			m_FloatAttributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
+			m_IntAttributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 	}
 	else
 	{
 		m_IntAttributes.push_back(MaterialAttrib<GLint>(attributeName));
 		m_IntAttributes[m_IntAttributes.size() - 1].value = value;
 		if (location >= 0)
-			m_FloatAttributes[m_IntAttributes.size() - 1].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
+			m_IntAttributes[m_IntAttributes.size() - 1].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 		return false;
 	}
 
@@ -115,6 +115,12 @@ bool Material::SetAttributeF4(char* attributeName, GLfloat value[4], GLint locat
 	return true;
 }
 
+bool Material::SetAttributeF4(char* attributeName, Vector4 value, GLint location)
+{
+	GLfloat vec[4] = {value.x, value.y, value.z, value.w };
+	return SetAttributeF4(attributeName, vec, location);
+}
+
 bool Material::SetAttributeF3(char* attributeName, GLfloat value[3], GLint location)
 {
 	short index = -1;
@@ -148,6 +154,12 @@ bool Material::SetAttributeF3(char* attributeName, GLfloat value[3], GLint locat
 	return true;
 }
 
+bool Material::SetAttributeF3(char* attributeName, Vector3 value, GLint location)
+{
+	GLfloat vec[3] = {value.x, value.y, value.z };
+	return SetAttributeF3(attributeName, vec, location);
+}
+
 bool Material::SetAttributeF2(char* attributeName, GLfloat value[2], GLint location)
 {
 	short index = -1;
@@ -178,6 +190,13 @@ bool Material::SetAttributeF2(char* attributeName, GLfloat value[2], GLint locat
 
 	return true;
 }
+
+bool Material::SetAttributeF2(char* attributeName, Vector2 value, GLint location)
+{
+	GLfloat vec[2] = {value.x, value.y };
+	return SetAttributeF3(attributeName, vec, location);
+}
+
 
 bool Material::SetAttributeTex(char* attributeName, Texture2D value, int location)
 {

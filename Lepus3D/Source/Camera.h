@@ -18,6 +18,8 @@ namespace LepusEngine
 			Camera(Transform transform);
 			void SetTransform(Transform transform);
 			glm::mat4 GetView();
+			Vector3 GetViewVector();
+			Transform GetTransform();
 		};
 	}
 }

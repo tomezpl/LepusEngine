@@ -5,24 +5,63 @@ using namespace Lepus3D;
 
 Scene::Scene()
 {
-	m_MeshArr.clear();
-	m_TransfArr.clear();
+	m_ObjArr.clear();
+	m_LightArr.clear();
+	m_AmbientColor = Color(255, 255, 255, 255);
+	m_AmbientIntensity = 0.5f;
 }
 
 int Scene::AddMesh(Mesh m, Transform t)
 {
-	m_MeshArr.push_back(m);
-	m_TransfArr.push_back(t);
-	return GetSize() - 1;
+	Renderable* obj = new Renderable(m);
+	obj->mTransform = t;
+	return this->AddMesh(obj);
 }
 
-int Scene::GetSize()
+int Scene::AddMesh(Renderable* renderable)
 {
-	return m_MeshArr.size();
+	m_ObjArr.push_back(renderable);
+	return GetRenderableCount() - 1;
+}
+
+int Scene::AddLight(Light* light)
+{
+	m_LightArr.push_back(light);
+	return GetLightCount() - 1;
+}
+
+int Scene::GetRenderableCount()
+{
+	return m_ObjArr.size();
+}
+
+int Scene::GetLightCount()
+{
+	return m_LightArr.size();
+}
+
+void Scene::RemoveLight(int index)
+{
+	m_LightArr.erase(m_LightArr.begin() + (index - 1));
 }
 
 void Scene::RemoveMesh(int index)
 {
-	m_MeshArr.erase(m_MeshArr.begin() + (index - 1));
-	m_TransfArr.erase(m_TransfArr.begin() + (index - 1));
+	m_ObjArr.erase(m_ObjArr.begin() + (index - 1));
+}
+
+void Scene::SetAmbient(Color color)
+{
+	m_AmbientColor = color;
+}
+
+void Scene::SetAmbient(float intensity)
+{
+	m_AmbientIntensity = intensity;
+}
+
+void Scene::SetAmbient(Color color, float intensity)
+{
+	SetAmbient(color);
+	SetAmbient(intensity);
 }

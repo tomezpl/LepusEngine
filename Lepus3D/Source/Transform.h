@@ -23,7 +23,7 @@ namespace LepusEngine
 		Transform(Vector3 position, Vector3 rotation, Vector3 scale);
 		glm::mat4 GetMatrix(); // calculate a transformation matrix
 		void SetPosition(Vector3 position);
-		void SetRotation(Vector3 rotation);
+		void SetRotation(Vector3 rotation); // rotation in degrees
 		void SetScale(Vector3 scale);
 		void SetScale(float scale);
 		void Move(Vector3 translation);
@@ -32,6 +32,21 @@ namespace LepusEngine
 		Vector3 GetRotation();
 		Vector3 GetScale();
 		std::string ToString();
+	};
+
+	class Transformable {
+	friend class RenderEngine;
+	protected:
+		Transform mTransform;
+	public:
+		Transformable() { }
+		void SetPosition(Vector3 position) { mTransform.SetPosition(position); }
+		void SetRotation(Vector3 rotation) { mTransform.SetRotation(rotation); }
+		void SetScale(Vector3 scale) { mTransform.SetScale(scale); }
+		void SetScale(float scale) { mTransform.SetScale(scale); }
+		void Move(Vector3 translation) { mTransform.Move(translation); }
+		void Rotate(Vector3 rotation) { mTransform.Rotate(rotation); }
+		Transform GetTransform() { return mTransform; }
 	};
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "Shader.h"
 #include "Texture.h"
+#include "Transform/Vector.h"
 #include "Material/MaterialAttrib.h"
 #include <vector>
 
@@ -28,8 +29,11 @@ namespace LepusEngine
 			bool SetAttributeI(char* attributeName, GLint value, GLint location = 0);
 			bool SetAttributeF(char* attributeName, GLfloat value, GLint location = 0);
 			bool SetAttributeF4(char* attributeName, GLfloat value[4], GLint location = 0);
+			bool SetAttributeF4(char* attributeName, Vector4 value, GLint location = 0);
 			bool SetAttributeF3(char* attributeName, GLfloat value[3], GLint location = 0);
+			bool SetAttributeF3(char* attributeName, Vector3 value, GLint location = 0);
 			bool SetAttributeF2(char* attributeName, GLfloat value[2], GLint location = 0);
+			bool SetAttributeF2(char* attributeName, Vector2 value, GLint location = 0);
 			bool SetAttributeFP(char* attributeName, GLfloat* value, GLint location = 0);
 			bool SetAttributeTex(char* attributeName, Texture2D value, int location = 0);
 			GLint GetAttributeI(char* attributeName);

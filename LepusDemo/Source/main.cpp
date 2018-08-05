@@ -2,7 +2,6 @@
 #include "../../Lepus3D/Source/Camera/FPPCamera.h"
 
 using namespace LepusEngine;
-using namespace Lepus3D;
 
 int main()
 {
@@ -11,30 +10,36 @@ int main()
 	bool isRunning = true;
 
 	Lepus3D::Scene scene;
-	Lepus3D::Transform camTransform;
-	Lepus3D::FPPCamera cam(camTransform);
-	cam.SetWindow(engine.GetWindowPtr());
+	Lepus3D::Material testMat("Material", "Phong");
+	Lepus3D::Renderable* box = new Lepus3D::Renderable(Lepus3D::BoxMeshUnindexed());
+	Lepus3D::Light sceneLight(Lepus3D::Vector3(0.0f, 1.25f, 0.0f), Lepus3D::Color(255, 255, 255, 255), 1.0f);
+	testMat.SetAttributeF("_SpecularStrength", 0.5f);
+	testMat.SetAttributeI("_SpecularShininess", 256);
+	testMat.SetAttributeF3("_DiffColor", Lepus3D::Color(100, 149, 237, 255).GetVector3());
+	box->GetMesh()->SetMaterial(testMat); 
+
+	Lepus3D::FPPCamera cam(*(new Lepus3D::Transform())); // init a transformable fpp camera
+	cam.SetWindow(engine.GetWindowPtr()); // bind camera to window to receive input
+
+	scene.AddLight(&sceneLight);
+	scene.AddMesh(box);
 
 	sf::Clock timer;
-	float dTime;
-
-	Lepus3D::BoxMeshUnindexed mesh;
-	Lepus3D::Material mat("Material", "PerVertexUnlit");
-	Lepus3D::Texture2D tex("wood.jpg");
-	mat.SetAttributeTex("_Texture1", tex);
-	mesh.SetMaterial(mat);
-
-	scene.AddMesh(mesh);
+	float dTime; // delta time between frames
+	float elapsedTime = 0.0f;
 
 	while (isRunning)
 	{
-		dTime = timer.restart().asSeconds();
-		engine.Update();
-		cam.ProcessInput(dTime);
-		engine.StartScene(&cam);
-		engine.DrawScene(scene);
-		engine.EndScene();
-		isRunning = engine.Update();
+		elapsedTime += dTime = timer.restart().asSeconds(); // running time is needed for the scene light to orbit
+
+		sceneLight.SetPosition(Lepus3D::Vector3(0.0f, 1.25f * sin(elapsedTime), 1.25f * cos(elapsedTime))); // orbit the light around the box
+
+		engine.Update(); // update window before drawing
+		cam.ProcessInput(dTime); // move camera according to input
+		engine.StartScene(&cam); // set current camera, prepare engine for drawing
+		engine.DrawScene(scene); // draw objects in scene
+		engine.EndScene(); // finish rendering and present
+		isRunning = engine.Update(); // update window and check if engine is still running
 	}
 
 	engine.Shutdown();

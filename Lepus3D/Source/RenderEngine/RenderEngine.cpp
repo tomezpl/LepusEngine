@@ -51,7 +51,7 @@ bool RenderEngine::Init()
 	glGenTextures(sizeof(m_TextureSet) / sizeof(GLuint), m_TextureSet);
 
 	m_Ready.renderer = true;
-	
+
 	return true;
 }
 
@@ -76,14 +76,14 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	GLfloat* vArr = new GLfloat[vDS / sizeof(GLfloat)];
 	for (unsigned short i = 0, j = 0; i < vDS / sizeof(GLfloat); i += sizeof(vD[i]) / sizeof(GLfloat), j++)
 	{
-		vArr[i] = vD[j].x;
-		vArr[i+1] = vD[j].y;
-		vArr[i+2] = vD[j].z;
-		vArr[i+3] = vD[j].r;
-		vArr[i+4] = vD[j].g;
-		vArr[i+5] = vD[j].b;
-		vArr[i+6] = vD[j].s;
-		vArr[i+7] = vD[j].t;
+		vArr[i] = vD[j].x; // vertex model space position (X coord)
+		vArr[i+1] = vD[j].y; // vertex model space position (Y coord)
+		vArr[i+2] = vD[j].z; // vertex model space position (Z coord)
+		vArr[i+3] = vD[j].s; // texture coord S
+		vArr[i+4] = vD[j].t; // texture coord T
+		vArr[i+5] = vD[j].nX; // normal vector X
+		vArr[i+6] = vD[j].nY; // normal vector Y
+		vArr[i+7] = vD[j].nZ; // normal vector Z
 	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
@@ -125,15 +125,19 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
 
-		// Set vertex colours
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
+		// Set texture coords
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(1);
 
-		// Set texture coords
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(6 * sizeof(GLfloat)));
+		// Set normal vectors
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(5 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(2);
 	}
 	glBindVertexArray(0); // unbind VAO
+
+	// Set View position for lighting
+
+	material.SetAttributeF3("_ViewPos", m_Cam->GetTransform().GetPosition());
 
 	material.Use();
 
@@ -200,10 +204,18 @@ bool RenderEngine::Update()
 
 void RenderEngine::DrawScene(Scene& sc)
 {
-	int length = sc.GetSize();
+	int length = sc.GetRenderableCount();
 	for (int i = 0; i < length; i++)
 	{
-		DrawMesh(sc.m_MeshArr[i], *(sc.m_MeshArr[i].m_Mat), sc.m_TransfArr[i]);
+		Mesh* mesh = sc.m_ObjArr[i]->GetMesh();
+		if(sc.GetLightCount() > 0 && sc.m_LightArr[0] != nullptr)
+		{
+			mesh->m_Mat->SetAttributeF3("_LightPos", sc.m_LightArr[0]->GetPosition());
+			mesh->m_Mat->SetAttributeF3("_LightColor", sc.m_LightArr[0]->GetColor().GetVector3());
+		}
+		mesh->m_Mat->SetAttributeF3("_AmbientColor", sc.m_AmbientColor.GetVector3());
+		mesh->m_Mat->SetAttributeF("_AmbientStrength", sc.m_AmbientIntensity);
+		DrawMesh(*mesh, *(mesh->m_Mat), sc.m_ObjArr[i]->mTransform);
 	}
 }
 
