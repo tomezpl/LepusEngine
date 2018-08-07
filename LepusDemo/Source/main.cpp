@@ -1,5 +1,6 @@
 #include "../../Lepus3D/Source/RenderEngine.h"
 #include "../../Lepus3D/Source/Camera/FPPCamera.h"
+#include "../../Lepus3D/Source/Assets.h"
 
 using namespace LepusEngine;
 
@@ -9,6 +10,10 @@ int main()
 
 	bool isRunning = true;
 
+	Lepus3D::Assets::ModelImporter modelImp("Models/mycube_test.obj");
+	modelImp.Read();
+	modelImp.Close();
+
 	Lepus3D::Scene scene;
 	Lepus3D::Material testMat("Material", "Phong");
 	Lepus3D::Renderable* box = new Lepus3D::Renderable(Lepus3D::BoxMeshUnindexed());
@@ -16,7 +21,7 @@ int main()
 	testMat.SetAttributeF("_SpecularStrength", 0.5f);
 	testMat.SetAttributeI("_SpecularShininess", 256);
 	testMat.SetAttributeF3("_DiffColor", Lepus3D::Color(100, 149, 237, 255).GetVector3());
-	box->GetMesh()->SetMaterial(testMat); 
+	box->GetMesh()->SetMaterial(testMat);
 
 	Lepus3D::FPPCamera cam(*(new Lepus3D::Transform())); // init a transformable fpp camera
 	cam.SetWindow(engine.GetWindowPtr()); // bind camera to window to receive input
