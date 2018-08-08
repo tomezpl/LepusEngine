@@ -16,7 +16,7 @@ int main()
 
 	Lepus3D::Scene scene;
 	Lepus3D::Material testMat("Material", "Phong");
-	Lepus3D::Renderable* box = new Lepus3D::Renderable(Lepus3D::BoxMeshUnindexed());
+	Lepus3D::Renderable* box = new Lepus3D::Renderable(modelImp.GetSubMesh());
 	Lepus3D::Light sceneLight(Lepus3D::Vector3(0.0f, 1.25f, 0.0f), Lepus3D::Color(255, 255, 255, 255), 1.0f);
 	testMat.SetAttributeF("_SpecularStrength", 0.5f);
 	testMat.SetAttributeI("_SpecularShininess", 256);

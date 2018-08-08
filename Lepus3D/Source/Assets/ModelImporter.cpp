@@ -21,9 +21,128 @@ ModelImporter::ModelImporter(string fn)
 
 bool ModelImporter::_ReadOBJ()
 {
-	string word = "";
-	while(*mObjFile >> word)
-		cout << word << endl;
+	string line = "";
+	enum OBJImportState { ObjectSearch, BuildObject };
+	OBJImportState state = ObjectSearch;
+	VertexArray verts, normals, finalVerts; // obj indexes normals and assigns them to vertices, so we'll need to load them into a separate array. also separate array for final vertices as we don't use indexing (we'll recalculate normals)
+	vector<unsigned int> indices, finalIndices; // finalIndices will just be an array of indices with the size of n total vertices
+	while(mObjFile->good())
+	{
+		getline(*mObjFile, line);
+		if(line[0] == '#') // ignore comments
+			continue;
+		string keyword = ""; // current keyword, like "o" for object, "v" for vertex, etc.
+		string data = ""; // current data, like coordinates when keyword is "v", or material name when keyword is "usemtl"
+		int firstSpace = line.find(" "); // first whitespace character in the line
+		keyword = line.substr(0, firstSpace);
+		if(keyword == "o")
+		{
+			if(state == ObjectSearch)
+			{
+				if (verts.size() > 0)
+				{
+					Mesh loadedMesh(finalVerts, true);
+					loadedMesh.SetIndices(finalIndices);
+					mGeometry.push_back(loadedMesh);
+				}
+				verts.clear();
+				normals.clear();
+				indices.clear();
+				finalVerts.clear();
+				finalIndices.clear();
+				state = BuildObject;
+			}
+			else
+				state = ObjectSearch;
+		}
+		else if(keyword == "v" || keyword == "vn")
+		{
+			Vertex v;
+			data = line.substr(firstSpace+1);
+			string xyz[3] = { "", "", "" };
+			for(int i = 0; i < 3; i++)
+			{
+				xyz[i] = data.substr(0, data.find(" "));
+				data = data.substr(data.find(" ")+1);
+			}
+			if(keyword == "v")
+			{
+				v.x = stof(xyz[0]);
+				v.y = stof(xyz[1]);
+				v.z = stof(xyz[2]);
+				verts.push_back(v);
+			}
+			else
+			{
+				v.nX = stof(xyz[0]);
+				v.nY = stof(xyz[1]);
+				v.nZ = stof(xyz[2]);
+				normals.push_back(v);
+			}
+		}
+		else if(keyword == "f")
+		{
+			data = line;
+			for(int i = 0; i < 3; i++)
+			{
+				data = data.substr(data.find(" ")+1);
+				string vertexIndex = data.substr(0, data.find("/"));
+				data = data.substr(data.find("/")+1);
+				// next up should be the vertex UV coord index, which might be empty
+				// loading in UVs is still TODO
+				string uvIndex = "";
+				if(data.find("/") != 0)
+				{
+					uvIndex = data.substr(data.find("/"));
+					data = data.substr(data.find("/")+1);
+				}
+				else
+					data = data.substr(1);
+				string normalIndex = data.substr(0, data.find(" "));
+				unsigned int vIdx = stoi(vertexIndex);
+				if(uvIndex != "")
+					unsigned int uvIdx = stoi(uvIndex);
+				unsigned int nIdx = stoi(normalIndex);
+				indices.push_back(vIdx - 1);
+				verts[vIdx-1].nX = normals[nIdx-1].nX;
+				verts[vIdx-1].nY = normals[nIdx-1].nY;
+				verts[vIdx-1].nZ = normals[nIdx-1].nZ;
+			}
+		}
+	}
+	if (verts.size() > 0)
+	{
+		// copy unique vertices to the finalVerts based on indices
+		for(int i = 0; i < indices.size(); i++)
+		{
+			finalVerts.push_back(verts[indices[i]]);
+			finalIndices.push_back(i);
+			// recalculate normals for triangles
+			if((i+1) % 3 == 0)
+			{
+				Vector3 normalVecs[3] = {
+					Vector3(glm::cross(Vector3(finalVerts[i].x, finalVerts[i].y, finalVerts[i].z).vec3(), Vector3(finalVerts[i-1].x, finalVerts[i-1].y, finalVerts[i-1].z).vec3())),
+					Vector3(glm::cross(Vector3(finalVerts[i-2].x, finalVerts[i-2].y, finalVerts[i-2].z).vec3(), Vector3(finalVerts[i-1].x, finalVerts[i-1].y, finalVerts[i-1].z).vec3())),
+					Vector3(glm::cross(Vector3(finalVerts[i-2].x, finalVerts[i-2].y, finalVerts[i-2].z).vec3(), Vector3(finalVerts[i].x, finalVerts[i].y, finalVerts[i].z).vec3()))
+				};
+				finalVerts[i-2].nX = normalVecs[0].x;
+				finalVerts[i-2].nY = normalVecs[0].y;
+				finalVerts[i-2].nZ = normalVecs[0].z;
+				finalVerts[i-1].nX = normalVecs[1].x;
+				finalVerts[i-1].nY = normalVecs[1].y;
+				finalVerts[i-1].nZ = normalVecs[1].z;
+				finalVerts[i].nX = normalVecs[2].x;
+				finalVerts[i].nY = normalVecs[2].y;
+				finalVerts[i].nZ = normalVecs[2].z;
+			}
+		}
+		Mesh loadedMesh(finalVerts, true);
+		loadedMesh.SetIndices(finalIndices);
+		mGeometry.push_back(loadedMesh);
+	}
+	verts.clear();
+	normals.clear();
+	indices.clear();
 	return true;
 }
 
@@ -34,7 +153,7 @@ bool ModelImporter::Init(string fn)
 	// filename for the .obj file
 	string objFN = fn;
 	// filename for the .mtl material library file
-	string mtlFN = fn.substr(0, fn.length() - string(".obj").length());
+	string mtlFN = fn.substr(0, fn.length() - string(".obj").length()) + ".mtl";
 
 	mObjFile = new ifstream(objFN);
 	mMtlFile = new ifstream(mtlFN);
@@ -47,9 +166,9 @@ bool ModelImporter::Read()
 	return _ReadOBJ();
 }
 
-Mesh *ModelImporter::GetMeshes()
+Mesh ModelImporter::GetSubMesh(int idx)
 {
-	return nullptr;
+	return mGeometry[idx];
 }
 
 bool ModelImporter::Close()

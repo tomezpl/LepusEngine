@@ -15,13 +15,14 @@ namespace LepusEngine {
 			private:
 				std::ifstream* mObjFile; // Wavefront OBJ file handle
 				std::ifstream* mMtlFile; // Wavefront OBJ material library file handle
+				std::vector<Mesh> mGeometry;
 				bool _ReadOBJ(); // read data from .obj file
 			public:
 				ModelImporter();
 				ModelImporter(std::string filename);
 				bool Init(std::string filename);
 				bool Read();
-				Mesh *GetMeshes();
+				Mesh GetSubMesh(int meshIndex = 0);
 				bool Close();
 				~ModelImporter();
 			};
