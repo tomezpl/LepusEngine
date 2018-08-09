@@ -26,6 +26,7 @@ bool ModelImporter::_ReadOBJ()
 	OBJImportState state = ObjectSearch;
 	VertexArray verts, normals, finalVerts; // obj indexes normals and assigns them to vertices, so we'll need to load them into a separate array. also separate array for final vertices as we don't use indexing (we'll recalculate normals)
 	vector<unsigned int> indices, finalIndices; // finalIndices will just be an array of indices with the size of n total vertices
+	int indexCounter = 0;
 	while(mObjFile->good())
 	{
 		getline(*mObjFile, line);
@@ -50,6 +51,7 @@ bool ModelImporter::_ReadOBJ()
 				indices.clear();
 				finalVerts.clear();
 				finalIndices.clear();
+				indexCounter = 0;
 				state = BuildObject;
 			}
 			else
@@ -103,43 +105,17 @@ bool ModelImporter::_ReadOBJ()
 				if(uvIndex != "")
 					unsigned int uvIdx = stoi(uvIndex);
 				unsigned int nIdx = stoi(normalIndex);
-				indices.push_back(vIdx - 1);
-				verts[vIdx-1].nX = normals[nIdx-1].nX;
-				verts[vIdx-1].nY = normals[nIdx-1].nY;
-				verts[vIdx-1].nZ = normals[nIdx-1].nZ;
+				indices.push_back(indexCounter++);
+				finalVerts.push_back(verts[vIdx-1]);
+				finalVerts[indexCounter-1].nX = normals[nIdx-1].nX;
+				finalVerts[indexCounter-1].nY = normals[nIdx-1].nY;
+				finalVerts[indexCounter-1].nZ = normals[nIdx-1].nZ;
 			}
 		}
 	}
-	if (verts.size() > 0)
-	{
-		// copy unique vertices to the finalVerts based on indices
-		for(int i = 0; i < indices.size(); i++)
-		{
-			finalVerts.push_back(verts[indices[i]]);
-			finalIndices.push_back(i);
-			// recalculate normals for triangles
-			if((i+1) % 3 == 0)
-			{
-				Vector3 normalVecs[3] = {
-					Vector3(glm::cross(Vector3(finalVerts[i].x, finalVerts[i].y, finalVerts[i].z).vec3(), Vector3(finalVerts[i-1].x, finalVerts[i-1].y, finalVerts[i-1].z).vec3())),
-					Vector3(glm::cross(Vector3(finalVerts[i-2].x, finalVerts[i-2].y, finalVerts[i-2].z).vec3(), Vector3(finalVerts[i-1].x, finalVerts[i-1].y, finalVerts[i-1].z).vec3())),
-					Vector3(glm::cross(Vector3(finalVerts[i-2].x, finalVerts[i-2].y, finalVerts[i-2].z).vec3(), Vector3(finalVerts[i].x, finalVerts[i].y, finalVerts[i].z).vec3()))
-				};
-				finalVerts[i-2].nX = normalVecs[0].x;
-				finalVerts[i-2].nY = normalVecs[0].y;
-				finalVerts[i-2].nZ = normalVecs[0].z;
-				finalVerts[i-1].nX = normalVecs[1].x;
-				finalVerts[i-1].nY = normalVecs[1].y;
-				finalVerts[i-1].nZ = normalVecs[1].z;
-				finalVerts[i].nX = normalVecs[2].x;
-				finalVerts[i].nY = normalVecs[2].y;
-				finalVerts[i].nZ = normalVecs[2].z;
-			}
-		}
-		Mesh loadedMesh(finalVerts, true);
-		loadedMesh.SetIndices(finalIndices);
-		mGeometry.push_back(loadedMesh);
-	}
+	Mesh loadedMesh(finalVerts, true);
+	loadedMesh.SetIndices(indices);
+	mGeometry.push_back(loadedMesh);
 	verts.clear();
 	normals.clear();
 	indices.clear();
