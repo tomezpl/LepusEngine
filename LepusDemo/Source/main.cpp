@@ -16,11 +16,13 @@ int main()
 
 	Lepus3D::Scene scene;
 	Lepus3D::Material testMat("Material", "Phong");
+	Lepus3D::Texture2D testTex("Textures/cube_test.jpg");
 	Lepus3D::Renderable* box = new Lepus3D::Renderable(modelImp.GetSubMesh());
 	Lepus3D::Light sceneLight(Lepus3D::Vector3(0.0f, 2.50f, 0.0f), Lepus3D::Color(255, 255, 255, 255), 1.0f);
 	testMat.SetAttributeF("_SpecularStrength", 0.5f);
 	testMat.SetAttributeI("_SpecularShininess", 256);
 	testMat.SetAttributeF3("_DiffColor", Lepus3D::Color(100, 149, 237, 255).GetVector3());
+	testMat.SetAttributeTex("_Texture1", testTex);
 	box->GetMesh()->SetMaterial(testMat);
 	box->SetScale(0.25f);
 

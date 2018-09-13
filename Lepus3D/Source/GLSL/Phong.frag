@@ -30,5 +30,5 @@ void main()
 	float specAngle = max(dot(viewDir, lightReflect), 0.0f);
 	vec3 specular = _LightColor * _SpecularStrength * pow(specAngle, _SpecularShininess);
 
-	color = vec4((ambient + diffuse + specular) * _DiffColor, 1.0f);
+	color = vec4((ambient + diffuse + specular) * _DiffColor, 1.0f) * texture(_Texture1, TexCoord);
 }
