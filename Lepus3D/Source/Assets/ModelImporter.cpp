@@ -24,7 +24,7 @@ bool ModelImporter::_ReadOBJ()
 	string line = "";
 	enum OBJImportState { ObjectSearch, BuildObject };
 	OBJImportState state = ObjectSearch;
-	VertexArray verts, normals, finalVerts; // obj indexes normals and assigns them to vertices, so we'll need to load them into a separate array. also separate array for final vertices as we don't use indexing (we'll recalculate normals)
+	VertexArray verts, normals, uvs, finalVerts; // obj indexes normals and assigns them to vertices, so we'll need to load them into a separate array. also separate array for final vertices as we don't use indexing (we'll recalculate normals)
 	vector<unsigned int> indices, finalIndices; // finalIndices will just be an array of indices with the size of n total vertices
 	int indexCounter = 0;
 	while(mObjFile->good())
@@ -57,12 +57,12 @@ bool ModelImporter::_ReadOBJ()
 			else
 				state = ObjectSearch;
 		}
-		else if(keyword == "v" || keyword == "vn")
+		else if(keyword == "v" || keyword == "vn" || keyword == "vt")
 		{
 			Vertex v;
 			data = line.substr(firstSpace+1);
 			string xyz[3] = { "", "", "" };
-			for(int i = 0; i < 3; i++)
+			for(int i = 0; i < 3 || (keyword == "vt" && i < 2); i++)
 			{
 				xyz[i] = data.substr(0, data.find(" "));
 				data = data.substr(data.find(" ")+1);
@@ -74,12 +74,18 @@ bool ModelImporter::_ReadOBJ()
 				v.z = stof(xyz[2]);
 				verts.push_back(v);
 			}
-			else
+			else if(keyword == "vn")
 			{
 				v.nX = stof(xyz[0]);
 				v.nY = stof(xyz[1]);
 				v.nZ = stof(xyz[2]);
 				normals.push_back(v);
+			}
+			else if(keyword == "vt")
+			{
+				v.s = stof(xyz[0]);
+				v.t = stof(xyz[1]);
+				uvs.push_back(v);
 			}
 		}
 		else if(keyword == "f")
@@ -95,21 +101,27 @@ bool ModelImporter::_ReadOBJ()
 				string uvIndex = "";
 				if(data.find("/") != 0)
 				{
-					uvIndex = data.substr(data.find("/"));
+					uvIndex = data.substr(0, data.find("/"));
 					data = data.substr(data.find("/")+1);
 				}
 				else
 					data = data.substr(1);
 				string normalIndex = data.substr(0, data.find(" "));
 				unsigned int vIdx = stoi(vertexIndex);
+				unsigned int uvIdx = 0;
 				if(uvIndex != "")
-					unsigned int uvIdx = stoi(uvIndex);
+					uvIdx = stoi(uvIndex);
 				unsigned int nIdx = stoi(normalIndex);
 				indices.push_back(indexCounter++);
 				finalVerts.push_back(verts[vIdx-1]);
 				finalVerts[indexCounter-1].nX = normals[nIdx-1].nX;
 				finalVerts[indexCounter-1].nY = normals[nIdx-1].nY;
 				finalVerts[indexCounter-1].nZ = normals[nIdx-1].nZ;
+				if(uvIdx != 0)
+				{
+					finalVerts[indexCounter-1].s = normals[uvIdx-1].s;
+					finalVerts[indexCounter-1].t = normals[uvIdx-1].t;
+				}
 			}
 		}
 	}
@@ -118,6 +130,7 @@ bool ModelImporter::_ReadOBJ()
 	mGeometry.push_back(loadedMesh);
 	verts.clear();
 	normals.clear();
+	uvs.clear();
 	indices.clear();
 	return true;
 }

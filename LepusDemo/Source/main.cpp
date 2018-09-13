@@ -10,7 +10,7 @@ int main()
 
 	bool isRunning = true;
 
-	Lepus3D::Assets::ModelImporter modelImp("Models/ball.obj");
+	Lepus3D::Assets::ModelImporter modelImp("Models/uv_cube.obj");
 	modelImp.Read();
 	modelImp.Close();
 
