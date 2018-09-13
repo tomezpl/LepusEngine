@@ -119,8 +119,8 @@ bool ModelImporter::_ReadOBJ()
 				finalVerts[indexCounter-1].nZ = normals[nIdx-1].nZ;
 				if(uvIdx != 0)
 				{
-					finalVerts[indexCounter-1].s = normals[uvIdx-1].s;
-					finalVerts[indexCounter-1].t = normals[uvIdx-1].t;
+					finalVerts[indexCounter-1].s = uvs[uvIdx-1].s;
+					finalVerts[indexCounter-1].t = uvs[uvIdx-1].t;
 				}
 			}
 		}
