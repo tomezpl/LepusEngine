@@ -12,23 +12,34 @@ Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
 {
 	auto vCount = verts.size();
 	bool repeated = false;
-	unsigned short lastUnique = 0;
-	for (unsigned short i = 0; i < vCount; i++)
+	unsigned long long lastUnique = 0;
+	if (!ignoreIndexing)
 	{
-		for (unsigned short j = 0; j < i && !repeated && !ignoreIndexing; j++)
+		for (unsigned long long i = 0; i < vCount; i++)
 		{
-			if (verts[i] == verts[j])
+			for (unsigned long long j = 0; j < i && !repeated && !ignoreIndexing; j++)
 			{
-				m_Indices.push_back(j);
-				repeated = true;
+				if (verts[i] == verts[j])
+				{
+					m_Indices.push_back(j);
+					repeated = true;
+				}
 			}
+			if (!repeated)
+			{
+				m_Vertices.push_back(verts[i]);
+				m_Indices.push_back(lastUnique++);
+			}
+			repeated = false;
 		}
-		if (!repeated)
+	}
+	else
+	{
+		m_Vertices = verts;
+		for (unsigned long long i = 0; i < vCount; i++)
 		{
-			m_Vertices.push_back(verts[i]);
-			m_Indices.push_back(lastUnique++);
+			m_Indices.push_back(i);
 		}
-		repeated = false;
 	}
 	m_Indexed = !ignoreIndexing;
 }
@@ -39,10 +50,10 @@ VertexPack Mesh::GetVertexBuffer()
 	return ret;
 }
 
-unsigned int* Mesh::GetIndexBuffer(unsigned int& indexCount)
+unsigned long long* Mesh::GetIndexBuffer(unsigned long long& indexCount)
 {
 	indexCount = m_Indices.size();
-	unsigned int* ret = new unsigned int[indexCount];
+	unsigned long long* ret = new unsigned long long[indexCount];
 	for (auto i = 0; i < indexCount; i++)
 	{
 		ret[i] = m_Indices[i];
@@ -51,7 +62,7 @@ unsigned int* Mesh::GetIndexBuffer(unsigned int& indexCount)
 	return ret;
 }
 
-void Mesh::SetIndices(std::vector<unsigned int> indices)
+void Mesh::SetIndices(std::vector<unsigned long long> indices)
 {
 	m_Indices = indices;
 	m_Indexed = true;

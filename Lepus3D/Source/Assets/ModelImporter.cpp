@@ -25,7 +25,7 @@ bool ModelImporter::_ReadOBJ()
 	enum OBJImportState { ObjectSearch, BuildObject };
 	OBJImportState state = ObjectSearch;
 	VertexArray verts, normals, uvs, finalVerts; // obj indexes normals and assigns them to vertices, so we'll need to load them into a separate array. also separate array for final vertices as we don't use indexing (we'll recalculate normals)
-	vector<unsigned int> indices, finalIndices; // finalIndices will just be an array of indices with the size of n total vertices
+	vector<unsigned long long> indices, finalIndices; // finalIndices will just be an array of indices with the size of n total vertices
 	int indexCounter = 0;
 	while(mObjFile->good())
 	{
@@ -107,11 +107,11 @@ bool ModelImporter::_ReadOBJ()
 				else
 					data = data.substr(1);
 				string normalIndex = data.substr(0, data.find(" "));
-				unsigned int vIdx = stoi(vertexIndex);
-				unsigned int uvIdx = 0;
+				unsigned long long vIdx = stoll(vertexIndex);
+				unsigned long long uvIdx = 0;
 				if(uvIndex != "")
-					uvIdx = stoi(uvIndex);
-				unsigned int nIdx = stoi(normalIndex);
+					uvIdx = stoll(uvIndex);
+				unsigned long long nIdx = stoll(normalIndex);
 				indices.push_back(indexCounter++);
 				finalVerts.push_back(verts[vIdx-1]);
 				finalVerts[indexCounter-1].nX = normals[nIdx-1].nX;

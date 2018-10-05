@@ -20,7 +20,8 @@ namespace LepusEngine
 		private:
 			Window m_Window;
 			char* m_WindowName;
-			GLuint m_VBO, m_IBO, m_VAO, m_eCount;
+			GLuint m_VBO, m_IBO, m_VAO;
+			unsigned long long m_eCount;
 			struct { 
 				bool 
 					window, 

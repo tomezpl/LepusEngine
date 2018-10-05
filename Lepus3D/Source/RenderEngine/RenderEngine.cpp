@@ -66,15 +66,15 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 {
 	bool useIndexing = mesh.IsIndexed();
 
-	unsigned int* iD = nullptr;
+	unsigned long long* iD = nullptr;
 	if(useIndexing)
-		iD = mesh.GetIndexBuffer(m_eCount);
+		iD = mesh.GetIndexBuffer((unsigned long long)m_eCount);
 	VertexPack vP = mesh.GetVertexBuffer();
 	Vertex* vD = vP.data;
-	unsigned int vDS = vP.size() * sizeof(Vertex);
+	unsigned long long vDS = vP.size() * sizeof(Vertex);
 
 	GLfloat* vArr = new GLfloat[vDS / sizeof(GLfloat)];
-	for (unsigned short i = 0, j = 0; i < vDS / sizeof(GLfloat); i += sizeof(vD[i]) / sizeof(GLfloat), j++)
+	for (unsigned long long i = 0, j = 0; i < vDS / sizeof(GLfloat); i += sizeof(vD[i]) / sizeof(GLfloat), j++)
 	{
 		vArr[i] = vD[j].x; // vertex model space position (X coord)
 		vArr[i+1] = vD[j].y; // vertex model space position (Y coord)
@@ -118,7 +118,7 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		if (useIndexing)
 		{
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_eCount * sizeof(GLuint), iD, GL_STATIC_DRAW); // pass elements/indices to GPU
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_eCount * sizeof(unsigned long long), iD, GL_STATIC_DRAW); // pass elements/indices to GPU
 		}
 
 		// Set vertex positions
@@ -159,7 +159,7 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-
+		useIndexing = false; // TODO: temporary fix for drawing artifacts
 		if (useIndexing)
 			glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
 		else
