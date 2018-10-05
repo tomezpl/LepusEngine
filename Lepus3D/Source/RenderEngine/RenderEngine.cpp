@@ -44,6 +44,7 @@ bool RenderEngine::Init()
 	glViewport(0, 0, m_Window.getSize().x, m_Window.getSize().y);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 
 	glGenBuffers(1, &m_VBO);
 	glGenBuffers(1, &m_IBO);
@@ -74,6 +75,7 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	unsigned long long vDS = vP.size() * sizeof(Vertex);
 
 	GLfloat* vArr = new GLfloat[vDS / sizeof(GLfloat)];
+	// TODO: This copy loop might be a potential culprit of framerate issues. It has to copy all floats on each draw call.
 	for (unsigned long long i = 0, j = 0; i < vDS / sizeof(GLfloat); i += sizeof(vD[i]) / sizeof(GLfloat), j++)
 	{
 		vArr[i] = vD[j].x; // vertex model space position (X coord)
