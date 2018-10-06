@@ -70,13 +70,12 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	unsigned long long* iD = nullptr;
 	if(useIndexing)
 		iD = mesh.GetIndexBuffer((unsigned long long)m_eCount);
-	VertexPack vP = mesh.GetVertexBuffer();
-	Vertex* vD = vP.data;
-	unsigned long long vDS = vP.size() * sizeof(Vertex);
+	unsigned long long vC = mesh.GetVertexCount();
+	unsigned long long vDS = vC * sizeof(Vertex);
 
-	GLfloat* vArr = new GLfloat[vDS / sizeof(GLfloat)];
+	GLfloat* vArr = mesh.GetVertexBuffer();
 	// TODO: This copy loop might be a potential culprit of framerate issues. It has to copy all floats on each draw call.
-	for (unsigned long long i = 0, j = 0; i < vDS / sizeof(GLfloat); i += sizeof(vD[i]) / sizeof(GLfloat), j++)
+	/*for (unsigned long long i = 0, j = 0; i < vDS / sizeof(GLfloat); i += sizeof(vD[i]) / sizeof(GLfloat), j++)
 	{
 		vArr[i] = vD[j].x; // vertex model space position (X coord)
 		vArr[i+1] = vD[j].y; // vertex model space position (Y coord)
@@ -86,7 +85,7 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		vArr[i+5] = vD[j].nX; // normal vector X
 		vArr[i+6] = vD[j].nY; // normal vector Y
 		vArr[i+7] = vD[j].nZ; // normal vector Z
-	}
+	}*/
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
@@ -165,14 +164,13 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		if (useIndexing)
 			glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
 		else
-			glDrawArrays(GL_TRIANGLES, 0, vP.size());
+			glDrawArrays(GL_TRIANGLES, 0, vC);
 	}
 	glBindVertexArray(0);
 
 	// Release resources
-	delete vD;
 	delete iD;
-	delete vArr;
+	//delete vArr;
 }
 
 bool RenderEngine::Update()

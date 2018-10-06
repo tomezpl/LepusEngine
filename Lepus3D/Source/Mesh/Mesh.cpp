@@ -27,7 +27,16 @@ Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
 			}
 			if (!repeated)
 			{
-				m_Vertices.push_back(verts[i]);
+				// Convert to raw float array
+				m_Vertices.push_back(verts[i].x);
+				m_Vertices.push_back(verts[i].y);
+				m_Vertices.push_back(verts[i].z);
+				m_Vertices.push_back(verts[i].s);
+				m_Vertices.push_back(verts[i].t);
+				m_Vertices.push_back(verts[i].nX);
+				m_Vertices.push_back(verts[i].nY);
+				m_Vertices.push_back(verts[i].nZ);
+
 				m_Indices.push_back(lastUnique++);
 			}
 			repeated = false;
@@ -35,7 +44,18 @@ Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
 	}
 	else
 	{
-		m_Vertices = verts;
+		// Convert to raw float array
+		for (unsigned long long i = 0; i < vCount; i++)
+		{
+			m_Vertices.push_back(verts[i].x);
+			m_Vertices.push_back(verts[i].y);
+			m_Vertices.push_back(verts[i].z);
+			m_Vertices.push_back(verts[i].s);
+			m_Vertices.push_back(verts[i].t);
+			m_Vertices.push_back(verts[i].nX);
+			m_Vertices.push_back(verts[i].nY);
+			m_Vertices.push_back(verts[i].nZ);
+		}
 		for (unsigned long long i = 0; i < vCount; i++)
 		{
 			m_Indices.push_back(i);
@@ -44,10 +64,15 @@ Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
 	m_Indexed = !ignoreIndexing;
 }
 
-VertexPack Mesh::GetVertexBuffer()
+float* Mesh::GetVertexBuffer()
 {
-	VertexPack ret = VertexPack(m_Vertices);
+	float* ret = m_Vertices.data();
 	return ret;
+}
+
+unsigned long long Mesh::GetVertexCount()
+{
+	return (m_Indexed) ? m_Indices.size() : m_Vertices.size() / 8;
 }
 
 unsigned long long* Mesh::GetIndexBuffer(unsigned long long& indexCount)

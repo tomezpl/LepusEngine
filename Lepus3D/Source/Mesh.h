@@ -12,14 +12,15 @@ namespace LepusEngine
 			friend class RenderEngine;
 			friend class Renderable;
 		private:
-			VertexArray m_Vertices;
+			std::vector<float> m_Vertices;
 			std::vector<unsigned long long> m_Indices;
 			bool m_Indexed;
 			Material* m_Mat; // only one material per mesh now - this will be changed with submeshes
 		public:
 			Mesh();
 			Mesh(VertexArray vertices, bool ignoreIndexing = false);
-			VertexPack GetVertexBuffer();
+			float* GetVertexBuffer();
+			unsigned long long GetVertexCount();
 			unsigned long long* GetIndexBuffer(unsigned long long& indexCount);
 			void SetIndices(std::vector<unsigned long long> indices);
 			void SetMaterial(Material& mat);
