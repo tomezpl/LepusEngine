@@ -144,6 +144,8 @@ bool ModelImporter::Init(string fn)
 	// filename for the .mtl material library file
 	string mtlFN = fn.substr(0, fn.length() - string(".obj").length()) + ".mtl";
 
+	mGeometry.clear();
+
 	mObjFile = new ifstream(objFN);
 	mMtlFile = new ifstream(mtlFN);
 
