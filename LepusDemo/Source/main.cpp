@@ -1,11 +1,13 @@
 #include "../../Lepus3D/Source/RenderEngine.h"
 #include "../../Lepus3D/Source/Camera/FPPCamera.h"
 #include "../../Lepus3D/Source/Assets.h"
+#include "../../LepusEngine/Source/Logger.h"
 
 using namespace LepusEngine;
 
 int main()
 {
+	LepusEngine::Logger::Enabled = true; // enable logging
 	Lepus3D::RenderEngine engine("LepusDemo", 800, 600);
 
 	bool isRunning = true;
@@ -36,6 +38,7 @@ int main()
 	float dTime; // delta time between frames
 	float elapsedTime = 0.0f;
 
+	LepusEngine::Logger::LogInfo("", "main", "Demo starting!");
 	while (isRunning)
 	{
 		elapsedTime += dTime = timer.restart().asSeconds(); // running time is needed for the scene light to orbit
@@ -49,6 +52,7 @@ int main()
 		engine.EndScene(); // finish rendering and present
 		isRunning = engine.Update(); // update window and check if engine is still running
 	}
+	LepusEngine::Logger::LogInfo("", "main", "Demo shutting down!");
 
 	engine.Shutdown();
 

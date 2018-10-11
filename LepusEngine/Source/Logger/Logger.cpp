@@ -5,15 +5,12 @@
 using namespace LepusEngine;
 using namespace std;
 
-#ifdef _DEBUG
-#define LEPUS_ENABLE_LOG
-#endif
+bool Logger::Enabled = false;
 
 void Logger::Log(char* cN, char* fN, int eT, char* msg, char* fP)
 {
-#ifndef LEPUS_ENABLE_LOG
-	return;
-#endif
+	if(!Enabled)
+		return;
 	string output = cN; 
 	output.append("::");
 	output.append(fN);
