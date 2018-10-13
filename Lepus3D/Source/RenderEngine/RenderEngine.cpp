@@ -74,18 +74,6 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	unsigned long long vDS = vC * sizeof(Vertex);
 
 	GLfloat* vArr = mesh.GetVertexBuffer();
-	// TODO: This copy loop might be a potential culprit of framerate issues. It has to copy all floats on each draw call.
-	/*for (unsigned long long i = 0, j = 0; i < vDS / sizeof(GLfloat); i += sizeof(vD[i]) / sizeof(GLfloat), j++)
-	{
-		vArr[i] = vD[j].x; // vertex model space position (X coord)
-		vArr[i+1] = vD[j].y; // vertex model space position (Y coord)
-		vArr[i+2] = vD[j].z; // vertex model space position (Z coord)
-		vArr[i+3] = vD[j].s; // texture coord S
-		vArr[i+4] = vD[j].t; // texture coord T
-		vArr[i+5] = vD[j].nX; // normal vector X
-		vArr[i+6] = vD[j].nY; // normal vector Y
-		vArr[i+7] = vD[j].nZ; // normal vector Z
-	}*/
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
