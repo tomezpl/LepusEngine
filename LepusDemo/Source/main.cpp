@@ -7,7 +7,7 @@ using namespace LepusEngine;
 
 int main()
 {
-	LepusEngine::Logger::Enabled = true; // enable logging
+	LepusEngine::Logger::Enabled = true; // disable logging
 	Lepus3D::RenderEngine engine("LepusDemo", 800, 600);
 
 	bool isRunning = true;

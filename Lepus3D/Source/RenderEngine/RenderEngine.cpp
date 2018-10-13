@@ -176,6 +176,7 @@ bool RenderEngine::Update()
 	newWndName.append(" - FPS: ");
 	newWndName.append(std::to_string((int)(1.f / m_LastFrameTime)));
 	// TODO: Assign window name
+	glfwSetWindowTitle(m_Window, newWndName.c_str());
 
 	/*sf::Event ev;
 	while (m_Window.pollEvent(ev))
@@ -220,6 +221,7 @@ void RenderEngine::EndScene()
 	float currentTime = glfwGetTime();
 	m_LastFrameTime = currentTime - m_ElapsedTime;
 	m_ElapsedTime = currentTime;
+	glfwPollEvents();
 }
 
 void RenderEngine::Shutdown()
