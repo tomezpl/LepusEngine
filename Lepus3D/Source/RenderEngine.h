@@ -1,8 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
-#include "Window.h"
-#include <SFML/OpenGL.hpp>
+#include <GLFW/glfw3.h>
 
 #include "Material.h"
 #include "Vertex.h"
@@ -18,7 +17,7 @@ namespace LepusEngine
 		class RenderEngine
 		{
 		private:
-			Window m_Window;
+			GLFWwindow* m_Window;
 			char* m_WindowName;
 			GLuint m_VBO, m_IBO, m_VAO;
 			unsigned long long m_eCount;
@@ -28,8 +27,7 @@ namespace LepusEngine
 					renderer; 
 			} m_Ready;
 			GLuint m_TextureSet[16];
-			sf::Clock m_Clock; // will be used for FPS counter and such
-			float m_LastFrameTime, m_LastFPSUpdateTime;
+			float m_LastFrameTime, m_ElapsedTime;
 			Camera* m_Cam;
 		public:
 			RenderEngine() { m_Ready = { false, false }; };
@@ -39,7 +37,7 @@ namespace LepusEngine
 			void StartScene(Camera* camera);
 			void DrawMesh(Mesh& mesh, Material& material, Transform& transform);
 			void DrawScene(Scene& scene);
-			Window* GetWindowPtr() { return &m_Window; };
+			GLFWwindow* GetWindowPtr() { return m_Window; };
 			void EndScene();
 
 			// Runs the window's event loop, returns false if window was closed

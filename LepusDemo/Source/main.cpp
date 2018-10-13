@@ -34,14 +34,15 @@ int main()
 	scene.AddLight(&sceneLight);
 	scene.AddMesh(box);
 
-	sf::Clock timer;
-	float dTime; // delta time between frames
-	float elapsedTime = 0.0f;
+	float dTime = 0.0f; // delta time between frames
+	float elapsedTime = glfwGetTime();
 
 	LepusEngine::Logger::LogInfo("", "main", "Demo starting!");
 	while (isRunning)
 	{
-		elapsedTime += dTime = timer.restart().asSeconds(); // running time is needed for the scene light to orbit
+		dTime = elapsedTime;
+		elapsedTime = glfwGetTime(); // running time is needed for the scene light to orbit
+		dTime = elapsedTime - dTime;
 
 		sceneLight.SetPosition(Lepus3D::Vector3(0.0f, 2.50f * sin(elapsedTime), 2.50f * cos(elapsedTime))); // orbit the light around the box
 

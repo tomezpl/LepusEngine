@@ -10,26 +10,27 @@ RenderEngine::RenderEngine(char* name, unsigned short width, unsigned short heig
 	this->Init(name, width, height);
 }
 
+// TODO
 bool RenderEngine::Init(char* name, unsigned short width, unsigned short height)
 {
+	glfwInit(); // start GLFW
+	m_ElapsedTime = glfwGetTime();
+	m_LastFrameTime = 0.0;
+
 	m_Cam = nullptr;
 	m_Ready = { false, false };
 	m_WindowName = name;
-	sf::ContextSettings settings;
-	settings.depthBits = 24;
-	settings.stencilBits = 8;
-	m_Window.create(sf::VideoMode(width, height), name, sf::Style::Default, settings);
-	m_Ready.window = m_Window.isOpen();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	m_Window = glfwCreateWindow(width, height, name, 0, 0);
+	m_Ready.window = (glfwGetWindowAttrib(m_Window, GLFW_VISIBLE) == 0) ? false : true;
+	glfwMakeContextCurrent(m_Window);
 	return this->Init();
 }
 
 bool RenderEngine::Init()
 {
 	m_eCount = 0;
-
-	m_LastFPSUpdateTime = m_LastFrameTime = 0.f;
-
-	m_Clock.restart();
 
 	if (!m_Ready.window)
 	{
@@ -41,7 +42,10 @@ bool RenderEngine::Init()
 	if (err != GLEW_OK)
 		Logger::LogWarning("RenderEngine", "Init", "GLEW failed to load");
 
-	glViewport(0, 0, m_Window.getSize().x, m_Window.getSize().y);
+	// TODO: replace SFML window
+	int width, height = 0;
+	glfwGetFramebufferSize(m_Window, &width, &height);
+	glViewport(0, 0, width, height);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -58,6 +62,7 @@ bool RenderEngine::Init()
 
 void RenderEngine::StartScene(Camera* cam)
 {
+	m_ElapsedTime = glfwGetTime(); // get time for frame time measurement
 	m_Cam = cam;
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -143,7 +148,10 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		model = transform.GetMatrix();
 		//view = glm::translate(view, glm::vec3(0.f, 0.f, -2.f));
 		view = m_Cam->GetView();
-		projection = glm::perspective(45.f, (float)m_Window.getSize().x / (float)m_Window.getSize().y, 0.01f, 100.f);
+		// TODO: replace SFML window
+		int width, height = 0;
+		glfwGetWindowSize(m_Window, &width, &height);
+		projection = glm::perspective(45.f, (float)width / (float)height, 0.01f, 100.f);
 
 		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -161,19 +169,15 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	//delete vArr;
 }
 
+// TODO: Remove SFML
 bool RenderEngine::Update()
 {
 	std::string newWndName = m_WindowName;
 	newWndName.append(" - FPS: ");
-	float currentTime = m_Clock.getElapsedTime().asSeconds();
-	newWndName.append(std::to_string((int)(1.f / (currentTime - m_LastFrameTime))));
-	if (currentTime - m_LastFPSUpdateTime >= 1.f)
-	{
-		m_Window.setTitle(newWndName);
-		m_LastFPSUpdateTime = currentTime;
-	}
-	m_LastFrameTime = currentTime;
-	sf::Event ev;
+	newWndName.append(std::to_string((int)(1.f / m_LastFrameTime)));
+	// TODO: Assign window name
+
+	/*sf::Event ev;
 	while (m_Window.pollEvent(ev))
 	{
 		switch (ev.type)
@@ -185,7 +189,10 @@ bool RenderEngine::Update()
 			glViewport(0, 0, ev.size.width, ev.size.height);
 			break;
 		}
-	}
+	}*/
+
+	if (glfwWindowShouldClose(m_Window))
+		glfwDestroyWindow(m_Window);
 
 	return true;
 }
@@ -209,7 +216,10 @@ void RenderEngine::DrawScene(Scene& sc)
 
 void RenderEngine::EndScene()
 {
-	m_Window.display();
+	glfwSwapBuffers(m_Window);
+	float currentTime = glfwGetTime();
+	m_LastFrameTime = currentTime - m_ElapsedTime;
+	m_ElapsedTime = currentTime;
 }
 
 void RenderEngine::Shutdown()
@@ -218,7 +228,9 @@ void RenderEngine::Shutdown()
 	glDeleteBuffers(1, &m_IBO);
 	glDeleteVertexArrays(1, &m_VAO);
 
-	m_Window.close();
+	glfwDestroyWindow(m_Window);
+
+	glfwTerminate();
 }
 
 RenderEngine::~RenderEngine()

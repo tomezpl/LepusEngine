@@ -3,12 +3,12 @@
 
 using namespace LepusEngine::Lepus3D;
 
-FPPCamera::FPPCamera(Window* wnd)
+FPPCamera::FPPCamera(GLFWwindow* wnd)
 {
 	this->SetWindow(wnd);
 }
 
-void FPPCamera::SetWindow(Window* wnd)
+void FPPCamera::SetWindow(GLFWwindow* wnd)
 {
 	m_Wnd = wnd;
 	m_LastX = 0.5f;
@@ -24,7 +24,7 @@ void FPPCamera::ProcessInput(float deltaTime)
 {
 	const float lookSensitivity = 100.f;
 	auto position = m_Transform.GetPosition().vec3();
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
 		position += m_Target.vec3() * deltaTime * 2.f;
 	}
@@ -39,11 +39,11 @@ void FPPCamera::ProcessInput(float deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
 		position += glm::normalize(glm::cross(m_Target.vec3(), m_Up.vec3())) * 2.0f * deltaTime;
-	}
+	}*/
 	m_Transform.SetPosition(Vector3(position.x, position.y, position.z));
 	Vector3 rotation = m_Transform.GetRotation();
 
-	auto mouseInput = sf::Mouse::getPosition();
+	/*auto mouseInput = sf::Mouse::getPosition();
 	Vector2 mouseInputF(mouseInput.x, mouseInput.y);
 	auto wndSize = sf::Vector2i(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height);
 	bool mouseGood = false;
@@ -55,7 +55,7 @@ void FPPCamera::ProcessInput(float deltaTime)
 		rotation.y += mouseRot.x * lookSensitivity;
 		if (rotation.y <= 0.0f)
 			rotation.y += 360.0f; // quick fix for issue #2 (negative rotation not supported)
-		rotation.x -= mouseRot.y * lookSensitivity;
+		rotation.x -= mouseRot.y * lookSensitivity;*/
 
 	// quick fix for issue #2 (no negative rotation)
 	if (rotation.x <= 0.0f)
@@ -67,7 +67,7 @@ void FPPCamera::ProcessInput(float deltaTime)
 	m_Transform.SetRotation(rotation);
 
 	Logger::LogInfo("FPPCamera", "ProcessInput", (char*)(m_Transform.ToString().c_str()));
-	if (mouseGood)
+	/*if (mouseGood)
 	{
 		m_LastX = mouseInputF.x;
 		m_LastY = mouseInputF.y;
@@ -77,5 +77,5 @@ void FPPCamera::ProcessInput(float deltaTime)
 			m_Wnd->setMouseCursorGrabbed(true);
 			m_Wnd->setMouseCursorVisible(false);
 		}
-	}
+	}*/
 }

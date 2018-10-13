@@ -31,24 +31,24 @@ Check out the GENie scripting reference if you need, it's quite compact and shou
 #### Windows
 The GENie script on Windows is optimised specifically for building with Visual Studio. VS2013, 2015 and 2017 should work, and so should any newer releases.
 
-You will need to download the third-party libraries used (SFML and GLEW). In addition, you'll need to set up the following environment variables in your system settings:
-* SFML_DIR
-	* Points to the root directory of a 64-bit SFML package for MSVC++ (folder name usually *SFML-x.x.x-windows-vc1x-64-bit*).
-	* For example, *$(SFML_DIR)/lib/* should point to the *lib* folder in your 64-bit SFML directory
-* SFML_DIR32
-	* Points to the root directory of a 32-bit SFML package for MSVC++ (folder name usually *SFML-x.x.x-windows-vc1x-32-bit*).
-	* For example, *$(SFML_DIR32)/lib/* should point to the *lib* folder in your 32-bit SFML directory
+You will need to download the third-party libraries used (GLFW and GLEW). In addition, you'll need to set up the following environment variables in your system settings:
+* GLFW_DIR
+	* Points to the root directory of a 64-bit pre-compiled binary GLFW package for MSVC++ (folder name usually *glfw-x.x.x.bin.WIN64*).
+	* For example, *$(GLFW_DIR)/lib-vc2015/* should point to the *lib-vc2015* folder in your 64-bit GLFW (*glfw-x.x.x.bin.WIN64*) directory
+* GLFW_DIR32
+	* Points to the root directory of a 32-bit pre-compiled binary GLFW package for MSVC++ (folder name usually *glfw-x.x.x.bin.WIN32*).
+	* For example, *$(GLFW_DIR32)/lib-vc2015/* should point to the *lib-vc2015* folder in your 32-bit GLFW (*glfw-x.x.x.bin.WIN32*) directory
 * GLEW_DIR
 	* Points to the root directory of a GLEW package for Win32 (folder name usually *glew-x.x.x-win32*).
 	* For example, *$(GLEW_DIR)/lib/* should point to the *lib* folder in your GLEW directory
 
 #### GNU/Linux
-You'll need to install G++, pkg-config, g++-multilib, GNU make, as well as dependencies: *libgl1-mesa-dev*, *libsfml-dev* and *libglew-dev*.
+You'll need to install G++, pkg-config, g++-multilib, GNU make, as well as dependencies: *libgl1-mesa-dev*, *libglfw-dev* and *libglew-dev*.
 
 On Ubuntu, you can run:
 
 ```bash
-sudo apt-get install g++ make libgl1-mesa-dev libsfml-dev libglew-dev
+sudo apt-get install g++ make libgl1-mesa-dev libglfw-dev libglew-dev
 ```
 
 The GENie script on Linux was written with GNU Make in mind, but it is not tested or maintained as regularly as the Windows build tools, so please report any issues and try fixing them where possible. Run ```make LepusDemo``` to build the full engine along with the demo app. You can also append build type and platform to that command, like ```make LepusDemo config='debug64'```. Advised if you're running into "skipping library because incompatible" issues with GCC.

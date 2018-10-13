@@ -65,13 +65,13 @@ project "Lepus3D"
 
 	configuration "windows"
 		includedirs {
-			path.join(os.getenv("SFML_DIR"), "include"),
+			path.join(os.getenv("GLFW_DIR"), "include"),
 			path.join(os.getenv("GLEW_DIR"), "include"),
 			path.join(PROJ_DIR, "include\\glm-windows"),
 		}
 
 	configuration "linux"
-		links { "sfml-window", "sfml-system", "sfml-graphics", "sfml-audio", "sfml-network", "GLEW", "GLU", "GL" }
+		links { "glfw3", "GLEW", "GLU", "GL" }
 		includedirs { path.join(PROJ_DIR, "include/glm-linux") }
 
 	configuration { "Debug", "x32" }
@@ -109,14 +109,14 @@ project "LepusDemo"
 	includedirs {
 		PROJ_DIR,
 		path.join(PROJ_DIR, "include"),
-		path.join(os.getenv("SFML_DIR"), "include"),
+		path.join(os.getenv("GLFW_DIR"), "include"),
 		path.join(os.getenv("GLEW_DIR"), "include"),
 	}
 
 	links { "Lepus3D", "LepusEngine" }
 
 	configuration "linux"
-		links { "sfml-window", "sfml-system", "sfml-graphics", "sfml-audio", "sfml-network", "GLEW", "GLU", "GL" }
+		links { "glfw3", "GLEW", "GLU", "GL" }
 		includedirs { path.join(PROJ_DIR, "include/glm-linux") }
 
 	configuration "windows"
@@ -132,15 +132,9 @@ project "LepusDemo"
 			path.join(os.getenv("GLEW_DIR"), "lib/Release/x64"),
 		}
 
-	configuration { "windows", "Debug" }
-		links { "sfml-graphics-d", "sfml-system-d", "sfml-window-d" }
-
-	configuration { "windows", "Release" }
-		links { "sfml-graphics", "sfml-system", "sfml-window" }
-
 	configuration "windows"
-		libdirs { path.join(os.getenv("SFML_DIR"), "lib/") }
-		links { "opengl32", "glew32" }
+		libdirs { path.join(os.getenv("GLFW_DIR"), "lib-vc2015/") }
+		links { "glfw3", "opengl32", "glew32" }
 
 	configuration { "Debug", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Debug32/LepusDemo/"))
@@ -163,7 +157,7 @@ project "LepusDemo"
 		debugdir (path.join(PROJ_DIR, "bin/Release32/"))
 
 	configuration "windows"
-		postbuildcommands { "mkdir \"$(TargetDir)../../Content/GLSL\"", "xcopy \"$(SolutionDir)\\Lepus3D\\Source\\GLSL\" \"$(TargetDir)\\..\\..\\Content\\GLSL\"/C /Y", "copy \"$(SFML_DIR)\\bin\\*.dll\" \"$(TargetDir)\\\" /y", "copy \"$(GLEW_DIR)\\bin\\Release\\$(Platform)\\glew32.dll\" \"$(TargetDir)\" /y" }
+		postbuildcommands { "mkdir \"$(TargetDir)../../Content/GLSL\"", "xcopy \"$(SolutionDir)\\Lepus3D\\Source\\GLSL\" \"$(TargetDir)\\..\\..\\Content\\GLSL\"/C /Y", "copy \"$(GLEW_DIR)\\bin\\Release\\$(Platform)\\glew32.dll\" \"$(TargetDir)\" /y" }
 
 	configuration "not windows"
 		postbuildcommands { "mkdir -p ./Content/GLSL", "cp ./Lepus3D/Source/GLSL/* ./Content/GLSL/" }
