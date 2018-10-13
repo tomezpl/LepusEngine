@@ -192,8 +192,12 @@ bool RenderEngine::Update()
 		}
 	}*/
 
-	if (glfwWindowShouldClose(m_Window))
+	if (m_Ready.window && glfwWindowShouldClose(m_Window))
+	{
 		glfwDestroyWindow(m_Window);
+		m_Ready.window = false;
+		return false;
+	}
 
 	return true;
 }
@@ -230,7 +234,8 @@ void RenderEngine::Shutdown()
 	glDeleteBuffers(1, &m_IBO);
 	glDeleteVertexArrays(1, &m_VAO);
 
-	glfwDestroyWindow(m_Window);
+	if(m_Ready.window)
+		glfwDestroyWindow(m_Window);
 
 	glfwTerminate();
 }
