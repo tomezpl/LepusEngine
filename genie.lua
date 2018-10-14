@@ -27,6 +27,9 @@ project "LepusEngine"
 		path.join(PROJ_DIR, "LepusEngine/Source/**.cpp"),
 	}
 
+	configuration { "vs*", "Debug" }
+		buildoptions { "/Zi" }
+
 	configuration { "Debug", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Debug32/LepusEngine/"))
 		targetdir (path.join(PROJ_DIR, "lib/Debug32/"))
@@ -69,6 +72,9 @@ project "Lepus3D"
 			path.join(os.getenv("GLEW_DIR"), "include"),
 			path.join(PROJ_DIR, "include\\glm-windows"),
 		}
+
+	configuration { "vs*", "Debug" }
+		buildoptions { "/Zi" }
 
 	configuration "linux"
 		links { "glfw3", "GLEW", "GLU", "GL" }
@@ -135,6 +141,10 @@ project "LepusDemo"
 	configuration "windows"
 		libdirs { path.join(os.getenv("GLFW_DIR"), "lib-vc2015/") }
 		links { "glfw3", "opengl32", "glew32" }
+
+	configuration { "vs*", "Debug" }
+		buildoptions { "/Zi" }
+		linkoptions { "/DEBUG" }
 
 	configuration { "Debug", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Debug32/LepusDemo/"))
