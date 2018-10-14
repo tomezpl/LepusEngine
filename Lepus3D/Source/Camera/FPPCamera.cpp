@@ -1,5 +1,6 @@
 #include "FPPCamera.h"
 #include "LepusEngine/Source/Logger.h"
+#include <functional>
 
 using namespace LepusEngine::Lepus3D;
 
@@ -13,6 +14,8 @@ void FPPCamera::SetWindow(GLFWwindow* wnd)
 	m_Wnd = wnd;
 	m_LastX = 0.5f;
 	m_LastY = 0.5f;
+	_fppCamPtr = this;
+	glfwSetWindowSizeCallback(wnd, ResizeCallback);
 }
 
 glm::mat4 FPPCamera::Run()

@@ -1,7 +1,13 @@
 #pragma once
 
+#ifndef LEPUS_GLEW_INCLUDED
+#define LEPUS_GLEW_INCLUDED
 #include <GL/glew.h>
+#endif
+#ifndef LEPUS_GLFW_INCLUDED
+#define LEPUS_GLFW_INCLUDED
 #include <GLFW/glfw3.h>
+#endif
 
 #include "Material.h"
 #include "Vertex.h"

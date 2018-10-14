@@ -175,22 +175,7 @@ bool RenderEngine::Update()
 	std::string newWndName = m_WindowName;
 	newWndName.append(" - FPS: ");
 	newWndName.append(std::to_string((int)(1.f / m_LastFrameTime)));
-	// TODO: Assign window name
 	glfwSetWindowTitle(m_Window, newWndName.c_str());
-
-	/*sf::Event ev;
-	while (m_Window.pollEvent(ev))
-	{
-		switch (ev.type)
-		{
-		case sf::Event::Closed:
-			m_Window.close();
-			return false;
-		case sf::Event::Resized:
-			glViewport(0, 0, ev.size.width, ev.size.height);
-			break;
-		}
-	}*/
 
 	if (m_Ready.window && glfwWindowShouldClose(m_Window))
 	{

@@ -63,3 +63,8 @@ Transform Camera::GetTransform()
 {
 	return this->m_Transform;
 }
+
+void InputCamera::SetWindow(GLFWwindow* wnd)
+{
+	m_Wnd = wnd;
+}
