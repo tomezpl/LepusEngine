@@ -213,6 +213,11 @@ void RenderEngine::EndScene()
 	glfwPollEvents();
 }
 
+double RenderEngine::LastFrameTime()
+{
+	return m_LastFrameTime;
+}
+
 void RenderEngine::Shutdown()
 {
 	glDeleteBuffers(1, &m_VBO);

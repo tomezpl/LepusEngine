@@ -33,7 +33,7 @@ namespace LepusEngine
 					renderer; 
 			} m_Ready;
 			GLuint m_TextureSet[16];
-			float m_LastFrameTime, m_ElapsedTime;
+			double m_LastFrameTime, m_ElapsedTime;
 			Camera* m_Cam;
 		public:
 			RenderEngine() { m_Ready = { false, false }; };
@@ -49,6 +49,9 @@ namespace LepusEngine
 			// Runs the window's event loop, returns false if window was closed
 			// Draws the current vertex buffer to the screen
 			bool Update();
+
+			// Returns the time it took to render the last frame
+			double LastFrameTime();
 			
 			void Shutdown();
 			~RenderEngine();
