@@ -80,7 +80,7 @@ void FPPCamera::ProcessInput(float deltaTime)
 		rotation.x = 360.0f - 89.9f; // I was lazy to do the maths lol
 	m_Transform.SetRotation(rotation);
 
-	Logger::LogInfo("FPPCamera", "ProcessInput", (char*)(m_Transform.ToString().c_str()));
+	//Logger::LogInfo("FPPCamera", "ProcessInput", (char*)(m_Transform.ToString().c_str()));
 	if (mouseGood)
 	{
 		m_LastX = mouseX;
