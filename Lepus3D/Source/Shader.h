@@ -18,8 +18,8 @@ namespace LepusEngine
 			bool m_Ready;
 		public:
 			Shader() { m_ShaderName = ""; m_Ready = false; };
-			Shader(char* name);
-			bool Load(char* name = "");
+			Shader(char* name, char* directory = "../../Content/GLSL");
+			bool Load(char* name = "", char* directory = "../../Content/GLSL");
 			const char* VShaderSrc();
 			const char* FShaderSrc();
 			char* Name();

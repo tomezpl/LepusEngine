@@ -4,39 +4,39 @@
 
 using namespace LepusEngine::Lepus3D;
 
-Shader::Shader(char* name)
+Shader::Shader(char* name, char* dir)
 {
 	m_Ready = false;
-	if (!Load(name))
+	if (!Load(name, dir))
 	{
 #ifdef _DEBUG
-		std::cout << "Shader::Shader(name): error while loading shader " << name << "." << std::endl;
+		std::cout << "Shader::Shader(name, dir): error while loading shader " << name << "." << std::endl;
 #endif
 	}
 	else
 	{
 #ifdef _DEBUG
-		std::cout << "Shader::Shader(name): success loading shader " << name << "." << std::endl;
+		std::cout << "Shader::Shader(name, dir): success loading shader " << name << "." << std::endl;
 #endif
 		m_Ready = true;
 	}
 }
 
-bool Shader::Load(char* name)
+bool Shader::Load(char* name, char* dir)
 {
 	m_ShaderName = name;
 
-	if (!m_VShader.LoadShader(name))
+	if (!m_VShader.Load(name, dir))
 	{
 #ifdef _DEBUG
-		std::cout << "Shader::Load(name): error, vertex shader " << name << " failed to load." << std::endl;
+		std::cout << "Shader::Load(name, dir): error, vertex shader " << name << " failed to load." << std::endl;
 #endif
 		return false;
 	}
-	if (!m_FShader.LoadShader(name))
+	if (!m_FShader.Load(name, dir))
 	{
 #ifdef _DEBUG
-		std::cout << "Shader::Load(name): error, fragment shader " << name << " failed to load." << std::endl;
+		std::cout << "Shader::Load(name, dir): error, fragment shader " << name << " failed to load." << std::endl;
 #endif
 		return false;
 	}
@@ -60,7 +60,7 @@ bool Shader::Load(char* name)
 	if (!success)
 	{
 		glGetShaderInfoLog(m_VShader.m_Program, 512, NULL, infoLog);
-		std::cout << "Shader::Load(name): vertex shader " << m_ShaderName << " failed to compile (InfoLog: " << infoLog << ")" << std::endl;
+		std::cout << "Shader::Load(name, dir): vertex shader " << m_ShaderName << " failed to compile (InfoLog: " << infoLog << ")" << std::endl;
 		return false;
 	}
 
@@ -68,7 +68,7 @@ bool Shader::Load(char* name)
 	if (!success)
 	{
 		glGetShaderInfoLog(m_FShader.m_Program, 512, NULL, infoLog);
-		std::cout << "Shader::Load(name): fragment shader " << m_ShaderName << " failed to compile (InfoLog: " << infoLog << ")" << std::endl;
+		std::cout << "Shader::Load(name, dir): fragment shader " << m_ShaderName << " failed to compile (InfoLog: " << infoLog << ")" << std::endl;
 		return false;
 	}
 
@@ -81,7 +81,7 @@ bool Shader::Load(char* name)
 	if (!success)
 	{
 		glGetProgramInfoLog(m_Compiled, 512, NULL, infoLog);
-		std::cout << "Shader::Load(name): compiled shader " << m_ShaderName << " failed to link (InfoLog: " << infoLog << ")" << std::endl;
+		std::cout << "Shader::Load(name, dir): compiled shader " << m_ShaderName << " failed to link (InfoLog: " << infoLog << ")" << std::endl;
 		return false;
 	}
 

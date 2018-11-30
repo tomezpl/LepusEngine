@@ -19,8 +19,8 @@ namespace LepusEngine {
 				bool _ReadOBJ(); // read data from .obj file
 			public:
 				ModelImporter();
-				ModelImporter(std::string filename);
-				bool Init(std::string filename);
+				ModelImporter(std::string filename, std::string directory = "../../Content");
+				bool Init(std::string filename, std::string directory = "../../Content");
 				bool Read();
 				Mesh GetSubMesh(int meshIndex = 0);
 				bool Close();

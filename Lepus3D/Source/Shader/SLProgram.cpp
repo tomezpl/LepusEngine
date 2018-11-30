@@ -3,22 +3,22 @@
 
 using namespace LepusEngine::Lepus3D;
 
-SLProgram::SLProgram(char* name)
+SLProgram::SLProgram(char* name, char* dir)
 {
 #ifdef _DEBUG
 	if (name == "")
 		//std::cout << "SLProgram(name): warning, program name is null, needs to be passed while loading" << std::endl;
 		Logger::LogWarning("SLProgram", "SLProgram", "program name is null, need to pass while loading", "name");
 #endif
-	this->LoadShader(name);
+	this->Load(name, dir);
 }
 
-bool SLProgram::LoadShader(char* name)
+bool SLProgram::Load(char* name, char* dir)
 {
 	if (name == "")
 		return false;
 	m_ProgramName = name;
-		return this->_LoadShader();
+		return this->_LoadShader(dir);
 }
 
 bool SLProgram::_LoadFile(char* fileName)
@@ -47,17 +47,19 @@ bool SLProgram::_LoadFile(char* fileName)
 	return true;
 }
 
-bool VShader::_LoadShader()
+bool VShader::_LoadShader(char* dir)
 {
-	std::string fileName = "../../Content/GLSL/";
+	std::string fileName = dir;
+	fileName += "/";
 	fileName += m_ProgramName;
 	fileName += ".vert";
 	return this->_LoadFile((char*)fileName.c_str());
 }
 
-bool FShader::_LoadShader()
+bool FShader::_LoadShader(char* dir)
 {
-	std::string fileName = "../../Content/GLSL/";
+	std::string fileName = dir;
+	fileName += "/";
 	fileName += m_ProgramName;
 	fileName += ".frag";
 	return this->_LoadFile((char*)fileName.c_str());

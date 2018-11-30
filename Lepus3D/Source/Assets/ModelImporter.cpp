@@ -14,20 +14,20 @@ ModelImporter::ModelImporter()
 }
 
 // Opens file after constructor
-ModelImporter::ModelImporter(string fn)
+ModelImporter::ModelImporter(string fn, string dir)
 {
 	// initialise member variables
 	bool success = false;
 	mObjFile = nullptr;
 	mMtlFile = nullptr;
-	success = Init(fn);
+	success = Init(fn, dir);
 }
 
 // Opens model file
-bool ModelImporter::Init(string fn)
+bool ModelImporter::Init(string fn, string dir)
 {
 	// navigate to content folder
-	fn = "../../Content/" + fn;
+	fn = dir + "/" + fn;
 	// filename for the .obj file
 	string objFN = fn;
 	// filename for the .mtl material library file

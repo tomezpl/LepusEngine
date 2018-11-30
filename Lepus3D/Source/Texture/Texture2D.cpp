@@ -5,15 +5,15 @@
 
 using namespace LepusEngine::Lepus3D;
 
-Texture2D::Texture2D(char* fileName)
+Texture2D::Texture2D(char* fileName, char* dir)
 {
-	this->Load(fileName);
+	this->Load(fileName, dir);
 }
 
-// TODO: update with stbi
-void Texture2D::Load(char* fN)
+void Texture2D::Load(char* fN, char* dir)
 {
-	std::string filePath = "../../Content/";
+	std::string filePath = dir;
+	filePath.append("/");
 	filePath.append(fN);
 	//image.loadFromFile(filePath);
 	//image.flipVertically(); // Texture will be sampled with GLSL's coordinates that define (0,0) as bottom left
