@@ -15,9 +15,11 @@ void Texture2D::Load(char* fN, char* dir)
 	std::string filePath = dir;
 	filePath.append("/");
 	filePath.append(fN);
-	//image.loadFromFile(filePath);
-	//image.flipVertically(); // Texture will be sampled with GLSL's coordinates that define (0,0) as bottom left
 	m_Data = stbi_load(filePath.c_str(), &m_Width, &m_Height, &m_Channels, 4); // load RGBA texture
+
+	if(filePath.find(".tga") == std::string::npos)
+		stbi__vertical_flip(m_Data, m_Width, m_Height, 4); // non-TGA images need to be flipped vertically
+	
 	m_Size = m_Width * m_Height * sizeof(unsigned char) * 4;
 }
 
