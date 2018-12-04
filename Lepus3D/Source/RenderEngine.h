@@ -52,6 +52,8 @@ namespace LepusEngine
 
 			// Returns the time it took to render the last frame
 			double LastFrameTime();
+
+			void DumpToFile(std::string filePath = "output.bmp");
 			
 			void Shutdown();
 			~RenderEngine();

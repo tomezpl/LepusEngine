@@ -50,6 +50,8 @@ int main()
 		engine.DrawScene(scene); // draw objects in scene
 		engine.EndScene(); // finish rendering and present
 		isRunning = engine.Update(); // update window and check if engine is still running
+		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_F12) == GLFW_PRESS)
+			engine.DumpToFile();
 	}
 	LepusEngine::Logger::LogInfo("", "main", "Demo shutting down!");
 

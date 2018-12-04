@@ -2,6 +2,8 @@
 #include <iostream>
 #include "LepusEngine/Source/Logger.h"
 #include "../Transform.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION // This is critcal as otherwise the build will fail due to unresolved externals
+#include "../3rdparty/stb_image_write.h"
 
 using namespace LepusEngine::Lepus3D;
 
@@ -216,6 +218,17 @@ void RenderEngine::EndScene()
 double RenderEngine::LastFrameTime()
 {
 	return m_LastFrameTime;
+}
+
+void RenderEngine::DumpToFile(std::string fp)
+{
+	int width = 0;
+	int height = 0;
+	glfwGetFramebufferSize(m_Window, &width, &height);
+	unsigned char* data = new unsigned char[width*height * 3];
+	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
+	stbi_flip_vertically_on_write(1); // GL coordinates origin is vertically inverted, so data needs to be flipped on writing
+	stbi_write_bmp(fp.c_str(), width, height, 3, data);
 }
 
 void RenderEngine::Shutdown()
