@@ -7,7 +7,8 @@ Scene::Scene()
 {
 	m_ObjArr.clear();
 	m_LightArr.clear();
-	m_AmbientColor = Color(255, 255, 255, 255);
+	Color ambient(255, 255, 255, 255);
+	m_AmbientColor = ambient;
 	m_AmbientIntensity = 0.5f;
 }
 

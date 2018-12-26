@@ -76,7 +76,10 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 
 	unsigned long long* iD = nullptr;
 	if(useIndexing)
-		iD = mesh.GetIndexBuffer((unsigned long long)m_eCount);
+	{
+		unsigned long long eCount = m_eCount;
+		iD = mesh.GetIndexBuffer(eCount);
+	}
 	unsigned long long vC = mesh.GetVertexCount();
 	unsigned long long vDS = vC * sizeof(Vertex);
 

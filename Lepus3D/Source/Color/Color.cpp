@@ -5,7 +5,10 @@ using namespace Lepus3D;
 
 Color::Color()
 {
-	mVec.x = mVec.y = mVec.z = mVec.w = 0.0f;
+	mVec.x = 0.0f;
+	mVec.y = 0.0f;
+	mVec.z = 0.0f;
+	mVec.w = 0.0f;
 }
 
 Color::Color(unsigned char R, unsigned char G, unsigned char B, unsigned char A)
@@ -18,7 +21,8 @@ Color::Color(unsigned char R, unsigned char G, unsigned char B, unsigned char A)
 
 Vector4 Color::GetVector4()
 {
-	return mVec;
+	Vector4 ret(mVec.x, mVec.y, mVec.z, mVec.w);
+	return ret;
 }
 
 Vector3 Color::GetVector3()

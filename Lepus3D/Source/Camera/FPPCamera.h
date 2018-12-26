@@ -13,7 +13,12 @@ namespace LepusEngine::Lepus3D {
 		GLFWwindow* m_Wnd;
 		float m_LastX, m_LastY;
 	public:
-		friend void ResizeCallback(GLFWwindow* wnd, int w, int h);
+		static void ResizeCallback(GLFWwindow* wnd, int w, int h){
+		glViewport(0, 0, w, h);
+		_fppCamPtr->m_LastX = 0.5f;
+		_fppCamPtr->m_LastY = 0.5f;
+
+		}
 		FPPCamera() : InputCamera() { m_LastX = m_LastY = 0.5f; };
 		FPPCamera(Transform transform) : InputCamera(transform) { };
 		FPPCamera(GLFWwindow* window);
@@ -28,10 +33,10 @@ namespace LepusEngine::Lepus3D {
 #define LEPUS_FPP_CAM_RESIZE_CLB
 	// GLFW resize window callback - lastXY need to be reset to avoid erroneous input
 	// TODO: there is still unexpected movement when the window gets resized...
-	static void ResizeCallback(GLFWwindow* wnd, int w, int h) {
+/*	static void ResizeCallback(GLFWwindow* wnd, int w, int h) {
 		glViewport(0, 0, w, h);
 		_fppCamPtr->m_LastX = 0.5f;
 		_fppCamPtr->m_LastY = 0.5f;
-	}
+	}*/
 #endif
 }
