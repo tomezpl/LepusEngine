@@ -12,6 +12,7 @@ solution "LepusAll"
 	startproject "LepusDemo"
 
 PROJ_DIR = path.getabsolute(".")
+LINUX_LIBS_CMD = "`pkg-config --static --libs x11 xrandr xi xxf86vm glew glfw3`" 
 
 project "LepusEngine"
 	kind "StaticLib"
@@ -45,6 +46,9 @@ project "LepusEngine"
 	configuration { "Release", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Release32/LepusEngine/"))
 		targetdir (path.join(PROJ_DIR, "lib/Release32/"))
+	
+	configuration "linux"
+		linkoptions { LINUX_LIBS_CMD }
 
 
 project "Lepus3D"
@@ -77,7 +81,7 @@ project "Lepus3D"
 		buildoptions { "/Zi" }
 
 	configuration "linux"
-		links { "glfw3", "GLEW", "GLU", "GL" }
+		linkoptions { LINUX_LIBS_CMD }
 		includedirs { path.join(PROJ_DIR, "include/glm-linux") }
 
 	configuration { "Debug", "x32" }
@@ -122,8 +126,14 @@ project "LepusDemo"
 	links { "Lepus3D", "LepusEngine" }
 
 	configuration "linux"
-		links { "glfw3", "GLEW", "GLU", "GL" }
+		linkoptions { LINUX_LIBS_CMD }
 		includedirs { path.join(PROJ_DIR, "include/glm-linux") }
+	
+	configuration { "linux", "debug" }
+		targetdir "bin/debug/"
+
+	configuration { "linux", "release" }
+		targetdir "bin/release/"
 
 	configuration "windows"
 		includedirs { path.join(PROJ_DIR, "include/glm-windows") }
