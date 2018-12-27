@@ -74,7 +74,6 @@ project "Lepus3D"
 		includedirs {
 			path.join(os.getenv("GLFW_DIR"), "include"),
 			path.join(os.getenv("GLEW_DIR"), "include"),
-			path.join(PROJ_DIR, "include\\glm-windows"),
 		}
 
 	configuration { "vs*", "Debug" }
@@ -82,7 +81,6 @@ project "Lepus3D"
 
 	configuration "linux"
 		linkoptions { LINUX_LIBS_CMD }
-		includedirs { path.join(PROJ_DIR, "include/glm-linux") }
 
 	configuration { "Debug", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Debug32/Lepus3D/"))
@@ -127,16 +125,12 @@ project "LepusDemo"
 
 	configuration "linux"
 		linkoptions { LINUX_LIBS_CMD }
-		includedirs { path.join(PROJ_DIR, "include/glm-linux") }
 	
 	configuration { "linux", "debug" }
 		targetdir "bin/debug/"
 
 	configuration { "linux", "release" }
 		targetdir "bin/release/"
-
-	configuration "windows"
-		includedirs { path.join(PROJ_DIR, "include/glm-windows") }
 
 	configuration { "windows", "x32" }
 		libdirs {
