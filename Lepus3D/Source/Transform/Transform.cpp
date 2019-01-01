@@ -11,7 +11,7 @@ Transform::Transform(Vector3 p, Vector3 r, Vector3 s) : Transform::Transform()
 
 glm::mat4 Transform::GetMatrix()
 {
-	glm::mat4 ret;
+	glm::mat4 ret = glm::mat4(1.0);
 	ret = glm::translate(ret, m_Pos);
 	// Check if there is any rotation
 	// otherwise it would fill the matrix with NaN for some reason
