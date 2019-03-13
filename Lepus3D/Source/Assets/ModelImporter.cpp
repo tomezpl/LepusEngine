@@ -8,7 +8,7 @@ using namespace std;
 // Default constructor
 ModelImporter::ModelImporter()
 {
-	// initialise member variables
+	// Initialise filestreams to null
 	mObjFile = nullptr;
 	mMtlFile = nullptr;
 }
@@ -16,26 +16,30 @@ ModelImporter::ModelImporter()
 // Opens file after constructor
 ModelImporter::ModelImporter(string fn, string dir)
 {
-	// initialise member variables
-	bool success = false;
+	// Initialise filestreams to null
 	mObjFile = nullptr;
 	mMtlFile = nullptr;
-	success = Init(fn, dir);
+
+	// Open model file using the provided filename and directory path
+	Init(fn, dir);
 }
 
 // Opens model file
 bool ModelImporter::Init(string fn, string dir)
 {
-	// navigate to content folder
+	// Combine directory path and filename together to get filepath
 	fn = dir + "/" + fn;
-	// filename for the .obj file
+
+	// Filename for the .obj file
 	string objFN = fn;
-	// filename for the .mtl material library file
+	
+	// Filename for the .mtl material library file
 	string mtlFN = fn.substr(0, fn.length() - string(".obj").length()) + ".mtl";
 
-	mGeometry.clear(); // remove previous geometry loaded via this importer
+	// Remove any existing geometry data from possible previous import operations using this instance
+	mGeometry.clear();
 
-	// initialise filestream pointers
+	// Create filestreams
 	mObjFile = new ifstream(objFN);
 	mMtlFile = new ifstream(mtlFN);
 
@@ -45,10 +49,12 @@ bool ModelImporter::Init(string fn, string dir)
 // Actual .obj parsing
 bool ModelImporter::_ReadOBJ()
 {
-	string line = ""; // currently read line
-	enum OBJImportState { ObjectSearch, BuildObject }; // states are needed as multiple objects/meshes can be found in a model file (TODO: actually this looks unnecessary and could use a rewrite)
-	OBJImportState state = ObjectSearch; // ObjectSearch is when the parser is looking for an object/mesh, then it jumps to BuildObject to load vertices for that object/mesh
+	// Currently read line
+	string line = "";
+
+	// 
 	VertexArray verts, normals, uvs, finalVerts; // obj indexes normals and assigns them to vertices, so we'll need to load them into a separate array. also separate array for final vertices as we don't use indexing (we'll recalculate normals)
+
 	vector<unsigned long long> indices, finalIndices; // finalIndices will just be an array of indices with the size of n total vertices
 	int indexCounter = 0; // TODO: an incrementing index to write for each vertex (as in, ignoring indexing altogether and just writing an index for each vertex). Might consider getting rid of drawing elements altogether and just draw arrays instead.
 	while(mObjFile->good()) // check if file is still readable
@@ -61,29 +67,23 @@ bool ModelImporter::_ReadOBJ()
 		string data = ""; // current data, like coordinates when keyword is "v", or material name when keyword is "usemtl"
 		int firstSpace = line.find(" "); // first whitespace character in the line
 		keyword = line.substr(0, firstSpace); // skip till first whitespace
-		if(keyword == "o") // object has been found
+		if(keyword == "o") // object (mesh) has been found
 		{
-			if(state == ObjectSearch) // if the previous state was searching for an object, then prepare for the buildobject state
+			// Add last read mesh to model geometry
+			if (verts.size() > 0)
 			{
-				// Add last read mesh to model geometry
-				if (verts.size() > 0)
-				{
-					Mesh loadedMesh(finalVerts, true); // temporary mesh, don't index vertices
-					loadedMesh.SetIndices(finalIndices); // pass vertex indices (TODO: these don't actually perform index so could remove this to save memory)
-					mGeometry.push_back(loadedMesh);
-				}
-
-				// Reset data & state to prepare for next mesh
-				verts.clear();
-				normals.clear();
-				indices.clear();
-				finalVerts.clear();
-				finalIndices.clear();
-				indexCounter = 0;
-				state = BuildObject;
+				Mesh loadedMesh(finalVerts, true); // temporary mesh, don't index vertices
+				loadedMesh.SetIndices(finalIndices); // pass vertex indices (TODO: these don't actually perform index so could remove this to save memory)
+				mGeometry.push_back(loadedMesh);
 			}
-			else
-				state = ObjectSearch; // TODO: this logic seems to make no sense... rewrite?
+
+			// Reset data & state to prepare for next mesh
+			verts.clear();
+			normals.clear();
+			indices.clear();
+			finalVerts.clear();
+			finalIndices.clear();
+			indexCounter = 0;
 		}
 		else if(keyword == "v" || keyword == "vn" || keyword == "vt") // a vertex coordinate (position, normal or texture uv) is found
 		{
