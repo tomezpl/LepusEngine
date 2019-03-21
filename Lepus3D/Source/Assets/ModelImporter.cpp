@@ -52,8 +52,10 @@ bool ModelImporter::_ReadOBJ()
 	// Currently read line
 	string line = "";
 
-	// 
-	VertexArray verts, normals, uvs, finalVerts; // obj indexes normals and assigns them to vertices, so we'll need to load them into a separate array. also separate array for final vertices as we don't use indexing (we'll recalculate normals)
+	// .obj indexes normals and assigns them to vertices, so they have to be loaded into a separate array first.
+	// A separate array is also used for final set of vertices, as we ignore indexing; all vertices (duplicate or unique) are placed together, 
+	// and normals are recalculated.
+	VertexArray verts, normals, uvs, finalVerts;
 
 	vector<unsigned long long> indices, finalIndices; // finalIndices will just be an array of indices with the size of n total vertices
 	int indexCounter = 0; // TODO: an incrementing index to write for each vertex (as in, ignoring indexing altogether and just writing an index for each vertex). Might consider getting rid of drawing elements altogether and just draw arrays instead.
@@ -74,7 +76,7 @@ bool ModelImporter::_ReadOBJ()
 			{
 				Mesh loadedMesh(finalVerts, true); // temporary mesh, don't index vertices
 				loadedMesh.SetIndices(finalIndices); // pass vertex indices (TODO: these don't actually perform index so could remove this to save memory)
-				mGeometry.push_back(loadedMesh);
+				mGeometry.push_back(loadedMesh); // add mesh to geometry set
 			}
 
 			// Reset data & state to prepare for next mesh
@@ -89,7 +91,7 @@ bool ModelImporter::_ReadOBJ()
 		{
 			Vertex v;
 			data = line.substr(firstSpace+1); // skip the keyword and first whitespace
-			string xyz[3] = { "", "", "" }; // XYZ (or XY if keyword is vt) coordinates from file
+			string xyz[3] = { "", "", "" }; // XYZ (or XY if keyword is vt) coordinates from the line
 			for(int i = 0; i < 3 || (keyword == "vt" && i < 2); i++) // read all 3 (or 2 if vt) coordinates from the line
 			{
 				xyz[i] = data.substr(0, data.find(" "));
@@ -128,7 +130,7 @@ bool ModelImporter::_ReadOBJ()
 				data = data.substr(data.find("/")+1); // skips till after slash to read next index type
 				// next up should be the vertex UV coord index, which might be empty
 				string uvIndex = "";
-				if(data.find("/") != 0) // UV coord index is not empty (e.g. `f 1/1/1`)
+				if(data.find("/") != 0) // UV coord index is NOT empty (e.g. `f 1/1/1`)
 				{
 					uvIndex = data.substr(0, data.find("/")); // copy uv index
 					data = data.substr(data.find("/")+1); // skips to next index type
