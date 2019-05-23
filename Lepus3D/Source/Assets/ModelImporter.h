@@ -16,7 +16,7 @@ namespace LepusEngine {
 				std::ifstream* mObjFile; // Wavefront OBJ file handle
 				std::ifstream* mMtlFile; // Wavefront OBJ material library file handle
 				std::vector<Mesh> mGeometry; // Geometry set
-				bool _ReadOBJ(); // read data from .obj file
+				bool _ReadOBJ(); // reads data from .obj file
 			public:
 				// Creates a .obj model file importer instance
 				ModelImporter();

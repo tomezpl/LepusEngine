@@ -209,6 +209,7 @@ bool ModelImporter::Close()
 
 ModelImporter::~ModelImporter()
 {
+	// Makes sure file handles are closed
 	if(mObjFile != nullptr && mMtlFile != nullptr)
 		Close();
 }
