@@ -15,6 +15,11 @@ namespace LepusEngine
 		private:
 			Shader m_Shader;
 			char* m_Name;
+
+			// Attribute vectors
+			// These get passed to the GLSL shader
+			// Separate vector for each data type
+			// See SetAttribute/GetAttribute access functions.
 			std::vector<MaterialAttrib<GLint>> m_IntAttributes;
 			std::vector<MaterialAttrib<GLfloat>> m_FloatAttributes;
 			std::vector<MaterialAttrib<GLfloat[4]>> m_Vec4Attributes;
@@ -25,6 +30,8 @@ namespace LepusEngine
 			Material(char* materialName);
 			Material(char* materialName, char* shaderName);
 			bool SetShader(char* shaderName);
+
+			// Attribute setter functions
 			// Location will only be modified if it's >= 0
 			bool SetAttributeI(char* attributeName, GLint value, GLint location = 0);
 			bool SetAttributeF(char* attributeName, GLfloat value, GLint location = 0);
@@ -36,14 +43,22 @@ namespace LepusEngine
 			bool SetAttributeF2(char* attributeName, Vector2 value, GLint location = 0);
 			bool SetAttributeFP(char* attributeName, GLfloat* value, GLint location = 0);
 			bool SetAttributeTex(char* attributeName, Texture2D value, int location = 0);
+
+			// Attribute getter functions
 			GLint GetAttributeI(char* attributeName);
 			GLfloat GetAttributeF(char* attributeName);
 			GLfloat* GetAttributeVec4(char* attributeName);
 			GLfloat* GetAttributeVec3(char* attributeName);
 			GLfloat* GetAttributeVec2(char* attributeName);
 			Texture2D GetAttributeTex(char* attributeName);
+
+			// Apply the material for the next drawcall
 			void Use();
+
+			// Release material resources, unload the shader from memory
 			void Destroy();
+
+			// Destructor. Calls Destroy()
 			~Material();
 		};
 	}
