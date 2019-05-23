@@ -15,7 +15,7 @@ namespace LepusEngine
 {
 	namespace Lepus3D
 	{
-		// Base camera class. Completely static, only moved programmatically.
+		// Base camera class. Completely static, only moved programmatically. Derive from this to build your own camera models.
 		class Camera
 		{
 		protected:

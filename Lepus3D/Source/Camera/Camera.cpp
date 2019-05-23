@@ -11,6 +11,7 @@ Camera::Camera()
 
 void Camera::_Init()
 {
+	// Sets initial camera target at (0, 0, 0)
 	Vector3 defaultTarget = Vector3::Zero();
 	m_Target = defaultTarget;
 
