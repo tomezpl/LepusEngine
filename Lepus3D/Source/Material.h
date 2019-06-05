@@ -10,6 +10,8 @@ namespace LepusEngine
 {
 	namespace Lepus3D
 	{
+		// Material class
+		// Describes how to render primitives, what shader to use and what data to pass to it.
 		class Material {
 			friend class RenderEngine;
 		private:
