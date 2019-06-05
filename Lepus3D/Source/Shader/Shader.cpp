@@ -7,6 +7,8 @@ using namespace LepusEngine::Lepus3D;
 Shader::Shader(char* name, char* dir)
 {
 	m_Ready = false;
+
+	// Perform loading process
 	if (!Load(name, dir))
 	{
 #ifdef _DEBUG
@@ -26,6 +28,7 @@ bool Shader::Load(char* name, char* dir)
 {
 	m_ShaderName = name;
 
+	// Load vertex & fragment shader source code from file
 	if (!m_VShader.Load(name, dir))
 	{
 #ifdef _DEBUG
@@ -41,77 +44,90 @@ bool Shader::Load(char* name, char* dir)
 		return false;
 	}
 
-	GLint success;
-	GLchar infoLog[512];
+	GLint success; // success value of the loading process
+	GLchar infoLog[512]; // buffer for error messages, etc.
 
+	// Initialise empty GL shader instances
 	m_VShader.m_Program = glCreateShader(GL_VERTEX_SHADER);
 	m_FShader.m_Program = glCreateShader(GL_FRAGMENT_SHADER);
 
+	// Copy loaded shader source code
 	const GLchar* vShaderSource = this->VShaderSrc();
 	const GLchar* fShaderSource = this->FShaderSrc();
 
+	// Feed the shader source code to GL shader instances
 	glShaderSource(m_VShader.m_Program, 1, &vShaderSource, NULL);
 	glShaderSource(m_FShader.m_Program, 1, &fShaderSource, NULL);
 
+	// Compile the GL shader instances
 	glCompileShader(m_VShader.m_Program);
 	glCompileShader(m_FShader.m_Program);
 
+	// Get compile status of the vertex shader, store as success value
 	glGetShaderiv(m_VShader.m_Program, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
 		glGetShaderInfoLog(m_VShader.m_Program, 512, NULL, infoLog);
 		std::cout << "Shader::Load(name, dir): vertex shader " << m_ShaderName << " failed to compile (InfoLog: " << infoLog << ")" << std::endl;
-		return false;
+		return false; // Fail loading process if vertex shader compilation fails
 	}
 
+	// Get compile status of the fragment shader, store as success value
 	glGetShaderiv(m_FShader.m_Program, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
 		glGetShaderInfoLog(m_FShader.m_Program, 512, NULL, infoLog);
 		std::cout << "Shader::Load(name, dir): fragment shader " << m_ShaderName << " failed to compile (InfoLog: " << infoLog << ")" << std::endl;
-		return false;
+		return false; // Fail loading process if fragment shader compilation fails
 	}
 
+	// Create final compiled shader
 	m_Compiled = glCreateProgram();
 	glAttachShader(m_Compiled, m_VShader.m_Program);
 	glAttachShader(m_Compiled, m_FShader.m_Program);
 	glLinkProgram(m_Compiled);
 
+	// Get link status of the final compiled shader, store as success value
 	glGetProgramiv(m_Compiled, GL_LINK_STATUS, &success);
 	if (!success)
 	{
 		glGetProgramInfoLog(m_Compiled, 512, NULL, infoLog);
 		std::cout << "Shader::Load(name, dir): compiled shader " << m_ShaderName << " failed to link (InfoLog: " << infoLog << ")" << std::endl;
-		return false;
+		return false; // Fail loading process if shader linking fails
 	}
 
+	// Set Shader as ready to draw and return loading success
 	m_Ready = true;
 	return true;
 }
 
 const char* Shader::VShaderSrc()
 {
-	auto ret = m_VShader.m_ProgramStr.c_str();
+	const char* ret = m_VShader.m_ProgramStr.c_str();
 	return ret;
 }
 
 const char* Shader::FShaderSrc()
 {
-	auto ret = m_FShader.m_ProgramStr.c_str();
+	const char* ret = m_FShader.m_ProgramStr.c_str();
 	return ret;
 }
 
 char* Shader::Name()
 {
-	// The VShader and FShader share the names, so it doesn't matter which one we call
+	// The VShader and FShader share the names, so it doesn't matter which one we call.
 	char* ret = (char*)m_VShader.m_ProgramName.c_str();
+
+	// Should the Vertex shader return a blank name, try retrieving it from the Fragment shader.
 	if (ret == "")
 		ret = (char*)m_FShader.m_ProgramName.c_str();
+
 	return ret;
 }
 
 bool Shader::Run()
 {
+	// Check if Shader is ready to draw, and set it as currently used GL program if so.
 	if(m_Ready)
 		glUseProgram(m_Compiled);
 	else
@@ -126,6 +142,7 @@ bool Shader::Run()
 
 void Shader::Unload()
 {
+	// Delete the shader data with OpenGL and unready this instance
 	glDeleteShader(m_VShader.m_Program);
 	glDeleteShader(m_FShader.m_Program);
 	glDeleteProgram(m_Compiled);
