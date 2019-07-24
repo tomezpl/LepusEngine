@@ -12,7 +12,7 @@ solution "LepusAll"
 	startproject "LepusDemo"
 
 PROJ_DIR = path.getabsolute(".")
-LINUX_LIBS_CMD = "`pkg-config --static --libs x11 xrandr xi xxf86vm glew glfw3`" 
+LINUX_LIBS_CMD = "`pkg-config --static --libs x11 xrandr xi xxf86vm glew glfw3`"
 
 project "LepusEngine"
 	kind "StaticLib"
@@ -27,9 +27,31 @@ project "LepusEngine"
 		path.join(PROJ_DIR, "LepusEngine/Source/**.h"),
 		path.join(PROJ_DIR, "LepusEngine/Source/**.cpp"),
 	}
+	
+	configuration { "x32" }
+		includedirs {
+			path.join(os.getenv("PHYSX_DIR32"), "PhysX/include"),
+			path.join(os.getenv("PHYSX_DIR32"), "PxShared/include")
+		}
+
+	configuration { "x64" }
+		includedirs {
+			path.join(os.getenv("PHYSX_DIR"), "PhysX/include"),
+			path.join(os.getenv("PHYSX_DIR"), "PxShared/include")
+		}
 
 	configuration { "vs*", "Debug" }
 		buildoptions { "/Zi" }
+
+	configuration { "Debug" }
+		libdirs {
+			path.join(os.getenv("PHYSX_DIR"), "PhysX/bin/*/debug")
+		}
+
+	configuration { "Release" }
+		libdirs {
+			path.join(os.getenv("PHYSX_DIR"), "PhysX/bin/*/release")
+		}
 
 	configuration { "Debug", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Debug32/LepusEngine/"))
@@ -38,15 +60,17 @@ project "LepusEngine"
 	configuration { "Debug", "x64" }
 		objdir (path.join(PROJ_DIR, "obj/Debug64/LepusEngine/"))
 		targetdir (path.join(PROJ_DIR, "lib/Debug64/"))
+		links { "PhysX_64", "PhysXCharacterKinematic_static_64", "PhysXCommon_64", "PhysXCooking_64", "PhysXFoundation_64", "PhysXExtensions_static_64", "PhysXPvdSDK_static_64", "PhysXTask_static_64", "PhysXVehicle_static_64" }
 
 	configuration { "Release", "x64" }
 		objdir (path.join(PROJ_DIR, "obj/Release64/LepusEngine/"))
 		targetdir (path.join(PROJ_DIR, "lib/Release64/"))
+		links { "PhysX_64", "PhysXCharacterKinematic_static_64", "PhysXCommon_64", "PhysXCooking_64", "PhysXFoundation_64", "PhysXExtensions_static_64", "PhysXPvdSDK_static_64", "PhysXTask_static_64", "PhysXVehicle_static_64" }
 
 	configuration { "Release", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Release32/LepusEngine/"))
 		targetdir (path.join(PROJ_DIR, "lib/Release32/"))
-	
+
 	configuration "linux"
 		linkoptions { LINUX_LIBS_CMD }
 
@@ -121,11 +145,23 @@ project "LepusDemo"
 		path.join(os.getenv("GLEW_DIR"), "include"),
 	}
 
+	configuration "x32"
+		includedirs {
+			path.join(os.getenv("PHYSX_DIR32"), "PhysX/include"),
+			path.join(os.getenv("PHYSX_DIR32"), "PxShared/include")
+		}
+
+	configuration "x64"
+		includedirs {
+			path.join(os.getenv("PHYSX_DIR"), "PhysX/include"),
+			path.join(os.getenv("PHYSX_DIR"), "PxShared/include")
+		}
+
 	links { "Lepus3D", "LepusEngine" }
 
 	configuration "linux"
 		linkoptions { LINUX_LIBS_CMD }
-	
+
 	configuration { "linux", "debug" }
 		targetdir "bin/debug/"
 
@@ -134,13 +170,15 @@ project "LepusDemo"
 
 	configuration { "windows", "x32" }
 		libdirs {
-			path.join(os.getenv("GLEW_DIR"), "lib/Release/Win32"),
+			path.join(os.getenv("GLEW_DIR"), "lib/Release/Win32")
 		}
 
 	configuration { "windows", "x64" }
 		libdirs {
 			path.join(os.getenv("GLEW_DIR"), "lib/Release/x64"),
+			path.join(os.getenv("PHYSX_DIR"), "PhysX/bin/**/release")
 		}
+		links { "PhysX_64", "PhysXCharacterKinematic_static_64", "PhysXCommon_64", "PhysXCooking_64", "PhysXFoundation_64", "PhysXExtensions_static_64", "PhysXPvdSDK_static_64", "PhysXTask_static_64", "PhysXVehicle_static_64" }
 
 	configuration "windows"
 		libdirs { path.join(os.getenv("GLFW_DIR"), "lib-vc2015/") }
@@ -171,7 +209,7 @@ project "LepusDemo"
 		debugdir (path.join(PROJ_DIR, "bin/Release32/"))
 
 	configuration "windows"
-		postbuildcommands { "mkdir \"$(TargetDir)../../Content/GLSL\"", "xcopy \"$(SolutionDir)\\Lepus3D\\Source\\GLSL\" \"$(TargetDir)\\..\\..\\Content\\GLSL\"/C /Y", "copy \"$(GLEW_DIR)\\bin\\Release\\$(Platform)\\glew32.dll\" \"$(TargetDir)\" /y" }
+		postbuildcommands { "mkdir \"$(TargetDir)../../Content/GLSL\"", "xcopy \"$(SolutionDir)\\Lepus3D\\Source\\GLSL\" \"$(TargetDir)\\..\\..\\Content\\GLSL\"/C /Y", "copy \"$(GLEW_DIR)\\bin\\Release\\$(Platform)\\glew32.dll\" \"$(TargetDir)\" /y", "copy \"" .. path.join(os.matchdirs(path.join(os.getenv("PHYSX_DIR"), "PhysX/bin/*"))[1], "release") .. "\" \"$(TargetDir)\" /y" }
 
 	configuration "not windows"
 		postbuildcommands { "mkdir -p ./Content/GLSL", "cp ./Lepus3D/Source/GLSL/* ./Content/GLSL/" }
