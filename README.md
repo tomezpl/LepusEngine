@@ -39,8 +39,16 @@ You will need to download the third-party libraries used (GLFW and GLEW). In add
 	* Points to the root directory of a 32-bit pre-compiled binary GLFW package for MSVC++ (folder name usually *glfw-x.x.x.bin.WIN32*).
 	* For example, *$(GLFW_DIR32)/lib-vc2015/* should point to the *lib-vc2015* folder in your 32-bit GLFW (*glfw-x.x.x.bin.WIN32*) directory
 * GLEW_DIR
-	* Points to the root directory of a GLEW package for Win32 (folder name usually *glew-x.x.x-win32*).
+	* Points to the root directory of a GLEW package for Win32 (folder name usually *glew-x.x.x-win32/glew-x.x.x*).
 	* For example, *$(GLEW_DIR)/lib/* should point to the *lib* folder in your GLEW directory
+* PHYSX_DIR
+	* Points to the root directory of the *compiled binaries* for PhysX for 64-bit Visual C++ (folder name usually *PhysX-x.x/physx/install/vcxxwin64*).
+	* For example, *$(PHYSX_DIR)/PhysX/include/* should point to the *include* folder in your PhysX install directory.
+	* You can find info regarding building PhysX SDK from source on [NVIDIA's official PhysX repository](https://github.com/NVIDIAGameWorks/PhysX).
+* PHYSX_DIR32
+	* Points to the root directory of the *compiled binaries* for PhysX for 32-bit Visual C++ (folder name usually *PhysX-x.x/physx/install/vcxxwin32*).
+	* For example, *$(PHYSX_DIR)/PhysX/include/* should point to the *include* folder in your PhysX install directory.
+	* You can find info regarding building PhysX SDK from source on [NVIDIA's official PhysX repository](https://github.com/NVIDIAGameWorks/PhysX).
 
 #### GNU/Linux
 You'll need to install G++, pkg-config, g++-multilib, GNU make, as well as dependencies: *libgl1-mesa-dev*, *libglfw-dev* and *libglew-dev*.

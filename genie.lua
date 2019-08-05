@@ -43,12 +43,12 @@ project "LepusEngine"
 	configuration { "vs*", "Debug" }
 		buildoptions { "/Zi" }
 
-	configuration { "Debug" }
+	configuration { "x32" }
 		libdirs {
-			path.join(os.getenv("PHYSX_DIR"), "PhysX/bin/*/debug")
+			path.join(os.getenv("PHYSX_DIR32"), "PhysX/bin/*/release")
 		}
 
-	configuration { "Release" }
+	configuration { "x64" }
 		libdirs {
 			path.join(os.getenv("PHYSX_DIR"), "PhysX/bin/*/release")
 		}
@@ -56,6 +56,7 @@ project "LepusEngine"
 	configuration { "Debug", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Debug32/LepusEngine/"))
 		targetdir (path.join(PROJ_DIR, "lib/Debug32/"))
+		links { "PhysX_32", "PhysXCharacterKinematic_static_32", "PhysXCommon_32", "PhysXCooking_32", "PhysXFoundation_32", "PhysXExtensions_static_32", "PhysXPvdSDK_static_32", "PhysXTask_static_32", "PhysXVehicle_static_32" }
 
 	configuration { "Debug", "x64" }
 		objdir (path.join(PROJ_DIR, "obj/Debug64/LepusEngine/"))
@@ -70,6 +71,7 @@ project "LepusEngine"
 	configuration { "Release", "x32" }
 		objdir (path.join(PROJ_DIR, "obj/Release32/LepusEngine/"))
 		targetdir (path.join(PROJ_DIR, "lib/Release32/"))
+		links { "PhysX_32", "PhysXCharacterKinematic_static_32", "PhysXCommon_32", "PhysXCooking_32", "PhysXFoundation_32", "PhysXExtensions_static_32", "PhysXPvdSDK_static_32", "PhysXTask_static_32", "PhysXVehicle_static_32" }
 
 	configuration "linux"
 		linkoptions { LINUX_LIBS_CMD }
@@ -170,8 +172,10 @@ project "LepusDemo"
 
 	configuration { "windows", "x32" }
 		libdirs {
-			path.join(os.getenv("GLEW_DIR"), "lib/Release/Win32")
+			path.join(os.getenv("GLEW_DIR"), "lib/Release/Win32"),
+			path.join(os.getenv("PHYSX_DIR"), "PhysX/bin/**/release")
 		}
+		links { "PhysX_32", "PhysXCharacterKinematic_static_32", "PhysXCommon_32", "PhysXCooking_32", "PhysXFoundation_32", "PhysXExtensions_static_32", "PhysXPvdSDK_static_32", "PhysXTask_static_32", "PhysXVehicle_static_32" }
 
 	configuration { "windows", "x64" }
 		libdirs {
