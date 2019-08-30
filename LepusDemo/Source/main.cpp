@@ -5,6 +5,7 @@
 
 using namespace LepusEngine;
 
+// NDEBUG flag for PhysX.
 #define NDEBUG
 
 #include "PxPhysicsAPI.h"

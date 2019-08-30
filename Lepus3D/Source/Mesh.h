@@ -6,11 +6,18 @@
 
 namespace LepusEngine
 {
+	// Forward class declaration to avoid including Physics code in Renderer code.
+	namespace Physics
+	{
+		class PhysxColliderMeshData;
+	}
+	
 	namespace Lepus3D
 	{
 		class Mesh {
 			friend class RenderEngine;
 			friend class Renderable;
+			friend class ::LepusEngine::Physics::PhysxColliderMeshData;
 		private:
 			std::vector<float> m_Vertices;
 			std::vector<unsigned long long> m_Indices;

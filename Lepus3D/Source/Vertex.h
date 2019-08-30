@@ -25,7 +25,7 @@ namespace LepusEngine
 		public:
 			Vertex* data;
 			unsigned int size() { return m_Size; };
-			VertexPack() { data = new Vertex(); m_Size = 0; };
+			VertexPack() { data = new Vertex(); m_Size = 0; }; // TODO: Vertex()? that should be Vertex[0] to create an empty array...
 			VertexPack(VertexArray vertexData) { data = new Vertex[m_Size = vertexData.size()]; for (auto i = 0; i < m_Size; i++) { data[i] = vertexData[i]; } };
 		};
 	}
