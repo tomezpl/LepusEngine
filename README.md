@@ -41,7 +41,7 @@ __RenderEngine__ also creates and updates a GL context and window.
 An example app using the engine would look like this:
 
 ```c++
-#include "../../Lepus3D/Source/RenderEngine.h"
+#include <L3D/RenderEngine.h>
 
 using namespace LepusEngine;
 using namespace Lepus3D;
