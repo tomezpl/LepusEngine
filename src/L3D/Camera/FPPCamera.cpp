@@ -1,5 +1,5 @@
 #include "FPPCamera.h"
-#include "LepusEngine/Source/Logger.h"
+#include <LEngine/Logger.h>
 #include <functional>
 
 using namespace LepusEngine::Lepus3D;

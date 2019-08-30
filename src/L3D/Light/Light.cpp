@@ -1,5 +1,5 @@
 #include "../Light.h"
-#include "../../../LepusEngine/Source/Logger.h"
+#include <LEngine/Logger.h>
 
 using namespace LepusEngine;
 using namespace Lepus3D;

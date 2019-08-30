@@ -260,3 +260,8 @@ Makefile
 
 # GENIe exec
 genie
+
+# CMake
+CMakeCache.txt
+CMakeFiles
+CMakeFiles/**
