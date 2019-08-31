@@ -6,60 +6,32 @@ LepusEngine is a game engine developed in C++ and modern OpenGL (versions >= 3.3
 The renderer uses a programmable pipeline and as a result comes with a bundled set of GLSL shaders.
 
 ### Building
-The engine now uses Branimir Karadžić's [GENie project generator tool](https://github.com/bkaradzic/GENie).
+The engine now uses CMake (tested version 3.15.2). Download and install it if you don't have it already.
 
-For the most part, using GENie is limited to running this command
+General use of CMake comes down to running `cmake configure` and `cmake generate` (please look up KitWare's documentation to learn more).
 
-```
-genie <build-system>
-```
+Currently the engine only builds on Windows during to its reliance on PhysX. On Windows, you can also use CMake-gui.
 
-_For example_, if you want to build with __Visual Studio 2017__, you run
+#### Dependencies
+Download binaries for these libraries and place them in `<lepus_root>/build/deps`:
 
-```
-genie vs2017
-```
-
-or, if you want to build with GNU Make using a Makefile, you run
-
-```
-genie gmake
-```
-
-Check out the GENie scripting reference if you need, it's quite compact and shouldn't take you longer than a few minutes to understand.
-
-#### Windows
-The GENie script on Windows is optimised specifically for building with Visual Studio. VS2013, 2015 and 2017 should work, and so should any newer releases.
-
-You will need to download the third-party libraries used (GLFW and GLEW). In addition, you'll need to set up the following environment variables in your system settings:
-* GLFW_DIR
-	* Points to the root directory of a 64-bit pre-compiled binary GLFW package for MSVC++ (folder name usually *glfw-x.x.x.bin.WIN64*).
-	* For example, *$(GLFW_DIR)/lib-vc2015/* should point to the *lib-vc2015* folder in your 64-bit GLFW (*glfw-x.x.x.bin.WIN64*) directory
-* GLFW_DIR32
-	* Points to the root directory of a 32-bit pre-compiled binary GLFW package for MSVC++ (folder name usually *glfw-x.x.x.bin.WIN32*).
-	* For example, *$(GLFW_DIR32)/lib-vc2015/* should point to the *lib-vc2015* folder in your 32-bit GLFW (*glfw-x.x.x.bin.WIN32*) directory
-* GLEW_DIR
-	* Points to the root directory of a GLEW package for Win32 (folder name usually *glew-x.x.x-win32/glew-x.x.x*).
-	* For example, *$(GLEW_DIR)/lib/* should point to the *lib* folder in your GLEW directory
-* PHYSX_DIR
-	* Points to the root directory of the *compiled binaries* for PhysX for 64-bit Visual C++ (folder name usually *PhysX-x.x/physx/install/vcxxwin64*).
-	* For example, *$(PHYSX_DIR)/PhysX/include/* should point to the *include* folder in your PhysX install directory.
+* GLFW (*build/deps/glfw-x.x.x.bin.WIN64*)
+	* The root directory of a 64-bit pre-compiled binary GLFW package for MSVC++ (folder name usually *glfw-x.x.x.bin.WIN64*).
+	* For example, *build/deps/glfw-x.x.x.bin.WIN64/lib-vc2015/* should contain your 64-bit *glfw3.lib* files
+* GLFW32 (*build/deps/glfw-x.x.x.bin.WIN32*)
+	* The root directory of a 32-bit pre-compiled binary GLFW package for MSVC++ (folder name usually *glfw-x.x.x.bin.WIN32*).
+	* For example, *build/deps/glfw-x.x.x.bin.WIN32/lib-vc2015/* should contain your 32-bit *glfw3.lib* files
+* GLEW (*build/deps/glew-x.x.x-win32*)
+	* The root directory of a GLEW package for Win32 (folder name usually *glew-x.x.x-win32/glew-x.x.x*).
+	* For example, *build/deps/glew-x.x.x-win32/glew-x.x.x/lib/* should contain the *glew.lib* files
+* PHYSX (*build/deps/PhysX-x.x/physx/install/vcxxwin64*)
+	* The root directory of the *compiled binaries* for PhysX for 64-bit Visual C++ (folder name usually *PhysX-x.x/physx/install/vcxxwin64*).
+	* For example, *build/deps/PhysX-x.x/physx/install/vcxxwin64/PhysX/include/* should contain the *PxPhysXConfig.h* header file.
 	* You can find info regarding building PhysX SDK from source on [NVIDIA's official PhysX repository](https://github.com/NVIDIAGameWorks/PhysX).
-* PHYSX_DIR32
-	* Points to the root directory of the *compiled binaries* for PhysX for 32-bit Visual C++ (folder name usually *PhysX-x.x/physx/install/vcxxwin32*).
-	* For example, *$(PHYSX_DIR)/PhysX/include/* should point to the *include* folder in your PhysX install directory.
+* PHYSX32 (*build/deps/PhysX-x.x/physx/install/vcxxwin32*)
+	* The root directory of the *compiled binaries* for PhysX for 32-bit Visual C++ (folder name usually *PhysX-x.x/physx/install/vcxxwin32*).
+	* For example, *build/deps/PhysX-x.x/physx/install/vcxxwin32/PhysX/include/* should contain the *PxPhysXConfig.h* header file.
 	* You can find info regarding building PhysX SDK from source on [NVIDIA's official PhysX repository](https://github.com/NVIDIAGameWorks/PhysX).
-
-#### GNU/Linux
-You'll need to install G++, pkg-config, g++-multilib, GNU make, as well as dependencies: *libgl1-mesa-dev*, *libglfw-dev* and *libglew-dev*.
-
-On Ubuntu, you can run:
-
-```bash
-sudo apt-get install g++ make libgl1-mesa-dev libglfw-dev libglew-dev
-```
-
-The GENie script on Linux was written with GNU Make in mind, but it is not tested or maintained as regularly as the Windows build tools, so please report any issues and try fixing them where possible. Run ```make LepusDemo``` to build the full engine along with the demo app. You can also append build type and platform to that command, like ```make LepusDemo config='debug64'```. Advised if you're running into "skipping library because incompatible" issues with GCC.
 
 ### Usage
 The __RenderEngine__ class (from the _LepusEngine_::_Lepus3D_ namespace) is responsible for drawing pretty much anything to your screen.
@@ -69,7 +41,7 @@ __RenderEngine__ also creates and updates a GL context and window.
 An example app using the engine would look like this:
 
 ```c++
-#include "../../Lepus3D/Source/RenderEngine.h"
+#include <L3D/RenderEngine.h>
 
 using namespace LepusEngine;
 using namespace Lepus3D;

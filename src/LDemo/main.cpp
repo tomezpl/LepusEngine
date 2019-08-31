@@ -1,15 +1,16 @@
-#include "../../Lepus3D/Source/RenderEngine.h"
-#include "../../Lepus3D/Source/Camera/FPPCamera.h"
-#include "../../Lepus3D/Source/Assets.h"
-#include "../../LepusEngine/Source/Logger.h"
+#include <L3D/RenderEngine.h>
+#include <L3D/Camera/FPPCamera.h>
+#include <L3D/Assets.h>
+#include <LEngine/Logger.h>
 
 using namespace LepusEngine;
 
-// NDEBUG flag for PhysX.
-#define NDEBUG
+#ifndef _DEBUG
+	#define NDEBUG
+#endif
 
-#include "PxPhysicsAPI.h"
-#include "extensions/PxDefaultAllocator.h"
+#include <PxPhysicsAPI.h>
+#include <extensions/PxDefaultAllocator.h>
 
 using namespace physx;
 

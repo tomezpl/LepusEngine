@@ -1,6 +1,6 @@
 #include "../RenderEngine.h"
 #include <iostream>
-#include "LepusEngine/Source/Logger.h"
+#include <LEngine/Logger.h>
 #include "../Transform.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION // This is critcal as otherwise the build will fail due to unresolved externals
 #include "../3rdparty/stb_image_write.h"
