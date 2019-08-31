@@ -4,20 +4,19 @@
 #define NDEBUG
 
 #include "../Physics.h"
-#include "Lepus3D/Source/Vertex.h"
+#include <L3D/Vertex.h>
 
 namespace LepusEngine
 {
-    namespace Physics {
-        class Rigidbody {
+        class PhysicsRigidbody {
         private:
             physx::PxMaterial* m_PxMat;
             physx::PxGeometry* m_PxCollider;
             physx::PxRigidDynamic* m_PxRigidbody;
         public:
-            Rigidbody() { m_PxMat = nullptr; m_PxRigidbody = nullptr; m_PxCollider = nullptr; }
-            Rigidbody(Mesh& geometry);
-            void InitCollider(Mesh& geometry);
+            PhysicsRigidbody() { m_PxMat = nullptr; m_PxRigidbody = nullptr; m_PxCollider = nullptr; }
+            PhysicsRigidbody(Lepus3D::Mesh& geometry);
+            void InitCollider(Lepus3D::Mesh& geometry);
         };
 
         class PhysxColliderMeshData : public physx::PxInputStream {
@@ -26,10 +25,9 @@ namespace LepusEngine
             uint32_t m_VertexCount;
         public:
             virtual uint32_t read(void* dest, uint32_t count);
-            PhysxColliderMeshData(Mesh& mesh);
+            PhysxColliderMeshData(Lepus3D::Mesh& mesh);
             virtual ~PhysxColliderMeshData();
         };
-    }
 }
 
 #endif

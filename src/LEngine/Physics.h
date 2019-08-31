@@ -3,7 +3,7 @@
 
 #include "PxPhysicsAPI.h"
 #include "extensions/PxDefaultAllocator.h"
-#include "../../Lepus3D/Source/Scene.h"
+#include <L3D/Scene.h>
 
 #define LEPUS_PHYSICS_DEFAULT_GRAVITY -9.81f
 

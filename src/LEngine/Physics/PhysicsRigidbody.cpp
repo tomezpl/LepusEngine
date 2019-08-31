@@ -1,26 +1,26 @@
 #include "PhysicsRigidbody.h"
-#include <cmath>
+#include <algorithm>
 
 using namespace LepusEngine;
-using namespace Lepus3D;
 
-Physics::PhysxColliderMeshData::PhysxColliderMeshData(Lepus3D::Mesh& mesh)
+PhysxColliderMeshData::PhysxColliderMeshData(Lepus3D::Mesh& mesh)
 {
-    m_Vertices = mesh.m_Vertices.data();
-    m_VertexCount = mesh.m_Vertices.size();
+    this->m_Vertices = mesh.m_Vertices.data();
+    this->m_VertexCount = mesh.m_Vertices.size();
 }
 
-uint32_t Physics::PhysxColliderMeshData::read(void* dest, uint32_t count)
+uint32_t PhysxColliderMeshData::read(void* dest, uint32_t count)
 {
-    memcpy(dest, m_Vertices, min(count, m_VertexCount));
+    memcpy(dest, m_Vertices, std::min(count, m_VertexCount));
+	return 0; // TODO
 }
 
-Physics::Rigidbody::Rigidbody(Mesh& geometry)
+PhysicsRigidbody::PhysicsRigidbody(Lepus3D::Mesh& geometry)
 {
     InitCollider(geometry);
 }
 
-void Physics::Rigidbody::InitCollider(Mesh& geometry)
+void PhysicsRigidbody::InitCollider(Lepus3D::Mesh& geometry)
 {
     physx::PxTriangleMesh* mesh;
     //PxPhysics::createTriangleMesh()

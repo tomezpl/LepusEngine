@@ -26,7 +26,33 @@ include_directories(${CMAKE_SOURCE_DIR}/include src)
 add_executable(LepusDemo src/LDemo/main.cpp)
 
 # Lepus3D sources
-set(Lepus3D_SRC src/L3D/Assets/ModelImporter.cpp src/L3D/Camera/Camera.cpp src/L3D/Camera/FPPCamera.cpp src/L3D/Color/Color.cpp src/L3D/Light/Light.cpp src/L3D/Material/Material.cpp src/L3D/Mesh/Mesh.cpp src/L3D/Renderable/Renderable.cpp src/L3D/RenderEngine/RenderEngine.cpp src/L3D/Scene/Scene.cpp src/L3D/Shader/Shader.cpp src/L3D/Shader/SLProgram.cpp src/L3D/Texture/Texture2D.cpp src/L3D/Transform/Transform.cpp)
+set(Lepus3D_SRC 
+	src/L3D/Assets.h
+		src/L3D/Assets/ModelImporter.h src/L3D/Assets/ModelImporter.cpp 
+	src/L3D/Camera.h
+		src/L3D/Camera/FPPCamera.h src/L3D/Camera/Camera.cpp src/L3D/Camera/FPPCamera.cpp 
+	src/L3D/Color.h
+		src/L3D/Color/Color.cpp 
+	src/L3D/Light.h
+		src/L3D/Light/Light.cpp 
+	src/L3D/Material.h
+		src/L3D/Material/MaterialAttrib.h src/L3D/Material/Material.cpp 
+	src/L3D/Mesh.h
+		src/L3D/Mesh/Mesh.cpp 
+	src/L3D/Renderable.h
+		src/L3D/Renderable/Renderable.cpp 
+	src/L3D/RenderEngine.h
+		src/L3D/RenderEngine/RenderEngine.cpp 
+	src/L3D/Scene.h
+		src/L3D/Scene/Scene.cpp 
+	src/L3D/Shader.h
+		src/L3D/Shader/SLProgram.h src/L3D/Shader/Shader.cpp src/L3D/Shader/SLProgram.cpp 
+	src/L3D/Texture.h 
+		src/L3D/Texture/Texture2D.cpp 
+	src/L3D/Transform.h
+		src/L3D/Transform/Transform.cpp src/L3D/Transform/Vector.h
+	src/L3D/Vertex.h
+)
 
 ## Lepus3D: GLEW includes
 file(GLOB GLEW_HEADER_DIRS ${DEPS_PATH}/glew*/*/include)
@@ -48,7 +74,14 @@ find_path(PHYSX_INCLUDES PxPhysXConfig.h ${PHYSX_HEADER_DIRS})
 find_path(PHYSX_PXSHARED_INCLUDES foundation/Px.h ${PHYSX_PXSHARED_DIRS})
 include_directories(${PHYSX_INCLUDES} ${PHYSX_PXSHARED_INCLUDES})
 
-add_library(LepusEngine src/LEngine/Logger/Logger.cpp)
+add_library(LepusEngine 
+	src/LEngine/Logger.h
+		src/LEngine/Logger/Logger.cpp 
+	src/LEngine/Physics.h
+		src/LEngine/Physics/Physics.cpp 
+		src/LEngine/Physics/PhysicsRigidbody.h
+		src/LEngine/Physics/PhysicsRigidbody.cpp
+)
 
 add_dependencies(Lepus3D LepusEngine)
 add_dependencies(LepusDemo Lepus3D)
