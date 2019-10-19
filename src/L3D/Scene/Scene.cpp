@@ -22,6 +22,7 @@ int Scene::AddMesh(Mesh m, Transform t)
 int Scene::AddMesh(Renderable* renderable)
 {
 	m_ObjArr.push_back(renderable);
+	m_PhysicsEngine->AddObject(*renderable->mRigidbody);
 	return GetRenderableCount() - 1;
 }
 

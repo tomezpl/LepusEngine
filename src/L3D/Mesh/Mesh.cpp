@@ -78,13 +78,12 @@ unsigned long long Mesh::GetVertexCount()
 unsigned long long* Mesh::GetIndexBuffer(unsigned long long& indexCount)
 {
 	indexCount = m_Indices.size();
-	unsigned long long* ret = new unsigned long long[indexCount];
-	for (auto i = 0; i < indexCount; i++)
-	{
-		ret[i] = m_Indices[i];
-	}
-	auto last = ret[indexCount - 2];
-	return ret;
+	return m_Indices.data();
+}
+
+unsigned long long Mesh::GetIndexCount()
+{
+	return m_Indices.size();
 }
 
 void Mesh::SetIndices(std::vector<unsigned long long> indices)

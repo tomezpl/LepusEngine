@@ -26,6 +26,7 @@ namespace LepusEngine
 			float* GetVertexBuffer();
 			unsigned long long GetVertexCount();
 			unsigned long long* GetIndexBuffer(unsigned long long& indexCount);
+			unsigned long long GetIndexCount();
 			void SetIndices(std::vector<unsigned long long> indices);
 			void SetMaterial(Material& mat);
 			bool IsIndexed();

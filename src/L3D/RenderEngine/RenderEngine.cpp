@@ -170,7 +170,7 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	glBindVertexArray(0);
 
 	// Release resources
-	delete iD;
+	//delete iD; // TODO: This should be released, but due to how the physics engine currently uses the same index buffer reference, it causes crashes and has to be reworked.
 	//delete vArr;
 }
 

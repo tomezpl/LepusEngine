@@ -1,22 +1,27 @@
 #pragma once
 
-#include "Renderable.h"
-#include "Transform.h"
-#include "Light.h"
-#include <vector>>
+#include <L3D/Renderable.h>
+#include <L3D/Transform.h>
+#include <L3D/Light.h>
+#include <LEngine/Physics.h>
+#include <vector>
 
 namespace LepusEngine {
+	class Physics;
 	namespace Lepus3D {
 		// Scene class
 		// Stores references to objects that appear in or contribute to the rendered scene (e.g. Renderables, Lights)
 		// Describes Ambient Lighting properties.
 		class Scene {
 		friend class RenderEngine;
+		friend class ::LepusEngine::Physics;
 		private:
-			std::vector<Renderable*> m_ObjArr;
-			std::vector<Light*> m_LightArr;
 			Color m_AmbientColor;
 			float m_AmbientIntensity;
+			Physics* m_PhysicsEngine;
+		protected:
+			std::vector<Renderable*> m_ObjArr;
+			std::vector<Light*> m_LightArr;
 		public:
 			// Default constructor. Creates a white ambient light with 0.5 intensity.
 			Scene();
