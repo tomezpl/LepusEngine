@@ -25,7 +25,7 @@ namespace LepusEngine
 			Mesh(VertexArray vertices, bool ignoreIndexing = false);
 			float* GetVertexBuffer();
 			unsigned long long GetVertexCount();
-			unsigned long long* GetIndexBuffer(unsigned long long& indexCount);
+			unsigned long long* GetIndexBuffer();
 			unsigned long long GetIndexCount();
 			void SetIndices(std::vector<unsigned long long> indices);
 			void SetMaterial(Material& mat);

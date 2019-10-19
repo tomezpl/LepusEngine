@@ -66,7 +66,9 @@ Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
 
 float* Mesh::GetVertexBuffer()
 {
-	float* ret = m_Vertices.data();
+	size_t vertexCount = m_Vertices.size();
+	float* ret = new float[vertexCount];
+	memcpy(ret, m_Vertices.data(), vertexCount * sizeof(float));
 	return ret;
 }
 
@@ -75,10 +77,12 @@ unsigned long long Mesh::GetVertexCount()
 	return (m_Indexed) ? m_Indices.size() : m_Vertices.size() / 8;
 }
 
-unsigned long long* Mesh::GetIndexBuffer(unsigned long long& indexCount)
+unsigned long long* Mesh::GetIndexBuffer()
 {
-	indexCount = m_Indices.size();
-	return m_Indices.data();
+	size_t indexCount = m_Indices.size();
+	unsigned long long* ret = new unsigned long long[indexCount];
+	memcpy(ret, m_Indices.data(), indexCount * sizeof(unsigned long long));
+	return ret;
 }
 
 unsigned long long Mesh::GetIndexCount()

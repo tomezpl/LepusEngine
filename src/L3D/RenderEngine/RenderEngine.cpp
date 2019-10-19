@@ -77,8 +77,8 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	unsigned long long* iD = nullptr;
 	if(useIndexing)
 	{
-		unsigned long long eCount = m_eCount;
-		iD = mesh.GetIndexBuffer(eCount);
+		unsigned long long eCount = mesh.GetIndexCount();
+		iD = mesh.GetIndexBuffer();
 	}
 	unsigned long long vC = mesh.GetVertexCount();
 	unsigned long long vDS = vC * sizeof(Vertex);
@@ -170,8 +170,8 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	glBindVertexArray(0);
 
 	// Release resources
-	//delete iD; // TODO: This should be released, but due to how the physics engine currently uses the same index buffer reference, it causes crashes and has to be reworked.
-	//delete vArr;
+	delete iD; // TODO: This should be released, but due to how the physics engine currently uses the same index buffer reference, it causes crashes and has to be reworked.
+	delete vArr;
 }
 
 // TODO: Remove SFML
