@@ -45,7 +45,6 @@ void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geome
 	physicsEngine.m_API->m_PxCooking->cookConvexMesh(desc, outStream);
 
 	physx::PxDefaultMemoryInputData convexMeshData(outStream.getData(), outStream.getSize());
-	// TODO: the vertices are not supposed to be raw vertices, but rather some Mesh format of chars that PhysX uses.
 	physx::PxConvexMesh* mesh = physicsEngine.m_API->m_PxPhysics->createConvexMesh(convexMeshData);
 	Lepus3D::Vector3 scale = transform.GetScale();
 	m_PxCollider = new physx::PxConvexMeshGeometry(mesh, physx::PxMeshScale(physx::PxVec3(scale.x, scale.y, scale.z)));
