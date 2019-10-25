@@ -35,7 +35,6 @@ PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geomet
 
 void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform)
 {
-	//PhysxColliderMeshData stream(geometry);
 	physx::PxDefaultMemoryOutputStream outStream;
 	physx::PxConvexMeshDesc desc;
 	desc.points.count = geometry.GetVertexCount();
