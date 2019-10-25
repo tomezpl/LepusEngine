@@ -38,10 +38,6 @@ void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geome
 	//PhysxColliderMeshData stream(geometry);
 	physx::PxDefaultMemoryOutputStream outStream;
 	physx::PxConvexMeshDesc desc;
-	unsigned long long indexCount;
-	//desc.triangles.data = geometry.GetIndexBuffer(indexCount);
-	//desc.triangles.count = indexCount;
-	//desc.triangles.stride = sizeof(unsigned long long) * 3;
 	desc.points.count = geometry.GetVertexCount();
 	desc.points.data = geometry.GetVertexBuffer();
 	desc.points.stride = sizeof(Lepus3D::Vertex);
@@ -50,7 +46,7 @@ void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geome
 
 	physx::PxDefaultMemoryInputData convexMeshData(outStream.getData(), outStream.getSize());
 	// TODO: the vertices are not supposed to be raw vertices, but rather some Mesh format of chars that PhysX uses.
-	physx::PxConvexMesh* mesh = physicsEngine.m_API->m_PxPhysics->createConvexMesh(convexMeshData); // TODO: Crashes here. Possibly incorrect vertex stream.
+	physx::PxConvexMesh* mesh = physicsEngine.m_API->m_PxPhysics->createConvexMesh(convexMeshData);
 	Lepus3D::Vector3 scale = transform.GetScale();
 	m_PxCollider = new physx::PxConvexMeshGeometry(mesh, physx::PxMeshScale(physx::PxVec3(scale.x, scale.y, scale.z)));
 }
