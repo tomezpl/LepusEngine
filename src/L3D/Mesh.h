@@ -17,17 +17,17 @@ namespace LepusEngine
 			friend class ::LepusEngine::PhysxColliderMeshData;
 		private:
 			std::vector<float> m_Vertices;
-			std::vector<unsigned long long> m_Indices;
+			std::vector<unsigned int> m_Indices;
 			bool m_Indexed;
 			Material* m_Mat; // only one material per mesh now - this will be changed with submeshes
 		public:
 			Mesh();
 			Mesh(VertexArray vertices, bool ignoreIndexing = false);
 			float* GetVertexBuffer();
-			unsigned long long GetVertexCount();
-			unsigned long long* GetIndexBuffer();
-			unsigned long long GetIndexCount();
-			void SetIndices(std::vector<unsigned long long> indices);
+			unsigned int GetVertexCount();
+			unsigned int* GetIndexBuffer();
+			unsigned int GetIndexCount();
+			void SetIndices(std::vector<unsigned int> indices);
 			void SetMaterial(Material& mat);
 			bool IsIndexed();
 		};
@@ -40,7 +40,7 @@ namespace LepusEngine
 				Vertex(-0.5f, 0.f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f), // Bottom-left
 				Vertex(0.5f, 0.f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f) // Bottom-right
 			}) {
-				this->SetIndices(std::vector<unsigned long long>{0, 1, 2, 1, 3, 2});
+				this->SetIndices(std::vector<unsigned int>{0, 1, 2, 1, 3, 2});
 			};
 		};
 

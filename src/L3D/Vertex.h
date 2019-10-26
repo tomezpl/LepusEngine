@@ -16,7 +16,7 @@ namespace LepusEngine
 		};
 
 		typedef std::vector<Vertex> VertexArray;
-		typedef std::vector<unsigned long long> IndexArray;
+		typedef std::vector<unsigned int> IndexArray;
 
 		class VertexPack
 		{
@@ -26,7 +26,7 @@ namespace LepusEngine
 			Vertex* data;
 			unsigned int size() { return m_Size; };
 			VertexPack() { data = new Vertex(); m_Size = 0; }; // TODO: Vertex()? that should be Vertex[0] to create an empty array...
-			VertexPack(VertexArray vertexData) { data = new Vertex[m_Size = vertexData.size()]; for (auto i = 0; i < m_Size; i++) { data[i] = vertexData[i]; } };
+			VertexPack(VertexArray vertexData) { data = new Vertex[m_Size = vertexData.size()]; for (unsigned int i = 0; i < m_Size; i++) { data[i] = vertexData[i]; } };
 		};
 	}
 }

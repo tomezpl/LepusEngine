@@ -74,10 +74,10 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 {
 	bool useIndexing = mesh.IsIndexed();
 
-	unsigned long long* iD = nullptr;
+	unsigned int* iD = nullptr;
 	if(useIndexing)
 	{
-		unsigned long long eCount = mesh.GetIndexCount();
+		unsigned int eCount = mesh.GetIndexCount();
 		iD = mesh.GetIndexBuffer();
 	}
 	unsigned long long vC = mesh.GetVertexCount();

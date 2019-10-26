@@ -57,7 +57,7 @@ bool ModelImporter::_ReadOBJ()
 	// and normals are recalculated.
 	VertexArray verts, normals, uvs, finalVerts;
 
-	vector<unsigned long long> indices, finalIndices; // finalIndices will just be an array of indices with the size of n total vertices
+	vector<unsigned int> indices, finalIndices; // finalIndices will just be an array of indices with the size of n total vertices
 	int indexCounter = 0; // TODO: an incrementing index to write for each vertex (as in, ignoring indexing altogether and just writing an index for each vertex). Might consider getting rid of drawing elements altogether and just draw arrays instead.
 	while(mObjFile->good()) // check if file is still readable
 	{

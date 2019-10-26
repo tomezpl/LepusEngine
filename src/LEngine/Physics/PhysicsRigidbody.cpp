@@ -1,4 +1,5 @@
 #include "PhysicsRigidbody.h"
+#include <LEngine/Logger.h>
 #include <algorithm>
 
 using namespace LepusEngine;
@@ -37,9 +38,20 @@ void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geome
 {
 	physx::PxDefaultMemoryOutputStream outStream;
 	physx::PxConvexMeshDesc desc;
+
 	desc.points.count = geometry.GetVertexCount();
-	desc.points.data = geometry.GetVertexBuffer();
-	desc.points.stride = sizeof(Lepus3D::Vertex);
+	// Initialise a float array for the data. count * 3 because we're only storing xyz of each vertex - UVs and the normals don't matter.
+	float* pointsData = new float[unsigned long long(geometry.GetVertexCount()) * 3];
+	float* vertices = geometry.GetVertexBuffer();
+	// Copy first 3 floats (xyz) from each Vertex
+	for (unsigned int i = 0, j = 0; i < geometry.GetVertexCount() * 3, j < geometry.GetVertexCount() * 8; i += 3, j += 8)
+	{
+		memcpy(pointsData + i, vertices + j, sizeof(float) * 3);
+	}
+	delete vertices;
+	desc.points.data = pointsData;
+	desc.points.stride = sizeof(float) * 3;
+	
 	desc.flags = physx::PxConvexFlag::eCOMPUTE_CONVEX;
 	physicsEngine.m_API->m_PxCooking->cookConvexMesh(desc, outStream);
 
@@ -47,6 +59,18 @@ void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geome
 	physx::PxConvexMesh* mesh = physicsEngine.m_API->m_PxPhysics->createConvexMesh(convexMeshData);
 	Lepus3D::Vector3 scale = transform.GetScale();
 	m_PxCollider = new physx::PxConvexMeshGeometry(mesh, physx::PxMeshScale(physx::PxVec3(scale.x, scale.y, scale.z)));
+#ifdef _DEBUG
+	int nbVertices = mesh->getNbVertices();
+	const physx::PxVec3* cookedVertices = mesh->getVertices();
+	Logger::LogInfo("PhysicsRigidbody", "InitCollider", "Initialised collider geometry from Lepus3D::Mesh. Below are the cooked vertices from PhysX:");
+	for (int i = 0; i < nbVertices; i++)
+	{
+		Logger::LogInfo("PhysicsRigidbody", "InitCollider", (char*)(std::string().append(std::to_string(cookedVertices[i].x))
+			.append(", ").append(std::to_string(cookedVertices[i].y))
+			.append(", ").append(std::to_string(cookedVertices[i].z)).c_str()));
+	}
+#endif
+	delete[] pointsData;
 }
 
 physx::PxRigidDynamic* const LepusEngine::PhysicsRigidbody::GetDynamic()
