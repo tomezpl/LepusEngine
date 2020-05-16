@@ -14,11 +14,9 @@ namespace LepusEngine {
 		// Describes Ambient Lighting properties.
 		class Scene {
 		friend class RenderEngine;
-		friend class ::LepusEngine::Physics;
 		private:
 			Color m_AmbientColor;
 			float m_AmbientIntensity;
-			Physics* m_PhysicsEngine;
 		protected:
 			std::vector<Renderable*> m_ObjArr;
 			std::vector<Light*> m_LightArr;

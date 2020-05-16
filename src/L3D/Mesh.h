@@ -14,7 +14,6 @@ namespace LepusEngine
 		class Mesh {
 			friend class RenderEngine;
 			friend class Renderable;
-			friend class ::LepusEngine::PhysxColliderMeshData;
 		private:
 			std::vector<float> m_Vertices;
 			std::vector<unsigned int> m_Indices;

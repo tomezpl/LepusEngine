@@ -1,6 +1,6 @@
 # LepusEngine - CMake config
 ## NOTES:
-### Wherever file(GLOB ...) is used to find a library/header, 
+### Wherever file(GLOB ...) is used to find a library/header,
 ### the folder structure for that library is based on Windows binaries available from the library's official source.
 ### TODO: It is assumed that CMake on Linux will just be able to pick the libraries up from system PATH, but that's yet to be tested.
 ### This build config assumes the use of Microsoft's vcpkg tool. It helps with managing libraries for cross-platform builds.
@@ -56,29 +56,29 @@ include_directories(${VCPKG_INCLUDE_PATH})
 add_executable(LepusDemo src/LDemo/main.cpp)
 
 # Lepus3D sources
-set(Lepus3D_SRC 
+set(Lepus3D_SRC
 	src/L3D/Assets.h
-		src/L3D/Assets/ModelImporter.h src/L3D/Assets/ModelImporter.cpp 
+		src/L3D/Assets/ModelImporter.h src/L3D/Assets/ModelImporter.cpp
 	src/L3D/Camera.h
-		src/L3D/Camera/FPPCamera.h src/L3D/Camera/Camera.cpp src/L3D/Camera/FPPCamera.cpp 
+		src/L3D/Camera/FPPCamera.h src/L3D/Camera/Camera.cpp src/L3D/Camera/FPPCamera.cpp
 	src/L3D/Color.h
-		src/L3D/Color/Color.cpp 
+		src/L3D/Color/Color.cpp
 	src/L3D/Light.h
-		src/L3D/Light/Light.cpp 
+		src/L3D/Light/Light.cpp
 	src/L3D/Material.h
-		src/L3D/Material/MaterialAttrib.h src/L3D/Material/Material.cpp 
+		src/L3D/Material/MaterialAttrib.h src/L3D/Material/Material.cpp
 	src/L3D/Mesh.h
-		src/L3D/Mesh/Mesh.cpp 
+		src/L3D/Mesh/Mesh.cpp
 	src/L3D/Renderable.h
-		src/L3D/Renderable/Renderable.cpp 
+		src/L3D/Renderable/Renderable.cpp
 	src/L3D/RenderEngine.h
-		src/L3D/RenderEngine/RenderEngine.cpp 
+		src/L3D/RenderEngine/RenderEngine.cpp
 	src/L3D/Scene.h
-		src/L3D/Scene/Scene.cpp 
+		src/L3D/Scene/Scene.cpp
 	src/L3D/Shader.h
-		src/L3D/Shader/SLProgram.h src/L3D/Shader/Shader.cpp src/L3D/Shader/SLProgram.cpp 
-	src/L3D/Texture.h 
-		src/L3D/Texture/Texture2D.cpp 
+		src/L3D/Shader/SLProgram.h src/L3D/Shader/Shader.cpp src/L3D/Shader/SLProgram.cpp
+	src/L3D/Texture.h
+		src/L3D/Texture/Texture2D.cpp
 	src/L3D/Transform.h
 		src/L3D/Transform/Transform.cpp src/L3D/Transform/Vector.h
 	src/L3D/Vertex.h
@@ -86,11 +86,11 @@ set(Lepus3D_SRC
 
 add_library(Lepus3D ${Lepus3D_SRC})
 
-add_library(LepusEngine 
+add_library(LepusEngine
 	src/LEngine/Logger.h
-		src/LEngine/Logger/Logger.cpp 
+		src/LEngine/Logger/Logger.cpp
 	src/LEngine/Physics.h
-		src/LEngine/Physics/Physics.cpp 
+		src/LEngine/Physics/Physics.cpp
 		src/LEngine/Physics/PhysicsRigidbody.h
 		src/LEngine/Physics/PhysicsRigidbody.cpp
 )
@@ -119,34 +119,19 @@ include_directories(Lepus3D ${GLFW_INCLUDES})
 set(PHYSX_INCLUDES ${VCPKG_DEPS_PATH}/include/physx)
 include_directories(${PHYSX_INCLUDES})
 
-## LepusEngine: Windows-specific PhysX and OpenGL libraries. Also sets debug working directory.
-find_library(PHYSX_LIB_64 PhysX_64 ${VCPKG_LIBS_REL_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_CHARKINEMATIC_LIB_64 PhysXCharacterKinematic_static_64 ${VCPKG_LIBS_REL_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_COMMON_LIB_64 PhysXCommon_64 ${VCPKG_LIBS_REL_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_COOKING_LIB_64 PhysXCooking_64 ${VCPKG_LIBS_REL_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_EXT_LIB_64 PhysXExtensions_static_64 ${VCPKG_LIBS_REL_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_FOUNDATION_LIB_64 PhysXFoundation_64 ${VCPKG_LIBS_REL_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_TASK_LIB_64 PhysXTask_static_64 ${VCPKG_LIBS_REL_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_VEHICLE_LIB_64 PhysXVehicle_static_64 ${VCPKG_LIBS_REL_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+## LepusEngine: Bullet3 libraries
+find_library(BULLET_COMMON_LIB Bullet3Common ${VCPKG_LIBS_REL_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+find_library(BULLET_COLLISION_LIB BulletCollision ${VCPKG_LIBS_REL_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+find_library(BULLET_DYNAMICS_LIB BulletDynamics ${VCPKG_LIBS_REL_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
 
-find_library(PHYSX_LIB_64_DBG PhysX_64 ${VCPKG_LIBS_DBG_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_CHARKINEMATIC_LIB_64_DBG PhysXCharacterKinematic_static_64 ${VCPKG_LIBS_DBG_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_COMMON_LIB_64_DBG PhysXCommon_64 ${VCPKG_LIBS_DBG_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_COOKING_LIB_64_DBG PhysXCooking_64 ${VCPKG_LIBS_DBG_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_EXT_LIB_64_DBG PhysXExtensions_static_64 ${VCPKG_LIBS_DBG_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_FOUNDATION_LIB_64_DBG PhysXFoundation_64 ${VCPKG_LIBS_DBG_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_TASK_LIB_64_DBG PhysXTask_static_64 ${VCPKG_LIBS_DBG_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-find_library(PHYSX_VEHICLE_LIB_64_DBG PhysXVehicle_static_64 ${VCPKG_LIBS_DBG_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+find_library(BULLET_COMMON_LIB_DBG Bullet3Common_Debug ${VCPKG_LIBS_DBG_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+find_library(BULLET_COLLISION_LIB_DBG BulletCollision_Debug ${VCPKG_LIBS_DBG_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+find_library(BULLET_DYNAMICS_LIB_DBG BulletDynamics_Debug ${VCPKG_LIBS_DBG_PATH} NO_DEFAULT_PATH NO_PACKAGE_ROOT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
 
-target_link_libraries(LepusEngine debug ${PHYSX_LIB_64_DBG} optimized ${PHYSX_LIB_64})
-target_link_libraries(LepusEngine debug ${PHYSX_CHARKINEMATIC_LIB_64_DBG} optimized ${PHYSX_CHARKINEMATIC_LIB_64})
-target_link_libraries(LepusEngine debug ${PHYSX_COMMON_LIB_64_DBG} optimized ${PHYSX_COMMON_LIB_64})
-target_link_libraries(LepusEngine debug ${PHYSX_COOKING_LIB_64_DBG} optimized ${PHYSX_COOKING_LIB_64})
-target_link_libraries(LepusEngine debug ${PHYSX_EXT_LIB_64_DBG} optimized ${PHYSX_EXT_LIB_64})
-target_link_libraries(LepusEngine debug ${PHYSX_FOUNDATION_LIB_64_DBG} optimized ${PHYSX_FOUNDATION_LIB_64})
-target_link_libraries(LepusEngine debug ${PHYSX_TASK_LIB_64_DBG} optimized ${PHYSX_TASK_LIB_64})
-target_link_libraries(LepusEngine debug ${PHYSX_VEHICLE_LIB_64_DBG} optimized ${PHYSX_VEHICLE_LIB_64})
-
+# Link Bullet for debug and release targets
+target_link_libraries(LepusEngine debug ${BULLET_COMMON_LIB_DBG} optimized ${BULLET_COMMON_LIB})
+target_link_libraries(LepusEngine debug ${BULLET_COLLISION_LIB_DBG} optimized ${BULLET_COLLISION_LIB})
+target_link_libraries(LepusEngine debug ${BULLET_DYNAMICS_LIB_DBG} optimized ${BULLET_DYNAMICS_LIB})
 
 file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/Release)
 file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/Debug)
@@ -154,23 +139,6 @@ file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/Debug)
 # Set working directory for debugger
 set_property(TARGET LepusDemo PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}/Debug")
 
-# TODO: Rewrite this for VCPKG integration
-#file(GLOB PHYSX_BIN_FOLDER_REL ${DEPS_PATH}/PhysX-*/physx/install/*/PhysX/bin/*/release)
-#file(COPY ${PHYSX_BIN_FOLDER_REL}/PhysX_64.dll DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Release)
-#file(COPY ${PHYSX_BIN_FOLDER_REL}/PhysXCommon_64.dll DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Release)
-#file(COPY ${PHYSX_BIN_FOLDER_REL}/PhysXCooking_64.dll DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Release)
-#file(COPY ${PHYSX_BIN_FOLDER_REL}/PhysXFoundation_64.dll DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Release)
-
-#file(GLOB PHYSX_BIN_FOLDER_DBG ${DEPS_PATH}/PhysX-*/physx/install/*/PhysX/bin/*/debug)
-#file(COPY ${PHYSX_BIN_FOLDER_DBG}/PhysX_64.dll DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Debug)
-#file(COPY ${PHYSX_BIN_FOLDER_DBG}/PhysXCommon_64.dll DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Debug)
-#file(COPY ${PHYSX_BIN_FOLDER_DBG}/PhysXCooking_64.dll DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Debug)
-#file(COPY ${PHYSX_BIN_FOLDER_DBG}/PhysXFoundation_64.dll DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Debug)
-	
-#file(GLOB GLEW_BIN_DIRS ${DEPS_PATH}/glew*/*/bin/Release/${CMAKE_VS_PLATFORM_NAME})
-#file(COPY ${GLEW_BIN_DIRS}/glew32.dll DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Release)
-#file(COPY ${GLEW_BIN_DIRS}/glew32.dll DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Debug)
-	
 if(${CMAKE_HOST_WIN32})
 	target_link_libraries(Lepus3D PRIVATE opengl32.lib)
 else()

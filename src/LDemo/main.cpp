@@ -4,7 +4,6 @@
 #include <LEngine/Logger.h>
 #include <LEngine/Physics.h>
 #include <LEngine/Physics/PhysicsRigidbody.h>
-#include <LEngine/World.h>
 
 using namespace LepusEngine;
 
@@ -12,15 +11,10 @@ using namespace LepusEngine;
 	#define NDEBUG
 #endif
 
-#include <PxPhysicsAPI.h>
-#include <extensions/PxDefaultAllocator.h>
-
-using namespace physx;
-
 int main()
 {
-	// Prepare PhysX
-	APIPhysX apiPhysx;
+	// Prepare Bullet3
+	APIBullet apiBullet;
 
 	// Enable logging
 	LepusEngine::Logger::Enabled = true;
@@ -44,7 +38,7 @@ int main()
 	Lepus3D::Scene scene;
 
 	// Create physics engine for this scene
-	LepusEngine::Physics physicsEngine(apiPhysx, scene);
+	LepusEngine::Physics physicsEngine(apiBullet, scene);
 
 	// Prepare the shading
 	Lepus3D::Material testMat("Material", "Phong"); // Use the phong shader, assign material name "Material"
@@ -58,7 +52,7 @@ int main()
 	// Prepare the geometry
 	// A Renderable encapsulates raw model data to be rendered in a Scene.
 	// Scale the box Renderable down to 1/4
-	Lepus3D::Renderable box = Lepus3D::Renderable(modelImp.GetSubMesh(), true, &physicsEngine);
+	Lepus3D::Renderable box = Lepus3D::Renderable(modelImp.GetSubMesh());
 	box.SetScale(0.25f);
 
 	// Create box in PhysX scene
@@ -66,7 +60,6 @@ int main()
 	Lepus3D::Vector3 boxPos = boxTransform.GetPosition();
 	Lepus3D::Vector3 boxRot = boxTransform.GetRotation();
 	Lepus3D::Vector3 boxScale = boxTransform.GetScale();
-	PxTransform boxDynamicTransform;
 
 	// Prepare the lighting
 	// A Light is created at xyz(0, 2.5, 0) with a white RGBA colour and intensity 1.0
@@ -83,29 +76,14 @@ int main()
 
 	// Add the box renderable and the light to scene
 	scene.AddLight(&sceneLight);
-	//scene.AddMesh(&box);
+	scene.AddMesh(&box);
 
 	// dTime: delta time between frames
 	// elapsedTime: total running time, needed for the scene light to orbit around the box
 	double dTime, elapsedTime = 0.0;
 
-	// This will be toggled after hitting space to start/stop PhysX
+	// This will be toggled after hitting space to start/stop physics simulation
 	bool physicsActive = false;
-
-	Game::World demoWorld;
-	demoWorld.AttachScene(&scene);
-
-	demoWorld.AddEntity(
-		new Game::TransformableEntity(
-			"Box", 
-			{ 
-				new Game::PhysicsRigidbodyComponent(physicsEngine, *box.GetMesh(), boxTransform),
-				new Game::RenderableComponent(*box.GetMesh())
-			}
-		)
-	);
-
-	demoWorld.AttachPhysics(&physicsEngine);
 
 	// Output start message to console
 	LepusEngine::Logger::LogInfo("", "main", "Demo starting!");
@@ -116,22 +94,13 @@ int main()
 		// Add delta time to update total running time
 		elapsedTime += dTime;
 
-		demoWorld.Update();
-
-		// Update box position after PhysX simulation
-		boxDynamicTransform = box.GetPhysicsRigidbody()->GetDynamic()->getGlobalPose();
-		box.SetPosition(Lepus3D::Vector3(boxDynamicTransform.p.x, boxDynamicTransform.p.y, boxDynamicTransform.p.z));
-		Lepus3D::Vector3 eulerAngles = Lepus3D::Vector3();
-		eulerAngles = Lepus3D::Vector3(glm::eulerAngles(glm::quat(boxDynamicTransform.q.w, boxDynamicTransform.q.x, boxDynamicTransform.q.y, boxDynamicTransform.q.z)));
-		box.SetRotation(eulerAngles);
-
 		// Orbit the light around the box over the application's running time
 		sceneLight.SetPosition(Lepus3D::Vector3(2.50f * sin(elapsedTime), 2.50f * sin(elapsedTime), 2.50f * cos(elapsedTime)));
 
 		engine.Update(); // Update window before drawing
 		cam.ProcessInput(dTime); // Move camera according to input using delta time to maintain consistent speed
 		engine.StartScene(&cam); // Set current camera, prepare engine for drawing
-		engine.DrawScene(*demoWorld.Get3DScene()); // Draw objects in scene
+		engine.DrawScene(scene); // Draw objects in scene
 		engine.EndScene(); // Finish rendering and present in window/screen
 		isRunning = engine.Update(); // Update window and check if engine is still running
 
@@ -148,8 +117,6 @@ int main()
 
 	// Close the rendering context(s), release resources
 	engine.Shutdown();
-
-	// Shutdown PhysX
 
 	return 0;
 }

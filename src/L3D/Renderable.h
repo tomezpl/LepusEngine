@@ -4,8 +4,6 @@
 #include "Transform.h"
 
 namespace LepusEngine {
-	class PhysicsRigidbody;
-	class Physics;
 
 	namespace Lepus3D {
 		class Renderable : public Transformable {
@@ -13,13 +11,11 @@ namespace LepusEngine {
 		friend class RenderEngine;
 		protected:
 			Mesh* mMesh;
-			::LepusEngine::PhysicsRigidbody* mRigidbody;
 		public:
 			Renderable();
-			Renderable(Mesh mesh, bool enablePhysics = false, Physics* physicsEngine = nullptr);
-			::LepusEngine::PhysicsRigidbody* GetPhysicsRigidbody();
+			Renderable(Mesh mesh);
 			Mesh* GetMesh();
-			void SetMesh(Mesh mesh, bool enablePhysics = false, Physics* physicsEngine = nullptr);
+			void SetMesh(Mesh mesh);
 			~Renderable();
 		};
 	}
