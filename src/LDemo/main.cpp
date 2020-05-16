@@ -4,6 +4,7 @@
 #include <LEngine/Logger.h>
 #include <LEngine/Physics.h>
 #include <LEngine/Physics/PhysicsRigidbody.h>
+#include <LEngine/World.h>
 
 using namespace LepusEngine;
 
@@ -82,7 +83,7 @@ int main()
 
 	// Add the box renderable and the light to scene
 	scene.AddLight(&sceneLight);
-	scene.AddMesh(&box);
+	//scene.AddMesh(&box);
 
 	// dTime: delta time between frames
 	// elapsedTime: total running time, needed for the scene light to orbit around the box
@@ -90,6 +91,21 @@ int main()
 
 	// This will be toggled after hitting space to start/stop PhysX
 	bool physicsActive = false;
+
+	Game::World demoWorld;
+	demoWorld.AttachScene(&scene);
+
+	demoWorld.AddEntity(
+		new Game::TransformableEntity(
+			"Box", 
+			{ 
+				new Game::PhysicsRigidbodyComponent(physicsEngine, *box.GetMesh(), boxTransform),
+				new Game::RenderableComponent(*box.GetMesh())
+			}
+		)
+	);
+
+	demoWorld.AttachPhysics(&physicsEngine);
 
 	// Output start message to console
 	LepusEngine::Logger::LogInfo("", "main", "Demo starting!");
@@ -100,18 +116,14 @@ int main()
 		// Add delta time to update total running time
 		elapsedTime += dTime;
 
-		if (physicsActive)
-		{
-			// Run physics simulation
-			physicsEngine.Run(60.0f);
+		demoWorld.Update();
 
-			// Update box position after PhysX simulation
-			boxDynamicTransform = box.GetPhysicsRigidbody()->GetDynamic()->getGlobalPose();
-			box.SetPosition(Lepus3D::Vector3(boxDynamicTransform.p.x, boxDynamicTransform.p.y, boxDynamicTransform.p.z));
-			Lepus3D::Vector3 eulerAngles = Lepus3D::Vector3();
-			eulerAngles = Lepus3D::Vector3(glm::eulerAngles(glm::quat(boxDynamicTransform.q.w, boxDynamicTransform.q.x, boxDynamicTransform.q.y, boxDynamicTransform.q.z)));
-			box.SetRotation(eulerAngles);
-		}
+		// Update box position after PhysX simulation
+		boxDynamicTransform = box.GetPhysicsRigidbody()->GetDynamic()->getGlobalPose();
+		box.SetPosition(Lepus3D::Vector3(boxDynamicTransform.p.x, boxDynamicTransform.p.y, boxDynamicTransform.p.z));
+		Lepus3D::Vector3 eulerAngles = Lepus3D::Vector3();
+		eulerAngles = Lepus3D::Vector3(glm::eulerAngles(glm::quat(boxDynamicTransform.q.w, boxDynamicTransform.q.x, boxDynamicTransform.q.y, boxDynamicTransform.q.z)));
+		box.SetRotation(eulerAngles);
 
 		// Orbit the light around the box over the application's running time
 		sceneLight.SetPosition(Lepus3D::Vector3(2.50f * sin(elapsedTime), 2.50f * sin(elapsedTime), 2.50f * cos(elapsedTime)));
@@ -119,7 +131,7 @@ int main()
 		engine.Update(); // Update window before drawing
 		cam.ProcessInput(dTime); // Move camera according to input using delta time to maintain consistent speed
 		engine.StartScene(&cam); // Set current camera, prepare engine for drawing
-		engine.DrawScene(scene); // Draw objects in scene
+		engine.DrawScene(*demoWorld.Get3DScene()); // Draw objects in scene
 		engine.EndScene(); // Finish rendering and present in window/screen
 		isRunning = engine.Update(); // Update window and check if engine is still running
 

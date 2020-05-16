@@ -11,11 +11,18 @@ namespace LepusEngine
             physx::PxMaterial* m_PxMat;
             physx::PxGeometry* m_PxCollider;
             physx::PxRigidDynamic* m_PxRigidbody;
+			bool m_Active;
+			Physics* m_PhysicsEngine;
         public:
-			PhysicsRigidbody() { m_PxMat = nullptr; m_PxRigidbody = nullptr; m_PxCollider = nullptr; }
+			PhysicsRigidbody() {
+				m_PxMat = nullptr; m_PxRigidbody = nullptr; m_PxCollider = nullptr; 
+				m_Active = false; m_PhysicsEngine = nullptr;
+			}
             PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform);
             void InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform);
 			physx::PxRigidDynamic* const GetDynamic();
+			void SetActive(bool active);
+			bool IsActive();
 			~PhysicsRigidbody();
         };
 

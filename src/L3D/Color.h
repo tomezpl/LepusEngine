@@ -1,5 +1,4 @@
-#ifndef _LEPUS3D_COLOR_
-#define _LEPUS3D_COLOR_
+#pragma once
 
 #include "Transform/Vector.h"
 
@@ -49,5 +48,3 @@ namespace LepusEngine {
 		};
 	}
 }
-
-#endif

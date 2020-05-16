@@ -1,5 +1,4 @@
-#ifndef _LEPUS3D_ASSETS_MODELIMP_
-#define _LEPUS3D_ASSETS_MODELIMP_
+#pragma once
 
 #include <fstream>
 #include <iostream>
@@ -46,5 +45,3 @@ namespace LepusEngine {
 		}
 	}
 }
-
-#endif

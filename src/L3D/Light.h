@@ -1,5 +1,4 @@
-#ifndef _LEPUS3D_LIGHT_
-#define _LEPUS3D_LIGHT_
+#pragma once
 
 #include "Transform.h"
 #include "Color.h"
@@ -36,5 +35,3 @@ namespace LepusEngine {
 		};
 	}
 }
-
-#endif

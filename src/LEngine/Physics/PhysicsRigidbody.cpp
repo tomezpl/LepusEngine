@@ -26,6 +26,8 @@ uint32_t PhysxColliderMeshData::read(void* dest, uint32_t count)
 
 PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform)
 {
+	m_PhysicsEngine = &physicsEngine;
+
     InitCollider(physicsEngine, geometry, transform);
 	m_PxMat = physicsEngine.m_API->m_PxPhysics->createMaterial(0.5f, 0.5f, 0.6f); // TODO: these are only test parameters - change them, or provide a way to override.
 	Lepus3D::Vector3 position = transform.GetPosition();
@@ -71,6 +73,32 @@ void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geome
 	}
 #endif
 	delete[] pointsData;
+}
+
+void LepusEngine::PhysicsRigidbody::SetActive(bool active)
+{
+	// Sets active status and removes/adds rigidbody as actor to scene if necessary
+
+	bool oldActive = m_Active;
+
+	m_Active = active; // set object status
+
+	if (oldActive != m_Active)
+	{
+		if (!m_Active)
+		{
+			m_PhysicsEngine->m_PxScene->removeActor(*m_PxRigidbody);
+		}
+		else
+		{
+			m_PhysicsEngine->m_PxScene->addActor(*m_PxRigidbody);
+		}
+	}
+}
+
+bool LepusEngine::PhysicsRigidbody::IsActive()
+{
+	return m_Active;
 }
 
 physx::PxRigidDynamic* const LepusEngine::PhysicsRigidbody::GetDynamic()
