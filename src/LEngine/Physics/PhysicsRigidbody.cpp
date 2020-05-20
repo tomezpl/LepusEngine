@@ -4,7 +4,7 @@
 
 using namespace LepusEngine;
 
-PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform)
+PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform, float mass)
 {
 	m_PhysicsEngine = &physicsEngine;
 
@@ -20,7 +20,7 @@ PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geomet
 	mBtCollider->calculateLocalInertia(1.f, localInertia);
 
 	mBtMotionState = new btDefaultMotionState(btTransform(btQuaternion(rot.x, rot.y, rot.z), btVector3(pos.x, pos.y, pos.z)));
-	mBtRigidbody = new btRigidBody(1.f, mBtMotionState, mBtCollider, localInertia);
+	mBtRigidbody = new btRigidBody(mass, mBtMotionState, mBtCollider, localInertia);
 	/*m_PxRigidbody = physx::PxCreateDynamic(*physicsEngine.m_API->m_PxPhysics, physx::PxTransform(position.x, position.y, position.z), *m_PxCollider, *m_PxMat, 10.0f);
 	m_PxRigidbody->setAngularDamping(0.5f);
 	m_PxRigidbody->setLinearVelocity(physx::PxVec3(0.0f));*/
@@ -52,6 +52,7 @@ void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geome
 	Lepus3D::Vector3 scale = transform.GetScale();
 	//m_PxCollider = new physx::PxConvexMeshGeometry(mesh, physx::PxMeshScale(physx::PxVec3(scale.x, scale.y, scale.z)));
 	mBtCollider = new btConvexHullShape(pointsData, geometry.GetVertexCount(), 3 * sizeof(float));
+	mBtCollider->setLocalScaling(btVector3(scale.x, scale.y, scale.z));
 #ifdef _DEBUG
 	/*int nbVertices = mesh->getNbVertices();
 	const physx::PxVec3* cookedVertices = mesh->getVertices();
@@ -92,7 +93,7 @@ bool LepusEngine::PhysicsRigidbody::IsActive()
 	return m_Active;
 }
 
-LepusEngine::RigidDynamic* const LepusEngine::PhysicsRigidbody::GetDynamic()
+btRigidBody* const LepusEngine::PhysicsRigidbody::GetBtRigidbody()
 {
 	return mBtRigidbody;
 	//return m_PxRigidbody;

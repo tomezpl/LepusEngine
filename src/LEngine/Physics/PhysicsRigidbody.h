@@ -5,7 +5,6 @@
 
 namespace LepusEngine
 {
-	typedef btRigidBody RigidDynamic;
         class PhysicsRigidbody {
 			friend class Physics;
         private:
@@ -28,9 +27,12 @@ namespace LepusEngine
 				// Initialise material, geometry and rigidbody 
 				m_Active = false; m_PhysicsEngine = nullptr; mBtCollider = nullptr; mBtRigidbody = nullptr; mBtMotionState = nullptr;
 			}
-            PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform);
+            PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform, float mass = 1.f);
             void InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform);
-			RigidDynamic* const GetDynamic();
+
+			// Returns the underlying Bullet3 rigidbody data
+			btRigidBody* const GetBtRigidbody();
+
 			Lepus3D::Transform GetTransform();
 			void SetActive(bool active);
 			bool IsActive();

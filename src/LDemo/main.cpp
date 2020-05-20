@@ -55,13 +55,19 @@ int main()
 	Lepus3D::Renderable box = Lepus3D::Renderable(modelImp.GetSubMesh());
 	box.SetScale(0.25f);
 
+	// This will be our static box placed below the first box to test collisions and dynamics
+	Lepus3D::Renderable box2 = Lepus3D::Renderable(modelImp.GetSubMesh());
+	box2.SetScale(0.2f);
+	box2.SetPosition(Lepus3D::Vector3(0.3f, -15.f, 0.f));
+
 	// Prepare the lighting
 	// A Light is created at xyz(0, 2.5, 0) with a white RGBA colour and intensity 1.0
 	// TODO: The light colour doesn't need Alpha, that one channel could go away
 	Lepus3D::Light sceneLight(Lepus3D::Vector3(0.0f, 2.50f, 0.0f), Lepus3D::Color(255, 255, 255, 255), 1.0f);
 
-	// Assign material to mesh
+	// Assign materials to meshes
 	box.GetMesh()->SetMaterial(testMat);
+	box2.GetMesh()->SetMaterial(testMat);
 
 	// Initialise a transformable FPPCamera (reacts to keyboard & mouse input)
 	Lepus3D::FPPCamera cam(*(new Lepus3D::Transform()));
@@ -71,9 +77,13 @@ int main()
 	// Add the box renderable and the light to scene
 	scene.AddLight(&sceneLight);
 	scene.AddMesh(&box);
+	scene.AddMesh(&box2);
 
 	PhysicsRigidbody boxRb(physicsEngine, *box.GetMesh(), box.GetTransform());
 	physicsEngine.AddObject(boxRb);
+
+	PhysicsRigidbody boxRb2(physicsEngine, *box2.GetMesh(), box2.GetTransform(), 0.f);
+	physicsEngine.AddObject(boxRb2);
 
 	// dTime: delta time between frames
 	// elapsedTime: total running time, needed for the scene light to orbit around the box
@@ -94,10 +104,13 @@ int main()
 		// Orbit the light around the box over the application's running time
 		sceneLight.SetPosition(Lepus3D::Vector3(2.50f * sin(elapsedTime), 2.50f * sin(elapsedTime), 2.50f * cos(elapsedTime)));
 
-		physicsEngine.Run(dTime);
+		if (physicsActive)
+		{
+			physicsEngine.Run(dTime);
+		}
 		Lepus3D::Transform boxCurrentPose = boxRb.GetTransform();
 		box.SetPosition(boxCurrentPose.GetPosition());
-		std::cout << boxCurrentPose.GetPosition().y << "\n" << std::endl;
+		//std::cout << boxCurrentPose.GetPosition().y << "\n" << std::endl;
 		engine.Update(); // Update window before drawing
 		cam.ProcessInput(dTime); // Move camera according to input using delta time to maintain consistent speed
 		engine.StartScene(&cam); // Set current camera, prepare engine for drawing
