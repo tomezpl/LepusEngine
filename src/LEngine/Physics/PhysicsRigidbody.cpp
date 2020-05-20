@@ -11,6 +11,16 @@ PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geomet
     InitCollider(physicsEngine, geometry, transform);
 	//m_PxMat = physicsEngine.m_API->m_PxPhysics->createMaterial(0.5f, 0.5f, 0.6f); // TODO: these are only test parameters - change them, or provide a way to override.
 	Lepus3D::Vector3 position = transform.GetPosition();
+	Lepus3D::Vector3 rot = transform.GetRotation();
+	Lepus3D::Vector3 pos = transform.GetPosition();
+
+	btAssert((!mBtCollider || mBtCollider->getShapeType() != INVALID_SHAPE_PROXYTYPE));
+
+	btVector3 localInertia(0.f, 0.f, 0.f);
+	mBtCollider->calculateLocalInertia(1.f, localInertia);
+
+	mBtMotionState = new btDefaultMotionState(btTransform(btQuaternion(rot.x, rot.y, rot.z), btVector3(pos.x, pos.y, pos.z)));
+	mBtRigidbody = new btRigidBody(1.f, mBtMotionState, mBtCollider, localInertia);
 	/*m_PxRigidbody = physx::PxCreateDynamic(*physicsEngine.m_API->m_PxPhysics, physx::PxTransform(position.x, position.y, position.z), *m_PxCollider, *m_PxMat, 10.0f);
 	m_PxRigidbody->setAngularDamping(0.5f);
 	m_PxRigidbody->setLinearVelocity(physx::PxVec3(0.0f));*/
@@ -41,6 +51,7 @@ void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geome
 	physx::PxConvexMesh* mesh = physicsEngine.m_API->m_PxPhysics->createConvexMesh(convexMeshData);*/
 	Lepus3D::Vector3 scale = transform.GetScale();
 	//m_PxCollider = new physx::PxConvexMeshGeometry(mesh, physx::PxMeshScale(physx::PxVec3(scale.x, scale.y, scale.z)));
+	mBtCollider = new btConvexHullShape(pointsData, geometry.GetVertexCount(), 3 * sizeof(float));
 #ifdef _DEBUG
 	/*int nbVertices = mesh->getNbVertices();
 	const physx::PxVec3* cookedVertices = mesh->getVertices();
@@ -83,8 +94,19 @@ bool LepusEngine::PhysicsRigidbody::IsActive()
 
 LepusEngine::RigidDynamic* const LepusEngine::PhysicsRigidbody::GetDynamic()
 {
-	return nullptr;
+	return mBtRigidbody;
 	//return m_PxRigidbody;
+}
+
+Lepus3D::Transform LepusEngine::PhysicsRigidbody::GetTransform()
+{
+	Lepus3D::Transform ret;
+	btTransform pose;
+	mBtMotionState->getWorldTransform(pose);
+	btVector3 position = pose.getOrigin();
+	ret.SetPosition(Lepus3D::Vector3(position.getX(), position.getY(), position.getZ()));
+
+	return ret;
 }
 
 LepusEngine::PhysicsRigidbody::~PhysicsRigidbody()

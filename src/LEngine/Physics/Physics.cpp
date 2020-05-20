@@ -3,27 +3,8 @@
 
 using namespace LepusEngine;
 
-APIBullet::APIBullet()
+Physics::Physics(Lepus3D::Scene& scene) : Physics()
 {
-	/*m_Foundation = PxCreateFoundation(PX_PHYSICS_VERSION, m_Allocator, m_ErrCb);
-
-	m_PxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_Foundation, PxTolerancesScale(), true);
-
-	physx::PxTolerancesScale toleranceScale = m_PxPhysics->getTolerancesScale();
-	physx::PxCookingParams cookingParams(toleranceScale);
-	m_PxCooking = PxCreateCooking(PX_PHYSICS_VERSION, *m_Foundation, cookingParams);*/
-}
-
-APIBullet::~APIBullet()
-{
-	/*m_PxPhysics->release();
-	m_PxCooking->release();
-	m_Foundation->release();*/
-}
-
-Physics::Physics(APIBullet& api, Lepus3D::Scene& scene) : Physics()
-{
-	m_API = &api;
     m_Scene = &(scene);
 	this->Init();
 	//m_Scene->m_PhysicsEngine = this;
@@ -31,14 +12,16 @@ Physics::Physics(APIBullet& api, Lepus3D::Scene& scene) : Physics()
 
 void Physics::Init(Lepus3D::Vector3 gravity)
 {
-	/*PxSceneDesc sceneDesc(m_API->m_PxPhysics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(gravity.x, gravity.y, gravity.z);
-	m_Dispatcher = PxDefaultCpuDispatcherCreate(2);
-	sceneDesc.cpuDispatcher = m_Dispatcher;
-	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
-	m_PxScene = m_API->m_PxPhysics->createScene(sceneDesc);*/
+	mCollisionConfig = new btDefaultCollisionConfiguration();
+	mCollisionDispatch = new btCollisionDispatcher(mCollisionConfig);
+	mBroadphase = new btDbvtBroadphase();
+	mConstraintSolver = new btSequentialImpulseConstraintSolver();
 
-	size_t renderableCount = m_Scene->GetRenderableCount();
+	// TODO: Generalise for adapting to Discrete/CCD?
+	mWorld = new btDiscreteDynamicsWorld(mCollisionDispatch, mBroadphase, mConstraintSolver, mCollisionConfig);
+	mWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
+
+	size_t renderableCount = 0/*m_Scene->GetRenderableCount()*/;
 
 	for (size_t i = 0; i < renderableCount; i++)
 	{
@@ -50,12 +33,14 @@ void Physics::Init(Lepus3D::Vector3 gravity)
 void LepusEngine::Physics::AddObject(PhysicsRigidbody & rigidbody)
 {
 	//m_PxScene->addActor(*rigidbody.m_PxRigidbody);
+	mWorld->addRigidBody(rigidbody.mBtRigidbody);
 }
 
-void Physics::Run(float rate)
+void Physics::Run(float dTime)
 {
 	/*m_PxScene->simulate(1.0f / rate);
 	m_PxScene->fetchResults(true);*/
+	mWorld->stepSimulation(dTime);
 }
 
 void Physics::Shutdown()
@@ -64,6 +49,13 @@ void Physics::Shutdown()
 	m_Dispatcher->release();*/
 	
 	m_Scene = nullptr;
+
+	// Delete Bullet resources
+	delete mWorld;
+	delete mConstraintSolver;
+	delete mBroadphase;
+	delete mCollisionDispatch;
+	delete mCollisionConfig;
 }
 
 Physics::~Physics()

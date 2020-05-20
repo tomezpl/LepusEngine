@@ -14,7 +14,7 @@ using namespace LepusEngine;
 int main()
 {
 	// Prepare Bullet3
-	APIBullet apiBullet;
+	//APIBullet apiBullet;
 
 	// Enable logging
 	LepusEngine::Logger::Enabled = true;
@@ -38,7 +38,7 @@ int main()
 	Lepus3D::Scene scene;
 
 	// Create physics engine for this scene
-	LepusEngine::Physics physicsEngine(apiBullet, scene);
+	LepusEngine::Physics physicsEngine(scene);
 
 	// Prepare the shading
 	Lepus3D::Material testMat("Material", "Phong"); // Use the phong shader, assign material name "Material"
@@ -54,12 +54,6 @@ int main()
 	// Scale the box Renderable down to 1/4
 	Lepus3D::Renderable box = Lepus3D::Renderable(modelImp.GetSubMesh());
 	box.SetScale(0.25f);
-
-	// Create box in PhysX scene
-	Lepus3D::Transform boxTransform = box.GetTransform();
-	Lepus3D::Vector3 boxPos = boxTransform.GetPosition();
-	Lepus3D::Vector3 boxRot = boxTransform.GetRotation();
-	Lepus3D::Vector3 boxScale = boxTransform.GetScale();
 
 	// Prepare the lighting
 	// A Light is created at xyz(0, 2.5, 0) with a white RGBA colour and intensity 1.0
@@ -77,6 +71,9 @@ int main()
 	// Add the box renderable and the light to scene
 	scene.AddLight(&sceneLight);
 	scene.AddMesh(&box);
+
+	PhysicsRigidbody boxRb(physicsEngine, *box.GetMesh(), box.GetTransform());
+	physicsEngine.AddObject(boxRb);
 
 	// dTime: delta time between frames
 	// elapsedTime: total running time, needed for the scene light to orbit around the box
@@ -97,6 +94,10 @@ int main()
 		// Orbit the light around the box over the application's running time
 		sceneLight.SetPosition(Lepus3D::Vector3(2.50f * sin(elapsedTime), 2.50f * sin(elapsedTime), 2.50f * cos(elapsedTime)));
 
+		physicsEngine.Run(dTime);
+		Lepus3D::Transform boxCurrentPose = boxRb.GetTransform();
+		box.SetPosition(boxCurrentPose.GetPosition());
+		std::cout << boxCurrentPose.GetPosition().y << "\n" << std::endl;
 		engine.Update(); // Update window before drawing
 		cam.ProcessInput(dTime); // Move camera according to input using delta time to maintain consistent speed
 		engine.StartScene(&cam); // Set current camera, prepare engine for drawing
