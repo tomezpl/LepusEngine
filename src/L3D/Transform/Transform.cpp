@@ -5,7 +5,6 @@ using namespace LepusEngine::Lepus3D;
 Transform::Transform(Vector3 p, Vector3 r, Vector3 s) : Transform::Transform()
 {
 	m_Pos = glm::vec4(p.x, p.y, p.z, 1.f);
-	m_Rot = glm::vec4(r.x, r.y, r.z, 1.f);
 	m_Scale = glm::vec4(s.x, s.y, s.z, 1.f);
 }
 
@@ -15,8 +14,9 @@ glm::mat4 Transform::GetMatrix()
 	ret = glm::translate(ret, m_Pos);
 	// Check if there is any rotation
 	// otherwise it would fill the matrix with NaN for some reason
-	if (m_Rot != Vector3(0.f, 0.f, 0.f).vec3())
-		ret = glm::rotate(ret, toRadians(m_RotAngle), m_Rot);
+	//if (m_Rot != Vector3(0.f, 0.f, 0.f).vec3())
+		//ret = glm::rotate(ret, toRadians(m_RotAngle), m_Rot);
+	ret *= glm::mat4_cast(glm::quat(m_Rot.w, m_Rot.x, m_Rot.y, m_Rot.z));
 	ret = glm::scale(ret, m_Scale);
 	return ret;
 }
@@ -26,21 +26,16 @@ void Transform::SetPosition(Vector3 p)
 	m_Pos = p.vec3();
 }
 
-void Transform::SetRotation(Vector3 r)
+void Transform::SetRotation(Quaternion r)
 {
-	float maxAngle = 0.f;
-	if (r.x >= r.y && r.x >= r.z)
-		maxAngle = r.x;
-	else if (r.y >= r.x && r.y >= r.z)
-		maxAngle = r.y;
-	else if (r.z >= r.x && r.z >= r.y)
-		maxAngle = r.z;
-	if (maxAngle != 0.f)
-	{
-		m_Rot = { r.x / maxAngle, r.y / maxAngle, r.z / maxAngle };
-		m_RotAngle = maxAngle;
-	}
+	m_Rot = glm::quat(r.w, r.x, r.y, r.z);
 }
+
+void LepusEngine::Lepus3D::Transform::SetRotation(Vector3 axis, double angle)
+{
+	m_Rot = glm::angleAxis((float)angle, axis.vec3());
+}
+
 void Transform::SetScale(Vector3 s)
 {
 	m_Scale = s.vec3();
@@ -72,9 +67,9 @@ Vector3 Transform::GetPosition()
 	return ret;
 }
 
-Vector3 Transform::GetRotation()
+Quaternion Transform::GetRotation()
 {
-	return Vector3::Create(m_Rot.x * m_RotAngle, m_Rot.y * m_RotAngle, m_Rot.z * m_RotAngle);
+	return Quaternion(m_Rot.x, m_Rot.y, m_Rot.z, m_Rot.w);
 }
 
 Vector3 Transform::GetScale()
@@ -85,7 +80,7 @@ Vector3 Transform::GetScale()
 std::string Transform::ToString()
 {
 	Vector3 p = this->GetPosition();
-	Vector3 r = this->GetRotation();
+	Quaternion r = this->GetRotation();
 	Vector3 s = this->GetScale();
 
 	std::string ret = "P ";

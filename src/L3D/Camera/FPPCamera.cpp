@@ -27,15 +27,15 @@ void FPPCamera::ProcessInput(float deltaTime)
 	// Check whether window is out of focus
 	if (!glfwGetWindowAttrib(m_Wnd, GLFW_FOCUSED))
 	{
-		glfwSetInputMode(m_Wnd, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Give back cursor control
-		return;
+		//glfwSetInputMode(m_Wnd, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Give back cursor control
+		//return;
 	}
 
 	// If window is in focus, request unlimited mouse movement from the window.
 	glfwSetInputMode(m_Wnd, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// TODO: This should be moved to LepusEngine, with an input manager class.
-	const float lookSensitivity = 100.f;
+	const float lookSensitivity = 5.f;
 
 	// Get current camera position.
 	glm::vec3 position = m_Transform.GetPosition().vec3();
@@ -52,19 +52,19 @@ void FPPCamera::ProcessInput(float deltaTime)
 	}
 	if (glfwGetKey(m_Wnd, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		position -= glm::normalize(glm::cross(m_Target.vec3(), m_Up.vec3())) * 2.0f * deltaTime;
+		position += m_Right.vec3() * 2.0f * deltaTime;
 	}
 	if (glfwGetKey(m_Wnd, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		position += glm::normalize(glm::cross(m_Target.vec3(), m_Up.vec3())) * 2.0f * deltaTime;
+		position -= m_Right.vec3() * 2.0f * deltaTime;
 	}
 
 	// Update the position after reading WASD input.
 	m_Transform.SetPosition(Vector3(position.x, position.y, position.z));
 
 	// Get current camera rotation.
-	Vector3 rotation = m_Transform.GetRotation();
-
+	Quaternion rotation = m_Transform.GetRotation();
+	
 	double mouseX = 0.0, mouseY = 0.0;
 	glfwGetCursorPos(m_Wnd, &mouseX, &mouseY); // Get XY coordinates of the cursor in the window, in pixels.
 
@@ -76,27 +76,38 @@ void FPPCamera::ProcessInput(float deltaTime)
 	mouseY /= wndHeight;
 
 	// Calculate the relative rotation value
-	Vector2 mouseRot(mouseX - 0.5, mouseY - 0.5);
+	Vector2 mouseRot((mouseX - 0.5) * -1.f, (mouseY - 0.5) * -1.f);
 
 	// Add the relative rotation to the camera's rotation
-	rotation.y += mouseRot.x * lookSensitivity;
-	if (rotation.y <= 0.0f)
-		rotation.y += 360.0f; // This is a quick fix for issue #2, where negative rotation was not supported
-	rotation.x -= mouseRot.y * lookSensitivity;
-	Logger::LogInfo("FPPCamera", "ProcessInput", (char*)std::to_string(mouseY).c_str());
+	glm::quat newRotation = glm::quat(rotation.w, rotation.x, rotation.y, rotation.z);
+	newRotation *= glm::angleAxis(-mouseRot.x / (10.f / lookSensitivity), Vector3(0.f, 1.f, 0.f).vec3());
+	newRotation *= glm::angleAxis(mouseRot.y / (10.f / lookSensitivity), m_Right.vec3());
+	
+	m_Transform.SetRotation(Quaternion(newRotation.x, newRotation.y, newRotation.z, newRotation.w));
 
-	// quick fix for issue #2 (no negative rotation)
-	if (rotation.x <= 0.0f)
-		rotation.x = 360.0f;
+	// Normalise target vector
+	glm::vec3 eye = glm::vec3(0.f, 0.f, 1.f) * newRotation;
+	glm::vec3 normTarget = glm::normalize(eye);
 
-	// Lock rotation so that camera cannot turn upside down
-	if (rotation.x > 449.9f)
-		rotation.x = 449.9f;
-	if (rotation.x < 360.0f - 89.9f)
-		rotation.x = 360.0f - 89.9f;
+	glm::vec3 right = glm::vec3(1.f, 0.f, 0.f) * newRotation;
+	glm::vec3 normRight = glm::normalize(right);
 
-	// Apply new rotation
-	m_Transform.SetRotation(rotation);
+
+	// Update target vector with new values
+	m_Target.x = normTarget.x;
+	m_Target.y = normTarget.y;
+	m_Target.z = normTarget.z;
+
+	m_Right.x = normRight.x;
+	m_Right.y = normRight.y;
+	m_Right.z = normRight.z;
+
+	glm::vec3 up = glm::cross(normTarget, normRight);
+	m_Up.x = up.x;
+	m_Up.y = up.y;
+	m_Up.z = up.z;
+	// Calculate vectors
+	//this->_CalcVectors();
 
 	// Update last cursor position
 	m_LastX = mouseX;

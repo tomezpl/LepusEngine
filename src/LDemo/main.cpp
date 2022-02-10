@@ -92,6 +92,8 @@ int main()
 	// This will be toggled after hitting space to start/stop physics simulation
 	bool physicsActive = false;
 
+	double lastYRot = 0.0;
+
 	// Output start message to console
 	LepusEngine::Logger::LogInfo("", "main", "Demo starting!");
 	while (isRunning)
@@ -108,9 +110,16 @@ int main()
 		{
 			physicsEngine.Run(dTime);
 		}
-		Lepus3D::Transform boxCurrentPose = boxRb.GetTransform();
+		Lepus3D::Transform boxCurrentPose = box.GetTransform();
+		Lepus3D::Vector3 euler = boxCurrentPose.GetRotation().ToEuler();
 		box.SetPosition(boxCurrentPose.GetPosition());
-		//std::cout << boxCurrentPose.GetPosition().y << "\n" << std::endl;
+		//euler.y *= (double)(180.0 / (double)PI);
+		euler.y = lastYRot + (double)dTime * 1.;
+		lastYRot = euler.y;
+		//std::cout << "dT: " << (double)dTime << std::endl;
+		box.SetRotation(Lepus3D::Quaternion::Mult(boxCurrentPose.GetRotation(), Lepus3D::Quaternion(Lepus3D::Vector3(0.f, 1.f, 0.f), (double)dTime)));
+		//std::cout << boxRb.GetTransform().ToString() << std::endl;
+		//std::cout << box.GetTransform().GetRotation().ToEuler().y << "\n" << std::endl;
 		engine.Update(); // Update window before drawing
 		cam.ProcessInput(dTime); // Move camera according to input using delta time to maintain consistent speed
 		engine.StartScene(&cam); // Set current camera, prepare engine for drawing

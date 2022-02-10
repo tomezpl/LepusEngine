@@ -11,7 +11,7 @@ PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geomet
     InitCollider(physicsEngine, geometry, transform);
 	//m_PxMat = physicsEngine.m_API->m_PxPhysics->createMaterial(0.5f, 0.5f, 0.6f); // TODO: these are only test parameters - change them, or provide a way to override.
 	Lepus3D::Vector3 position = transform.GetPosition();
-	Lepus3D::Vector3 rot = transform.GetRotation();
+	Lepus3D::Quaternion rot = transform.GetRotation();
 	Lepus3D::Vector3 pos = transform.GetPosition();
 
 	btAssert((!mBtCollider || mBtCollider->getShapeType() != INVALID_SHAPE_PROXYTYPE));
@@ -19,7 +19,7 @@ PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geomet
 	btVector3 localInertia(0.f, 0.f, 0.f);
 	mBtCollider->calculateLocalInertia(1.f, localInertia);
 
-	mBtMotionState = new btDefaultMotionState(btTransform(btQuaternion(rot.x, rot.y, rot.z), btVector3(pos.x, pos.y, pos.z)));
+	mBtMotionState = new btDefaultMotionState(btTransform(btQuaternion(rot.x, rot.y, rot.z, rot.w), btVector3(pos.x, pos.y, pos.z)));
 	mBtRigidbody = new btRigidBody(mass, mBtMotionState, mBtCollider, localInertia);
 	/*m_PxRigidbody = physx::PxCreateDynamic(*physicsEngine.m_API->m_PxPhysics, physx::PxTransform(position.x, position.y, position.z), *m_PxCollider, *m_PxMat, 10.0f);
 	m_PxRigidbody->setAngularDamping(0.5f);
@@ -105,7 +105,9 @@ Lepus3D::Transform LepusEngine::PhysicsRigidbody::GetTransform()
 	btTransform pose;
 	mBtMotionState->getWorldTransform(pose);
 	btVector3 position = pose.getOrigin();
+	btQuaternion rotation = pose.getRotation();
 	ret.SetPosition(Lepus3D::Vector3(position.getX(), position.getY(), position.getZ()));
+	ret.SetRotation(Lepus3D::Quaternion(rotation.x(), rotation.y(), rotation.z(), rotation.w()));
 
 	return ret;
 }
