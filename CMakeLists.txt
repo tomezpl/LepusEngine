@@ -81,6 +81,8 @@ set(Lepus3D_SRC
 		src/L3D/Texture/Texture2D.cpp
 	src/L3D/Transform.h
 		src/L3D/Transform/Transform.cpp src/L3D/Transform/Vector.h
+	src/L3D/Quaternion.h
+		src/L3D/Quaternion/Quaternion.cpp
 	src/L3D/Vertex.h
 )
 
@@ -93,6 +95,10 @@ add_library(LepusEngine
 		src/LEngine/Physics/Physics.cpp
 		src/LEngine/Physics/PhysicsRigidbody.h
 		src/LEngine/Physics/PhysicsRigidbody.cpp
+	src/LEngine/Entity.h
+		src/LEngine/Entity/Entity.cpp
+	src/LEngine/World.h
+		src/LEngine/World.cpp
 )
 
 add_dependencies(Lepus3D LepusEngine)

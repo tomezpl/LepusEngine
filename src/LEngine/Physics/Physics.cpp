@@ -3,9 +3,8 @@
 
 using namespace LepusEngine;
 
-Physics::Physics(Lepus3D::Scene& scene) : Physics()
+Physics::Physics()
 {
-    m_Scene = &(scene);
 	this->Init();
 	//m_Scene->m_PhysicsEngine = this;
 }
@@ -33,7 +32,8 @@ void Physics::Init(Lepus3D::Vector3 gravity)
 void LepusEngine::Physics::AddObject(PhysicsRigidbody & rigidbody)
 {
 	//m_PxScene->addActor(*rigidbody.m_PxRigidbody);
-	mWorld->addRigidBody(rigidbody.mBtRigidbody);
+	mWorld->addRigidBody(rigidbody.GetBtRigidbody());
+	rigidbody.SetPhysicsEngine(this);
 }
 
 void Physics::Run(float dTime)
@@ -47,8 +47,6 @@ void Physics::Shutdown()
 {
 	/*m_PxScene->release();
 	m_Dispatcher->release();*/
-	
-	m_Scene = nullptr;
 
 	// Delete Bullet resources
 	delete mWorld;

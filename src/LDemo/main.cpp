@@ -38,7 +38,7 @@ int main()
 	Lepus3D::Scene scene;
 
 	// Create physics engine for this scene
-	LepusEngine::Physics physicsEngine(scene);
+	LepusEngine::Physics physicsEngine = LepusEngine::Physics::Physics();
 
 	// Prepare the shading
 	Lepus3D::Material testMat("Material", "Phong"); // Use the phong shader, assign material name "Material"

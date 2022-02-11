@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Transform/Vector.h"
 #include <L3D/Quaternion.h>
+#include <LEngine/Entity.h>
 #include <string>
 
 namespace LepusEngine
@@ -38,6 +39,7 @@ namespace LepusEngine
 
 	class Transformable {
 	friend class RenderEngine;
+
 	protected:
 		Transform mTransform;
 	public:
@@ -50,6 +52,8 @@ namespace LepusEngine
 		void Move(Vector3 translation) { mTransform.Move(translation); }
 		void Rotate(Vector3 rotation) { mTransform.Rotate(rotation); }
 		Transform GetTransform() { return mTransform; }
+
+		inline Transform* GetTransformPtr() { return &mTransform; }
 	};
 	}
 }

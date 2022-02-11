@@ -1,8 +1,22 @@
 #include "PhysicsRigidbody.h"
 #include <LEngine/Logger.h>
+#include <L3D/Vertex.h>
+#include <L3D/Transform.h>
 #include <algorithm>
+#include <bullet/btBulletDynamicsCommon.h>
+#include <L3D/Mesh.h>
 
 using namespace LepusEngine;
+
+PhysicsRigidbody::PhysicsRigidbody()
+{
+	// Initialise material, geometry and rigidbody 
+	m_Active = false; 
+	m_PhysicsEngine = nullptr; 
+	mBtCollider = nullptr; 
+	mBtRigidbody = nullptr; 
+	mBtMotionState = nullptr;
+}
 
 PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform, float mass)
 {
@@ -91,6 +105,11 @@ void LepusEngine::PhysicsRigidbody::SetActive(bool active)
 bool LepusEngine::PhysicsRigidbody::IsActive()
 {
 	return m_Active;
+}
+
+void LepusEngine::PhysicsRigidbody::SetPhysicsEngine(LepusEngine::Physics* physicsEngine)
+{
+	m_PhysicsEngine = physicsEngine;
 }
 
 btRigidBody* const LepusEngine::PhysicsRigidbody::GetBtRigidbody()

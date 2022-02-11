@@ -1,5 +1,6 @@
-#include "../Renderable.h"
+#include <L3D/Renderable.h>
 #include <LEngine/Physics/PhysicsRigidbody.h>
+#include <L3D/Mesh.h>
 
 using namespace LepusEngine;
 using namespace Lepus3D;

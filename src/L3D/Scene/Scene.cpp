@@ -1,4 +1,5 @@
-#include "../Scene.h"
+#include <L3D/Scene.h>
+#include <L3D/Mesh.h>
 
 using namespace LepusEngine;
 using namespace Lepus3D;
