@@ -49,8 +49,14 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 
 # Engine-wide include directories
-include_directories(${CMAKE_SOURCE_DIR}/include src)
+include_directories(${CMAKE_SOURCE_DIR}/include src ${CMAKE_SOURCE_DIR}/3rdparty)
 include_directories(${VCPKG_INCLUDE_PATH})
+
+# DearImgui
+file(GLOB IMGUI_SRC ${CMAKE_SOURCE_DIR}/3rdparty/imgui/*.cpp ${CMAKE_SOURCE_DIR}/3rdparty/imgui/backends/imgui_impl_glfw.cpp ${CMAKE_SOURCE_DIR}/3rdparty/imgui/backends/imgui_impl_opengl3.cpp)
+
+add_library(DearImgui ${IMGUI_SRC})
+include_directories(${CMAKE_SOURCE_DIR}/3rdparty/imgui)
 
 # Demo executable
 add_executable(LepusDemo src/LDemo/main.cpp)
@@ -155,8 +161,9 @@ else()
 endif()
 
 target_link_libraries(Lepus3D ${OPENGL_LIBRARIES})
+target_link_libraries(Lepus3D PRIVATE DearImgui)
 target_link_libraries(Lepus3D PRIVATE LepusEngine)
-target_link_libraries(LepusDemo PRIVATE Lepus3D LepusEngine)
+target_link_libraries(LepusDemo PRIVATE DearImgui Lepus3D LepusEngine)
 
 # Copy content (models, GLSL, etc.)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Content)

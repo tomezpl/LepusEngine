@@ -1,3 +1,7 @@
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 #include <L3D/RenderEngine.h>
 #include <L3D/Camera/FPPCamera.h>
 #include <L3D/Assets.h>
@@ -21,6 +25,16 @@ int main()
 
 	// Create new graphics engine instance
 	Lepus3D::RenderEngine engine("LepusDemo", 800, 600);
+
+	// Setup DearImgui
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+	bool showDemoWindow = true;
+
+	ImGui_ImplGlfw_InitForOpenGL(engine.GetWindowPtr(), true);
+	ImGui_ImplOpenGL3_Init("#version 330 core");
 
 	// Termination condition for main loop
 	bool isRunning = true;
@@ -106,15 +120,31 @@ int main()
 		box2.Update(dTime);
 
 		engine.Update(); // Update window before drawing
-		cam.ProcessInput(dTime); // Move camera according to input using delta time to maintain consistent speed
+
+		if (cam.LockInput)
+		{
+			cam.ProcessInput(dTime); // Move camera according to input using delta time to maintain consistent speed
+		}
+
+		// Draw ImGui
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::ShowDemoWindow(&showDemoWindow);
+		ImGui::Render();
+
+
 		engine.StartScene(&cam); // Set current camera, prepare engine for drawing
 		engine.DrawScene(scene); // Draw objects in scene
+
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		engine.EndScene(); // Finish rendering and present in window/screen
 		isRunning = engine.Update(); // Update window and check if engine is still running
 
-		// Allow frame dumps (screenshots) on F12 keypress
+		// Allow frame dumps (screenshots) on F9 keypress
 		// Default filepath is "output.bmp"
-		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_F12) == GLFW_PRESS)
+		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_CAPS_LOCK) == GLFW_PRESS)
 		{
 			engine.DumpToFile();
 		}
@@ -122,6 +152,12 @@ int main()
 		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_SPACE) == GLFW_PRESS)
 		{
 			physicsActive = !physicsActive;
+		}
+
+		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_TAB) == GLFW_PRESS)
+		{
+			cam.LockInput = !cam.LockInput;
+			cam.UpdateCursorLock();
 		}
 	}
 	// Output shutdown message to console

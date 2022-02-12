@@ -21,6 +21,8 @@ namespace LepusEngine::Lepus3D {
 		GLFWwindow* m_Wnd; // Window handle
 		float m_LastX, m_LastY; // XY coordinates of the cursor in the last frame
 	public:
+		bool LockInput;
+
 		// Window-resize callback used by GLFW
 		static void ResizeCallback(GLFWwindow* wnd, int w, int h){
 			glViewport(0, 0, w, h);
@@ -31,10 +33,10 @@ namespace LepusEngine::Lepus3D {
 		}
 
 		// Default constructor. Initialises the cursor coordinates.
-		FPPCamera() : InputCamera() { m_LastX = m_LastY = 0.5f; };
+		FPPCamera() : InputCamera() { m_LastX = m_LastY = 0.5f; LockInput = true; };
 
 		// Constructor. Initialises the camera with an existing Transform, and centers the cursor coordinates.
-		FPPCamera(Transform transform) : InputCamera(transform) { m_LastX = m_LastY = 0.5f; };
+		FPPCamera(Transform transform) : InputCamera(transform) { m_LastX = m_LastY = 0.5f; LockInput = true; };
 
 		// Constructor. Initialises the camera with a window handle.
 		FPPCamera(GLFWwindow* window) { this->SetWindow(window); };
@@ -49,5 +51,8 @@ namespace LepusEngine::Lepus3D {
 		// Retrieves window input and updates the camera Transform accordingly.
 		// Should be called every frame.
 		void ProcessInput(float deltaTime);
+
+		void UpdateCursorLock();
+		void UpdateCursorLock(float wndWidth, float wndHeight);
 	};
 }

@@ -113,10 +113,32 @@ void FPPCamera::ProcessInput(float deltaTime)
 	m_LastX = mouseX;
 	m_LastY = mouseY;
 
+	UpdateCursorLock(wndWidth, wndHeight);
+}
+
+void FPPCamera::UpdateCursorLock(float wndWidth, float wndHeight)
+{
 	// Recenter cursor for next frame
-	if (glfwGetWindowAttrib(m_Wnd, GLFW_FOCUSED))
+	if (glfwGetWindowAttrib(m_Wnd, GLFW_FOCUSED) && LockInput)
 	{
 		glfwSetCursorPos(m_Wnd, wndWidth / 2, wndHeight / 2);
 		glfwSetInputMode(m_Wnd, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	else if (!LockInput)
+	{
+		glfwSetInputMode(m_Wnd, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+}
+
+void FPPCamera::UpdateCursorLock()
+{
+	// Recenter cursor for next frame
+	if (glfwGetWindowAttrib(m_Wnd, GLFW_FOCUSED) && LockInput)
+	{
+		glfwSetInputMode(m_Wnd, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	else if (!LockInput)
+	{
+		glfwSetInputMode(m_Wnd, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 }
