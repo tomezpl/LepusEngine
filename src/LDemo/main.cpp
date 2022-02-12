@@ -25,15 +25,6 @@ int main()
 	// Termination condition for main loop
 	bool isRunning = true;
 
-	// Initialise 3D model importer with uv-mapped cube model file
-	// This same instance can be reused throughout the app by calling ModelImporter::Init
-	Lepus3D::Assets::ModelImporter modelImp("Models/uv_cube.obj");
-
-	// Read model data in and close stream.
-	// This will stall the app's execution due to being synchronous.
-	modelImp.Read();
-	modelImp.Close();
-
 	// Initialise the scene
 	Lepus3D::Scene scene;
 
@@ -51,11 +42,11 @@ int main()
 
 	// A box that's going to fall down from (0, 0, 0).
 	// It will be 1/4 of the original size.
-	LepusEngine::Entity box = LepusEngine::Entity(new Lepus3D::Renderable(modelImp.GetSubMesh()), new PhysicsRigidbody(physicsEngine, Lepus3D::BoxMeshUnindexed(), Lepus3D::Transform()));
+	LepusEngine::Entity box = LepusEngine::Entity(new Lepus3D::Renderable(Lepus3D::BoxMeshUnindexed()), new PhysicsRigidbody(physicsEngine, Lepus3D::BoxMeshUnindexed(), Lepus3D::Transform()));
 	box.SetScale(0.25f);
 
 	// This will be our static box placed below the first box to test collisions and dynamics
-	LepusEngine::Entity box2 = LepusEngine::Entity(new Lepus3D::Renderable(modelImp.GetSubMesh()), new PhysicsRigidbody(physicsEngine, Lepus3D::BoxMeshUnindexed(), Lepus3D::Transform(Lepus3D::Vector3(0.3f, -15.f, 0.f), Lepus3D::Vector3::Zero(), Lepus3D::Vector3(3.f/2.f, 3.f/2.f, 3.f/2.f)), 0.f));
+	LepusEngine::Entity box2 = LepusEngine::Entity(new Lepus3D::Renderable(Lepus3D::BoxMeshUnindexed()), new PhysicsRigidbody(physicsEngine, Lepus3D::BoxMeshUnindexed(), Lepus3D::Transform(Lepus3D::Vector3(0.3f, -15.f, 0.f), Lepus3D::Vector3::Zero(), Lepus3D::Vector3(3.f/2.f, 3.f/2.f, 3.f/2.f)), 0.f));
 
 	// Prepare the lighting
 	// A Light is created at xyz(0, 2.5, 0) with a white RGBA colour and intensity 1.0
@@ -111,8 +102,6 @@ int main()
 		euler.y = lastYRot + (double)dTime * 1.;
 		lastYRot = euler.y;
 
-		//box.SetRotation(Lepus3D::Quaternion::Mult(boxCurrentPose.GetRotation(), Lepus3D::Quaternion(Lepus3D::Vector3(0.f, 1.f, 0.f), (double)dTime)));
-
 		box.Update(dTime);
 		box2.Update(dTime);
 
@@ -126,16 +115,13 @@ int main()
 		// Allow frame dumps (screenshots) on F12 keypress
 		// Default filepath is "output.bmp"
 		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_F12) == GLFW_PRESS)
+		{
 			engine.DumpToFile();
+		}
 
 		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_SPACE) == GLFW_PRESS)
 		{
 			physicsActive = !physicsActive;
-			
-			if (physicsActive)
-			{
-				//box.GetRigidbody()->GetBtRigidbody()->applyCentralForce(btVector3(1.f, -1.f, 0.f));
-			}
 		}
 	}
 	// Output shutdown message to console
