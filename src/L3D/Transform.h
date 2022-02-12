@@ -54,6 +54,7 @@ namespace LepusEngine
 		Transform GetTransform() { return mTransform; }
 
 		inline Transform* GetTransformPtr() { return &mTransform; }
+		inline Transform& GetTransformRef() { return mTransform; }
 	};
 	}
 }

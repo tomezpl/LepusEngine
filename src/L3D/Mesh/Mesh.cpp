@@ -105,3 +105,34 @@ bool Mesh::IsIndexed()
 {
 	return m_Indexed;
 }
+
+void Mesh::FlipNormals()
+{
+	size_t nbVerts = m_Vertices.size();
+
+	// The last 3 floats of a vertex should be the normals.
+	for (size_t i = Vertex::ComponentCount() - 1; i < nbVerts; i += Vertex::ComponentCount())
+	{
+		m_Vertices[i - 2] *= -1.f;
+		m_Vertices[i - 1] *= -1.f;
+		m_Vertices[i] *= -1.f;
+	}
+}
+
+void Mesh::ScaleVertices(float scale)
+{
+	ScaleVertices(Lepus3D::Vector3(scale, scale, scale));
+}
+
+void Mesh::ScaleVertices(Lepus3D::Vector3 scale)
+{
+	size_t nbVerts = m_Vertices.size();
+
+	// The first 3 floats of a vertex should be the vertex position.
+	for (size_t i = 0; i < nbVerts; i += Vertex::ComponentCount())
+	{
+		m_Vertices[i] *= scale.x;
+		m_Vertices[i + 1] *= scale.y;
+		m_Vertices[i + 2] *= scale.z;
+	}
+}

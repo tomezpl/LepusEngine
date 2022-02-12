@@ -6,6 +6,8 @@ namespace LepusEngine
 	{
 		class Renderable;
 		class Transform;
+		class Vector3;
+		class Quaternion;
 	}
 
 	class World;
@@ -32,9 +34,17 @@ namespace LepusEngine
 		inline LepusEngine::PhysicsRigidbody* GetRigidbody() { return mRigidbody; }
 		inline Lepus3D::Renderable* GetRenderable() { return mRenderable; }
 		inline bool HasPhysics() { return mRigidbody != nullptr; }
+		inline bool HasRenderable() { return mRenderable != nullptr; }
 
 		virtual void Update(float deltaTime);
 
 		void SetWorld(LepusEngine::World* world);
+
+		void SetScale(float scale);
+		void SetScale(Lepus3D::Vector3 scale);
+		void SetPosition(Lepus3D::Vector3 position);
+		void SetRotation(Lepus3D::Quaternion rotation);
+
+		Lepus3D::Transform GetTransform();
 	};
 }

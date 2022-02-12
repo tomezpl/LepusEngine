@@ -121,12 +121,13 @@ btRigidBody* const LepusEngine::PhysicsRigidbody::GetBtRigidbody()
 Lepus3D::Transform LepusEngine::PhysicsRigidbody::GetTransform()
 {
 	Lepus3D::Transform ret;
-	btTransform pose;
-	mBtMotionState->getWorldTransform(pose);
+	btTransform pose = mBtRigidbody->getWorldTransform();
 	btVector3 position = pose.getOrigin();
 	btQuaternion rotation = pose.getRotation();
 	ret.SetPosition(Lepus3D::Vector3(position.getX(), position.getY(), position.getZ()));
 	ret.SetRotation(Lepus3D::Quaternion(rotation.x(), rotation.y(), rotation.z(), rotation.w()));
+	btVector3 localScale = mBtRigidbody->getCollisionShape()->getLocalScaling();
+	ret.SetScale(Lepus3D::Vector3(localScale.x(), localScale.y(), localScale.z()));
 
 	return ret;
 }

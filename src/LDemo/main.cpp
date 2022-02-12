@@ -38,7 +38,7 @@ int main()
 	Lepus3D::Scene scene;
 
 	// Create physics engine for this scene
-	LepusEngine::Physics physicsEngine = LepusEngine::Physics::Physics();
+	LepusEngine::Physics physicsEngine = LepusEngine::Physics();
 
 	// Prepare the shading
 	Lepus3D::Material testMat("Material", "Phong"); // Use the phong shader, assign material name "Material"
@@ -49,16 +49,13 @@ int main()
 	testMat.SetAttributeF3("_DiffColor", Lepus3D::Color(100, 149, 237, 255).GetVector3());
 	testMat.SetAttributeTex("_Texture1", testTex);
 
-	// Prepare the geometry
-	// A Renderable encapsulates raw model data to be rendered in a Scene.
-	// Scale the box Renderable down to 1/4
-	Lepus3D::Renderable box = Lepus3D::Renderable(modelImp.GetSubMesh());
+	// A box that's going to fall down from (0, 0, 0).
+	// It will be 1/4 of the original size.
+	LepusEngine::Entity box = LepusEngine::Entity(new Lepus3D::Renderable(modelImp.GetSubMesh()), new PhysicsRigidbody(physicsEngine, Lepus3D::BoxMeshUnindexed(), Lepus3D::Transform()));
 	box.SetScale(0.25f);
 
 	// This will be our static box placed below the first box to test collisions and dynamics
-	Lepus3D::Renderable box2 = Lepus3D::Renderable(modelImp.GetSubMesh());
-	box2.SetScale(0.2f);
-	box2.SetPosition(Lepus3D::Vector3(0.3f, -15.f, 0.f));
+	LepusEngine::Entity box2 = LepusEngine::Entity(new Lepus3D::Renderable(modelImp.GetSubMesh()), new PhysicsRigidbody(physicsEngine, Lepus3D::BoxMeshUnindexed(), Lepus3D::Transform(Lepus3D::Vector3(0.3f, -15.f, 0.f), Lepus3D::Vector3::Zero(), Lepus3D::Vector3(3.f/2.f, 3.f/2.f, 3.f/2.f)), 0.f));
 
 	// Prepare the lighting
 	// A Light is created at xyz(0, 2.5, 0) with a white RGBA colour and intensity 1.0
@@ -66,8 +63,8 @@ int main()
 	Lepus3D::Light sceneLight(Lepus3D::Vector3(0.0f, 2.50f, 0.0f), Lepus3D::Color(255, 255, 255, 255), 1.0f);
 
 	// Assign materials to meshes
-	box.GetMesh()->SetMaterial(testMat);
-	box2.GetMesh()->SetMaterial(testMat);
+	box.GetRenderable()->GetMesh()->SetMaterial(testMat);
+	box2.GetRenderable()->GetMesh()->SetMaterial(testMat);
 
 	// Initialise a transformable FPPCamera (reacts to keyboard & mouse input)
 	Lepus3D::FPPCamera cam(*(new Lepus3D::Transform()));
@@ -76,14 +73,11 @@ int main()
 
 	// Add the box renderable and the light to scene
 	scene.AddLight(&sceneLight);
-	scene.AddMesh(&box);
-	scene.AddMesh(&box2);
+	scene.AddMesh(box.GetRenderable());
+	scene.AddMesh(box2.GetRenderable());
 
-	PhysicsRigidbody boxRb(physicsEngine, *box.GetMesh(), box.GetTransform());
-	physicsEngine.AddObject(boxRb);
-
-	PhysicsRigidbody boxRb2(physicsEngine, *box2.GetMesh(), box2.GetTransform(), 0.f);
-	physicsEngine.AddObject(boxRb2);
+	physicsEngine.AddObject(*box.GetRigidbody());
+	physicsEngine.AddObject(*box2.GetRigidbody());
 
 	// dTime: delta time between frames
 	// elapsedTime: total running time, needed for the scene light to orbit around the box
@@ -110,16 +104,18 @@ int main()
 		{
 			physicsEngine.Run(dTime);
 		}
+
 		Lepus3D::Transform boxCurrentPose = box.GetTransform();
 		Lepus3D::Vector3 euler = boxCurrentPose.GetRotation().ToEuler();
-		box.SetPosition(boxCurrentPose.GetPosition());
-		//euler.y *= (double)(180.0 / (double)PI);
+
 		euler.y = lastYRot + (double)dTime * 1.;
 		lastYRot = euler.y;
-		//std::cout << "dT: " << (double)dTime << std::endl;
-		box.SetRotation(Lepus3D::Quaternion::Mult(boxCurrentPose.GetRotation(), Lepus3D::Quaternion(Lepus3D::Vector3(0.f, 1.f, 0.f), (double)dTime)));
-		//std::cout << boxRb.GetTransform().ToString() << std::endl;
-		//std::cout << box.GetTransform().GetRotation().ToEuler().y << "\n" << std::endl;
+
+		//box.SetRotation(Lepus3D::Quaternion::Mult(boxCurrentPose.GetRotation(), Lepus3D::Quaternion(Lepus3D::Vector3(0.f, 1.f, 0.f), (double)dTime)));
+
+		box.Update(dTime);
+		box2.Update(dTime);
+
 		engine.Update(); // Update window before drawing
 		cam.ProcessInput(dTime); // Move camera according to input using delta time to maintain consistent speed
 		engine.StartScene(&cam); // Set current camera, prepare engine for drawing
@@ -133,7 +129,14 @@ int main()
 			engine.DumpToFile();
 
 		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_SPACE) == GLFW_PRESS)
+		{
 			physicsActive = !physicsActive;
+			
+			if (physicsActive)
+			{
+				//box.GetRigidbody()->GetBtRigidbody()->applyCentralForce(btVector3(1.f, -1.f, 0.f));
+			}
+		}
 	}
 	// Output shutdown message to console
 	LepusEngine::Logger::LogInfo("", "main", "Demo shutting down!");

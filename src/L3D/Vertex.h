@@ -10,6 +10,8 @@ namespace LepusEngine
 		class Vertex
 		{
 		public:
+			static inline const size_t ComponentCount() { return 8; }
+
 			float x, y, z, s, t, nX, nY, nZ;
 			Vertex(float X = 0.f, float Y = 0.f, float Z = 0.f, float S = 0.f, float T = 0.f, float normX = 0.f, float normY = 0.f, float normZ = 0.f) { x = X; y = Y; z = Z; s = S; t = T; nX = normX; nY = normY; nZ = normZ; };
 			Vertex operator=(Vertex& rs) { x = rs.x; y = rs.y; z = rs.z; s = rs.s; t = rs.t; nX = rs.nX; nY = rs.nY; nZ = rs.nZ; return *this; };
