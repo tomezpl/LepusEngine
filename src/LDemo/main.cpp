@@ -163,6 +163,10 @@ int main()
 	// Output shutdown message to console
 	LepusEngine::Logger::LogInfo("", "main", "Demo shutting down!");
 
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
 	// Close the rendering context(s), release resources
 	engine.Shutdown();
 
