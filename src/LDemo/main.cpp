@@ -87,8 +87,7 @@ int main()
 
 		renderable->GetMesh()->SetMaterial(defaultMat);
 
-		//if(indices.size() == 20784)
-			scene.AddMesh(renderable);
+		scene.AddMesh(renderable);
 	}
 
 	// Create physics engine for this scene
