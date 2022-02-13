@@ -14,24 +14,50 @@ namespace LepusEngine
 		class Mesh {
 			friend class RenderEngine;
 			friend class Renderable;
+			friend class Scene;
 		private:
 			std::vector<float> m_Vertices;
 			std::vector<unsigned int> m_Indices;
 			bool m_Indexed;
 			Material* m_Mat; // only one material per mesh now - this will be changed with submeshes
+
+			float* m_VertexBufferCache;
+			unsigned int* m_IndexBufferCache;
+
+			bool m_VertexBufferCacheDirty;
+			bool m_IndexBufferCacheDirty;
+
+			bool m_HasGLBuffers;
+
+			inline bool HasCachedVertexBuffer() { return m_VertexBufferCache != nullptr; }
+			inline bool HasCachedIndexBuffer() { return m_IndexBufferCache != nullptr; }
+
+			// OpenGL buffers
+			GLuint m_IBO, m_VBO;
+
+			void GLUpdateIBO();
+			void GLUpdateVBO();
 		public:
 			Mesh();
 			Mesh(VertexArray vertices, bool ignoreIndexing = false);
 			float* GetVertexBuffer();
-			unsigned int GetVertexCount();
+			size_t GetVertexCount();
 			unsigned int* GetIndexBuffer();
-			unsigned int GetIndexCount();
+			size_t GetIndexCount();
 			void SetIndices(std::vector<unsigned int> indices);
 			void SetMaterial(Material& mat);
 			bool IsIndexed();
 			void FlipNormals();
 			void ScaleVertices(float scale);
 			void ScaleVertices(Vector3 scale);
+
+			inline GLuint GLGetIBO() { return m_IBO; }
+			inline GLuint GLGetVBO() { return m_VBO; }
+
+			inline void GLSetIBO(GLuint ibo) { m_IBO = ibo; m_HasGLBuffers = true; }
+			inline void GLSetVBO(GLuint vbo) { m_VBO = vbo; m_HasGLBuffers = true;  }
+
+			inline bool HasGLBuffers() { return m_HasGLBuffers; }
 		};
 
 		class PlaneMesh : public Mesh {
@@ -81,12 +107,12 @@ namespace LepusEngine
 				Vertex(-0.5f, -0.5f, 0.5f, 1.0f, 0.0f) // Bottom-right
 			}, true) {
 				this->SetIndices(IndexArray{
-					0,1,2,1,3,2,
-					4,5,6,5,7,6,
+					2,1,0,2,3,1,
+					6,5,4,6,7,5,
 					8,9,10,9,11,10,
 					12,13,14,13,15,14,
-					16,17,18,17,19,18,
-					20,21,22,21,23,22
+					18,17,16,18,19,17,
+					22,21,20,22,23,21
 				});
 			};
 		};

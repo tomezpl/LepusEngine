@@ -1,4 +1,5 @@
 #include "../Mesh.h"
+#include <L3D/RenderEngine.h>
 
 using namespace LepusEngine::Lepus3D;
 
@@ -6,6 +7,15 @@ Mesh::Mesh()
 {
 	m_Indexed = false;
 	m_Mat = new Material("Default", "PerVertexUnlit");
+
+	m_VertexBufferCache = nullptr;
+	m_VertexBufferCacheDirty = false;
+
+	m_IndexBufferCache = nullptr;
+	m_IndexBufferCacheDirty = false;
+
+	m_IBO = m_VBO = 0;
+	m_HasGLBuffers = false;
 }
 
 Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
@@ -45,7 +55,7 @@ Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
 	else
 	{
 		// Convert to raw float array
-		for (unsigned int i = 0; i < vCount; i++)
+		for (size_t i = 0; i < vCount; i++)
 		{
 			m_Vertices.push_back(verts[i].x);
 			m_Vertices.push_back(verts[i].y);
@@ -56,36 +66,66 @@ Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
 			m_Vertices.push_back(verts[i].nY);
 			m_Vertices.push_back(verts[i].nZ);
 		}
-		for (unsigned int i = 0; i < vCount; i++)
+		for (size_t i = 0; i < vCount; i++)
 		{
 			m_Indices.push_back(i);
 		}
 	}
 	m_Indexed = !ignoreIndexing;
+
+	m_VertexBufferCacheDirty = true;
+	m_IndexBufferCacheDirty = true;
+
+	GLUpdateIBO();
+	GLUpdateVBO();
 }
 
 float* Mesh::GetVertexBuffer()
 {
-	size_t vertexCount = m_Vertices.size();
-	float* ret = new float[vertexCount];
-	memcpy(ret, m_Vertices.data(), vertexCount * sizeof(float));
-	return ret;
+	if(!HasCachedVertexBuffer() || m_VertexBufferCacheDirty)
+	{
+		if (HasCachedVertexBuffer())
+		{
+			delete[] m_VertexBufferCache;
+			m_VertexBufferCache = nullptr;
+		}
+
+		size_t vertexCount = m_Vertices.size();
+		m_VertexBufferCache = new float[vertexCount];
+		memcpy(m_VertexBufferCache, m_Vertices.data(), vertexCount * sizeof(float));
+
+		m_VertexBufferCacheDirty = false;
+	}
+
+	return m_VertexBufferCache;
 }
 
-unsigned int Mesh::GetVertexCount()
+size_t Mesh::GetVertexCount()
 {
 	return (m_Indexed) ? m_Indices.size() : m_Vertices.size() / 8;
 }
 
 unsigned int* Mesh::GetIndexBuffer()
 {
-	size_t indexCount = m_Indices.size();
-	unsigned int* ret = new unsigned int[indexCount];
-	memcpy(ret, m_Indices.data(), indexCount * sizeof(unsigned int));
-	return ret;
+	if (!HasCachedIndexBuffer() || m_IndexBufferCacheDirty)
+	{
+		if (HasCachedIndexBuffer())
+		{
+			delete[] m_IndexBufferCache;
+			m_IndexBufferCache = nullptr;
+		}
+
+		size_t indexCount = m_Indices.size();
+		m_IndexBufferCache = new unsigned int[indexCount];
+		memcpy(m_IndexBufferCache, m_Indices.data(), indexCount * sizeof(unsigned int));
+
+		m_IndexBufferCacheDirty = false;
+	}
+
+	return m_IndexBufferCache;
 }
 
-unsigned int Mesh::GetIndexCount()
+size_t Mesh::GetIndexCount()
 {
 	return m_Indices.size();
 }
@@ -94,6 +134,46 @@ void Mesh::SetIndices(std::vector<unsigned int> indices)
 {
 	m_Indices = indices;
 	m_Indexed = true;
+
+	GLUpdateIBO();
+}
+
+void Mesh::GLUpdateIBO()
+{
+	GLuint vao = RenderEngine::GLGetGlobalMeshVAO();
+	if (IsIndexed() && HasGLBuffers() && vao != 0)
+	{
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, GetIndexCount() * sizeof(unsigned int), GetIndexBuffer(), GL_STATIC_DRAW); // pass elements/indices to GPU
+		glBindVertexArray(0);
+	}
+}
+
+void Mesh::GLUpdateVBO()
+{
+	GLuint vao = RenderEngine::GLGetGlobalMeshVAO();
+	if (HasGLBuffers() && vao != 0)
+	{
+
+		glBindVertexArray(vao);
+
+		// Set vertex positions
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+		glEnableVertexAttribArray(0);
+
+		// Set texture coords
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
+
+		// Set normal vectors
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(5 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(2);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+		glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float), GetVertexBuffer(), GL_STATIC_DRAW); // pass vertices to GPU
+		glBindVertexArray(0);
+	}
 }
 
 void Mesh::SetMaterial(Material& mat)

@@ -22,6 +22,21 @@ int Scene::AddMesh(Mesh m, Transform t)
 
 int Scene::AddMesh(Renderable* renderable)
 {
+	Mesh* mesh = renderable->GetMesh();
+
+	if (!mesh->HasGLBuffers())
+	{
+		GLuint ibo, vbo;
+		glGenBuffers(1, &ibo);
+		glGenBuffers(1, &vbo);
+
+		mesh->GLSetIBO(ibo);
+		mesh->GLSetVBO(vbo);
+
+		mesh->GLUpdateIBO();
+		mesh->GLUpdateVBO();
+	}
+
 	m_ObjArr.push_back(renderable);
 	//m_PhysicsEngine->AddObject(*renderable->mRigidbody);
 	return GetRenderableCount() - 1;

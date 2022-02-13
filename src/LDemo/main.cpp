@@ -9,6 +9,10 @@
 #include <LEngine/Physics.h>
 #include <LEngine/Physics/PhysicsRigidbody.h>
 
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 using namespace LepusEngine;
 
 #ifndef _DEBUG
@@ -17,8 +21,9 @@ using namespace LepusEngine;
 
 int main()
 {
-	// Prepare Bullet3
-	//APIBullet apiBullet;
+	const aiScene* sponza = aiImportFile("../../Content/Models/sponza_lw/sponza/objects/sponza.lwo", aiPostProcessSteps::aiProcess_Triangulate | aiPostProcessSteps::aiProcess_GenNormals);
+
+	std::vector<Lepus3D::Mesh> sponzaMeshes;
 
 	// Enable logging
 	LepusEngine::Logger::Enabled = true;
@@ -41,6 +46,47 @@ int main()
 
 	// Initialise the scene
 	Lepus3D::Scene scene;
+
+	Lepus3D::Material defaultMat("DefaultMaterial", "Phong");
+	defaultMat.SetAttributeF("_SpecularStrength", 0.2f);
+	defaultMat.SetAttributeI("_SpecularShininess", 64);
+	defaultMat.SetAttributeF3("_DiffColor", Lepus3D::Color(128, 128, 128, 255).GetVector3());
+
+	for (size_t i = 0; i < sponza->mNumMeshes; i++)
+	{
+		aiMesh* currentMesh = sponza->mMeshes[i];
+
+		Lepus3D::VertexArray verts;
+		verts.reserve(currentMesh->mNumVertices);
+
+		for (size_t j = 0; j < currentMesh->mNumVertices; j++)
+		{
+			aiVector3t currentVertex = currentMesh->mVertices[j];
+			aiVector3t currentNormal = currentMesh->mNormals[j];
+
+			verts.push_back(Lepus3D::Vertex(currentVertex.x, currentVertex.y, currentVertex.z, 0.f, 0.f, currentNormal.x, currentNormal.y, currentNormal.z));
+		}
+
+		Lepus3D::Renderable* renderable = new Lepus3D::Renderable(Lepus3D::Mesh(verts, true));
+		
+		Lepus3D::IndexArray indices;
+		indices.reserve((size_t)currentMesh->mNumFaces * 3);
+		for (size_t j = 0; j < currentMesh->mNumFaces; j++)
+		{
+			aiFace* currentFace = &currentMesh->mFaces[j];
+
+			for (size_t k = 0; k < currentFace->mNumIndices; k++)
+			{
+				indices.push_back(currentFace->mIndices[k]);
+			}
+		}
+
+		renderable->GetMesh()->SetIndices(indices);
+
+		renderable->GetMesh()->SetMaterial(defaultMat);
+
+		scene.AddMesh(renderable);
+	}
 
 	// Create physics engine for this scene
 	LepusEngine::Physics physicsEngine = LepusEngine::Physics();
@@ -72,14 +118,14 @@ int main()
 	box2.GetRenderable()->GetMesh()->SetMaterial(testMat);
 
 	// Initialise a transformable FPPCamera (reacts to keyboard & mouse input)
-	Lepus3D::FPPCamera cam(*(new Lepus3D::Transform()));
+	Lepus3D::FPPCamera cam(*(new Lepus3D::Transform(Lepus3D::Vector3(0.f, 0.f, 0.f), Lepus3D::Vector3::Zero(), Lepus3D::Vector3(1.f, 1.f, 1.f))));
 	// Bind to window in order to receive keyboard & mouse input
 	cam.SetWindow(engine.GetWindowPtr());
 
 	// Add the box renderable and the light to scene
 	scene.AddLight(&sceneLight);
-	scene.AddMesh(box.GetRenderable());
-	scene.AddMesh(box2.GetRenderable());
+	//scene.AddMesh(box.GetRenderable());
+	//scene.AddMesh(box2.GetRenderable());
 
 	physicsEngine.AddObject(*box.GetRigidbody());
 	physicsEngine.AddObject(*box2.GetRigidbody());

@@ -120,6 +120,10 @@ target_link_libraries(Lepus3D PRIVATE GLEW::GLEW)
 find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(Lepus3D PRIVATE glfw)
 
+
+# Assimp
+find_package(assimp CONFIG REQUIRED)
+
 ## Lepus3D: GLEW includes
 include_directories(Lepus3D ${GLEW_INCLUDES})
 
@@ -163,7 +167,7 @@ endif()
 target_link_libraries(Lepus3D ${OPENGL_LIBRARIES})
 target_link_libraries(Lepus3D PRIVATE DearImgui)
 target_link_libraries(Lepus3D PRIVATE LepusEngine)
-target_link_libraries(LepusDemo PRIVATE DearImgui Lepus3D LepusEngine)
+target_link_libraries(LepusDemo PRIVATE DearImgui assimp::assimp Lepus3D LepusEngine)
 
 # Copy content (models, GLSL, etc.)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Content)

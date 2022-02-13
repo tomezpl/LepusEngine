@@ -7,6 +7,13 @@
 
 using namespace LepusEngine::Lepus3D;
 
+GLuint RenderEngine::m_MeshVAO = 0;
+
+GLuint RenderEngine::GLGetGlobalMeshVAO()
+{
+	return m_MeshVAO;
+}
+
 RenderEngine::RenderEngine(char* name, unsigned short width, unsigned short height)
 {
 	this->Init(name, width, height);
@@ -57,6 +64,27 @@ bool RenderEngine::Init()
 	glGenVertexArrays(1, &m_VAO);
 	glGenTextures(sizeof(m_TextureSet) / sizeof(GLuint), m_TextureSet);
 
+	if (m_MeshVAO == 0)
+	{
+		m_MeshVAO = m_VAO;
+	}
+
+	glBindVertexArray(m_VAO);
+
+	// Set vertex positions
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	// Set texture coords
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+
+	// Set normal vectors
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+
+	glBindVertexArray(0);
+
 	m_Ready.renderer = true;
 
 	return true;
@@ -74,16 +102,37 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 {
 	bool useIndexing = mesh.IsIndexed();
 
-	unsigned int* iD = nullptr;
+	/*unsigned int* iD = nullptr;
+	unsigned int eCount = mesh.GetIndexCount();
 	if(useIndexing)
 	{
-		unsigned int eCount = mesh.GetIndexCount();
 		iD = mesh.GetIndexBuffer();
 	}
 	unsigned long long vC = mesh.GetVertexCount();
-	unsigned long long vDS = vC * sizeof(Vertex);
+	unsigned long long vDS = vC * sizeof(Vertex);*/
 
-	GLfloat* vArr = mesh.GetVertexBuffer();
+	//GLfloat* vArr = mesh.GetVertexBuffer();
+
+	glBindVertexArray(m_VAO);
+
+	// Set vertex positions
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	// Set texture coords
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+
+	// Set normal vectors
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.GLGetVBO());
+
+	if (useIndexing)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.GLGetIBO());
+	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
@@ -108,31 +157,6 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		}
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
-	// bind VAO to VBO
-	glBindVertexArray(m_VAO);
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, vDS, vArr, GL_STATIC_DRAW); // pass vertices to GPU
-
-		if (useIndexing)
-		{
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_eCount * sizeof(unsigned long long), iD, GL_STATIC_DRAW); // pass elements/indices to GPU
-		}
-
-		// Set vertex positions
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
-		glEnableVertexAttribArray(0);
-
-		// Set texture coords
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(1);
-
-		// Set normal vectors
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(5 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(2);
-	}
-	glBindVertexArray(0); // unbind VAO
 
 	// Set View position for lighting
 
@@ -147,7 +171,6 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		glUniform1i(glGetUniformLocation(material.m_Shader.m_Compiled, material.m_TexAttributes[i].name), i);
 	}
 
-	glBindVertexArray(m_VAO);
 	{
 		glm::mat4 model, view, projection;
 		model = transform.GetMatrix();
@@ -161,17 +184,17 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(material.m_Shader.m_Compiled, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		useIndexing = false; // TODO: temporary fix for drawing artifacts
+
 		if (useIndexing)
-			glDrawElements(GL_TRIANGLES, m_eCount, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, (void*)0);
 		else
-			glDrawArrays(GL_TRIANGLES, 0, vC);
+			glDrawArrays(GL_TRIANGLES, 0, mesh.GetVertexCount());
 	}
+
 	glBindVertexArray(0);
 
 	// Release resources
-	delete iD; // TODO: This should be released, but due to how the physics engine currently uses the same index buffer reference, it causes crashes and has to be reworked.
-	delete vArr;
+	//delete iD; // TODO: This should be released, but due to how the physics engine currently uses the same index buffer reference, it causes crashes and has to be reworked.
 }
 
 // TODO: Remove SFML

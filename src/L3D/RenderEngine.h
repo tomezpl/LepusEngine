@@ -35,7 +35,12 @@ namespace LepusEngine
 			GLuint m_TextureSet[16];
 			double m_LastFrameTime, m_ElapsedTime;
 			Camera* m_Cam;
+
+			static GLuint m_MeshVAO;
+
 		public:
+			static GLuint GLGetGlobalMeshVAO();
+
 			RenderEngine() { m_Ready = { false, false }; };
 			RenderEngine(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
 			bool Init();
