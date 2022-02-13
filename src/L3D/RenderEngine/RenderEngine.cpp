@@ -29,7 +29,7 @@ bool RenderEngine::Init(char* name, unsigned short width, unsigned short height)
 	m_Cam = nullptr;
 	m_Ready = { false, false };
 	m_WindowName = name;
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	m_Window = glfwCreateWindow(width, height, name, 0, 0);
 	m_Ready.window = (glfwGetWindowAttrib(m_Window, GLFW_VISIBLE) == 0) ? false : true;
@@ -152,6 +152,8 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	material.SetAttributeF3("_ViewPos", m_Cam->GetTransform().GetPosition());
 
 	material.Use();
+
+	glUniform1i(glGetUniformLocation(material.m_Shader.m_Compiled, "_TextureCount"), textureCount);
 
 	for (auto i = 0; i < textureCount; i++)
 	{

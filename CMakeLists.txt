@@ -61,6 +61,10 @@ include_directories(${CMAKE_SOURCE_DIR}/3rdparty/imgui)
 # Demo executable
 add_executable(LepusDemo src/LDemo/main.cpp)
 
+# Lepus3D shaders
+file(GLOB LEPUS3D_SHADERS_SRC ${CMAKE_SOURCE_DIR}/Content/GLSL/*.frag ${CMAKE_SOURCE_DIR}/Content/GLSL/*.vert)
+add_custom_target(Lepus3D_Shaders SOURCES ${LEPUS3D_SHADERS_SRC})
+
 # Lepus3D sources
 set(Lepus3D_SRC
 	src/L3D/Assets.h

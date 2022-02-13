@@ -39,13 +39,15 @@ int main()
 	bool showDemoWindow = true;
 
 	ImGui_ImplGlfw_InitForOpenGL(engine.GetWindowPtr(), true);
-	ImGui_ImplOpenGL3_Init("#version 330 core");
+	ImGui_ImplOpenGL3_Init("#version 430 core");
 
 	// Termination condition for main loop
 	bool isRunning = true;
 
 	// Initialise the scene
 	Lepus3D::Scene scene;
+
+	Lepus3D::Texture2D testTex("Textures/cube_test.jpg"); // Load texture from file
 
 	Lepus3D::Material defaultMat("DefaultMaterial", "Phong");
 	defaultMat.SetAttributeF("_SpecularStrength", 0.2f);
@@ -94,12 +96,10 @@ int main()
 
 	// Prepare the shading
 	Lepus3D::Material testMat("Material", "Phong"); // Use the phong shader, assign material name "Material"
-	Lepus3D::Texture2D testTex("Textures/cube_test.jpg"); // Load texture from file
 	// Pass attributes to shader
 	testMat.SetAttributeF("_SpecularStrength", 0.5f);
 	testMat.SetAttributeI("_SpecularShininess", 256);
 	testMat.SetAttributeF3("_DiffColor", Lepus3D::Color(100, 149, 237, 255).GetVector3());
-	testMat.SetAttributeTex("_Texture1", testTex);
 
 	// A box that's going to fall down from (0, 0, 0).
 	// It will be 1/4 of the original size.

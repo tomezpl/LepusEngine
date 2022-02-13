@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 in vec3 Normal;
 in vec2 TexCoord;
 in vec3 FragPos;
@@ -6,6 +6,7 @@ in vec3 ViewPos;
 
 out vec4 color;
 
+uniform int _TextureCount;
 uniform sampler2D _Texture1;
 uniform float _AmbientStrength;
 uniform vec3 _AmbientColor;
@@ -30,5 +31,11 @@ void main()
 	float specAngle = max(dot(viewDir, lightReflect), 0.0f);
 	vec3 specular = _LightColor * _SpecularStrength * pow(specAngle, _SpecularShininess);
 
-	color = vec4((ambient + diffuse + specular) * _DiffColor, 1.0f) * texture(_Texture1, TexCoord);
+	vec4 textureCol = texture(_Texture1, TexCoord);
+	if(_TextureCount == 0)
+	{
+		textureCol = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	color = vec4((ambient + diffuse + specular) * _DiffColor, 1.0f) * textureCol;
 }
