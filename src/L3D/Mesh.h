@@ -33,7 +33,7 @@ namespace LepusEngine
 			inline bool HasCachedIndexBuffer() { return m_IndexBufferCache != nullptr; }
 
 			// OpenGL buffers
-			GLuint m_IBO, m_VBO;
+			GLuint m_IBO, m_VBO, m_VAO;
 
 			void GLUpdateIBO();
 			void GLUpdateVBO();
@@ -41,23 +41,25 @@ namespace LepusEngine
 			Mesh();
 			Mesh(VertexArray vertices, bool ignoreIndexing = false);
 			float* GetVertexBuffer();
-			size_t GetVertexCount();
+			size_t GetVertexCount() const;
 			unsigned int* GetIndexBuffer();
-			size_t GetIndexCount();
+			size_t GetIndexCount() const;
 			void SetIndices(std::vector<unsigned int> indices);
 			void SetMaterial(Material& mat);
-			bool IsIndexed();
+			bool IsIndexed() const;
 			void FlipNormals();
 			void ScaleVertices(float scale);
 			void ScaleVertices(Vector3 scale);
 
-			inline GLuint GLGetIBO() { return m_IBO; }
-			inline GLuint GLGetVBO() { return m_VBO; }
+			inline GLuint& GLGetVAO() { return m_VAO; }
+			inline GLuint& GLGetIBO() { return m_IBO; }
+			inline GLuint& GLGetVBO() { return m_VBO; }
 
 			inline void GLSetIBO(GLuint ibo) { m_IBO = ibo; m_HasGLBuffers = true; }
 			inline void GLSetVBO(GLuint vbo) { m_VBO = vbo; m_HasGLBuffers = true;  }
+			inline void GLSetVAO(GLuint vao) { m_VAO = vao; }
 
-			inline bool HasGLBuffers() { return m_HasGLBuffers; }
+			inline bool HasGLBuffers() const { return m_HasGLBuffers; }
 		};
 
 		class PlaneMesh : public Mesh {

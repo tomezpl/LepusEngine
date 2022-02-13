@@ -113,22 +113,11 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 
 	//GLfloat* vArr = mesh.GetVertexBuffer();
 
-	glBindVertexArray(m_VAO);
-
-	// Set vertex positions
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	// Set texture coords
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
-	// Set normal vectors
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
+	glBindVertexArray(mesh.GLGetVAO());
 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh.GLGetVBO());
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	if (useIndexing)
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.GLGetIBO());

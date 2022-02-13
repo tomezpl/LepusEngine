@@ -26,9 +26,13 @@ int Scene::AddMesh(Renderable* renderable)
 
 	if (!mesh->HasGLBuffers())
 	{
-		GLuint ibo, vbo;
+		GLuint ibo, vbo, vao;
+
 		glGenBuffers(1, &ibo);
 		glGenBuffers(1, &vbo);
+
+		glGenVertexArrays(1, &vao);
+		mesh->GLSetVAO(vao);
 
 		mesh->GLSetIBO(ibo);
 		mesh->GLSetVBO(vbo);
@@ -82,4 +86,19 @@ void Scene::SetAmbient(Color color, float intensity)
 {
 	SetAmbient(color);
 	SetAmbient(intensity);
+}
+
+void Scene::Shutdown()
+{
+	size_t nbRenderables = GetRenderableCount();
+	for (size_t i = 0; i < nbRenderables; i++)
+	{
+		Mesh* mesh = m_ObjArr[i]->GetMesh();
+		if (mesh->HasGLBuffers())
+		{
+			glDeleteBuffers(1, &mesh->GLGetVBO());
+			glDeleteBuffers(1, &mesh->GLGetIBO());
+			glDeleteVertexArrays(1, &mesh->GLGetVAO());
+		}
+	}
 }

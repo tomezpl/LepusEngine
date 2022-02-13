@@ -100,7 +100,7 @@ float* Mesh::GetVertexBuffer()
 	return m_VertexBufferCache;
 }
 
-size_t Mesh::GetVertexCount()
+size_t Mesh::GetVertexCount() const
 {
 	return (m_Indexed) ? m_Indices.size() : m_Vertices.size() / 8;
 }
@@ -125,7 +125,7 @@ unsigned int* Mesh::GetIndexBuffer()
 	return m_IndexBufferCache;
 }
 
-size_t Mesh::GetIndexCount()
+size_t Mesh::GetIndexCount() const
 {
 	return m_Indices.size();
 }
@@ -140,7 +140,7 @@ void Mesh::SetIndices(std::vector<unsigned int> indices)
 
 void Mesh::GLUpdateIBO()
 {
-	GLuint vao = RenderEngine::GLGetGlobalMeshVAO();
+	GLuint& vao = m_VAO;
 	if (IsIndexed() && HasGLBuffers() && vao != 0)
 	{
 		glBindVertexArray(vao);
@@ -152,25 +152,24 @@ void Mesh::GLUpdateIBO()
 
 void Mesh::GLUpdateVBO()
 {
-	GLuint vao = RenderEngine::GLGetGlobalMeshVAO();
+	GLuint& vao = m_VAO;
 	if (HasGLBuffers() && vao != 0)
 	{
-
 		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
 		// Set vertex positions
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * Vertex::ComponentCount(), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
 
 		// Set texture coords
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(3 * sizeof(GLfloat)));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * Vertex::ComponentCount(), (GLvoid*)(3 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(1);
 
 		// Set normal vectors
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(5 * sizeof(GLfloat)));
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * Vertex::ComponentCount(), (GLvoid*)(5 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(2);
 
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 		glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(float), GetVertexBuffer(), GL_STATIC_DRAW); // pass vertices to GPU
 		glBindVertexArray(0);
 	}
@@ -181,7 +180,7 @@ void Mesh::SetMaterial(Material& mat)
 	m_Mat = &mat;
 }
 
-bool Mesh::IsIndexed()
+bool Mesh::IsIndexed() const
 {
 	return m_Indexed;
 }

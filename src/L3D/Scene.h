@@ -56,6 +56,8 @@ namespace LepusEngine {
 
 			// Sets Ambient Light colour & intensity
 			void SetAmbient(Color ambientColor, float ambientIntensity);
+
+			void Shutdown();
 		};
 	}
 }
