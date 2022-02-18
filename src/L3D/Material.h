@@ -28,10 +28,15 @@ namespace LepusEngine
 			std::vector<MaterialAttrib<GLfloat[3]>> m_Vec3Attributes;
 			std::vector<MaterialAttrib<GLfloat[2]>> m_Vec2Attributes;
 			std::vector<MaterialAttrib<Texture2D>> m_TexAttributes;
+
+			bool m_HasLoadedShader;
 		public:
+			Material() { m_HasLoadedShader = false; m_Name = nullptr; }
 			Material(char* materialName);
 			Material(char* materialName, char* shaderName);
 			bool SetShader(char* shaderName);
+			void SetName(char* materialName);
+			const char* GetName();
 
 			// Attribute setter functions
 			// Location will only be modified if it's >= 0

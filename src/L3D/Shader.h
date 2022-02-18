@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Shader/SLProgram.h"
+#include <vector>
 
 namespace LepusEngine
 {
@@ -19,6 +20,25 @@ namespace LepusEngine
 			FShader m_FShader; // Fragment shader
 			GLuint m_Compiled; // Compiled shader
 			bool m_Ready; // Is Shader ready to use in drawcall?
+
+			// TODO:
+			// The shader cache needs some sort of refcounter to make sure we don't delete shaders while they're stil being used
+			static std::vector<Shader> _shaderCache;
+
+			static Shader* getFromShaderCache(const char* shaderName)
+			{
+				size_t nbShaders = _shaderCache.size();
+
+				for (size_t i = 0; i < nbShaders; i++)
+				{
+					if (strcmp(_shaderCache[i].m_ShaderName, shaderName) == 0)
+					{
+						return &_shaderCache[i];
+					}
+				}
+
+				return nullptr;
+			}
 		public:
 			// Default constructor. Creates an empty, unready shader.
 			Shader() { m_ShaderName = ""; m_Ready = false; };

@@ -5,12 +5,30 @@ using namespace LepusEngine::Lepus3D;
 
 Material::Material(char* name)
 {
-	m_Name = name;
+	m_Name = nullptr;
+	this->SetName(name);
 }
 
 Material::Material(char* name, char* shaderName) : Material(name)
 {
 	this->SetShader(shaderName);
+}
+
+void Material::SetName(char* materialName)
+{
+	if (m_Name != nullptr)
+	{
+		delete[] m_Name;
+	}
+
+	size_t n = strnlen_s(materialName, 1024) + 1;
+	m_Name = new char[n];
+	strcpy_s(m_Name, n * sizeof(char), materialName);
+}
+
+const char* Material::GetName()
+{
+	return m_Name;
 }
 
 bool Material::SetShader(char* shaderName)
@@ -30,7 +48,7 @@ bool Material::SetAttributeI(char* attributeName, GLint value, GLint location)
 
 	for (short i = 0; i < m_IntAttributes.size() && index < 0; i++)
 	{
-		if (m_IntAttributes[i].name == attributeName)
+		if (strcmp(m_IntAttributes[i].name, attributeName) == 0)
 			index = i;
 	}
 
@@ -58,7 +76,7 @@ bool Material::SetAttributeF(char* attributeName, GLfloat value, GLint location)
 
 	for (short i = 0; i < m_FloatAttributes.size() && index < 0; i++)
 	{
-		if (m_FloatAttributes[i].name == attributeName)
+		if (strcmp(m_FloatAttributes[i].name, attributeName) == 0)
 			index = i;
 	}
 
@@ -86,7 +104,7 @@ bool Material::SetAttributeF4(char* attributeName, GLfloat value[4], GLint locat
 
 	for (short i = 0; i < m_Vec4Attributes.size() && index < 0; i++)
 	{
-		if (m_Vec4Attributes[i].name == attributeName)
+		if (strcmp(m_Vec4Attributes[i].name, attributeName) == 0)
 			index = i;
 	}
 
@@ -127,7 +145,7 @@ bool Material::SetAttributeF3(char* attributeName, GLfloat value[3], GLint locat
 
 	for (short i = 0; i < m_Vec3Attributes.size() && index < 0; i++)
 	{
-		if (m_Vec3Attributes[i].name == attributeName)
+		if (strcmp(m_Vec3Attributes[i].name, attributeName) == 0)
 			index = i;
 	}
 
@@ -136,7 +154,7 @@ bool Material::SetAttributeF3(char* attributeName, GLfloat value[3], GLint locat
 		m_Vec3Attributes[index].value[0] = value[0];
 		m_Vec3Attributes[index].value[1] = value[1];
 		m_Vec3Attributes[index].value[2] = value[2];
-		if (location >= 0)
+		if (location >= 0 && m_Vec3Attributes[index].location < 0)
 			m_Vec3Attributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 	}
 	else
@@ -146,7 +164,7 @@ bool Material::SetAttributeF3(char* attributeName, GLfloat value[3], GLint locat
 		m_Vec3Attributes[index].value[0] = value[0];
 		m_Vec3Attributes[index].value[1] = value[1];
 		m_Vec3Attributes[index].value[2] = value[2];
-		if (location >= 0)
+		if (location >= 0 && m_Vec3Attributes[index].location < 0)
 			m_Vec3Attributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
 		return false;
 	}
@@ -166,7 +184,7 @@ bool Material::SetAttributeF2(char* attributeName, GLfloat value[2], GLint locat
 
 	for (short i = 0; i < m_Vec2Attributes.size() && index < 0; i++)
 	{
-		if (m_Vec2Attributes[i].name == attributeName)
+		if (strcmp(m_Vec2Attributes[i].name, attributeName) == 0)
 			index = i;
 	}
 
@@ -204,7 +222,7 @@ bool Material::SetAttributeTex(char* attributeName, Texture2D value, int locatio
 
 	for (short i = 0; i < m_TexAttributes.size() && index < 0; i++)
 	{
-		if (m_TexAttributes[i].name == attributeName)
+		if (strcmp(m_TexAttributes[i].name, attributeName) == 0)
 			index = i;
 	}
 
@@ -254,7 +272,7 @@ GLint Material::GetAttributeI(char* attributeName)
 {
 	for (unsigned short i = 0; i < m_IntAttributes.size(); i++)
 	{
-		if (m_IntAttributes[i].name == attributeName)
+		if (strcmp(m_IntAttributes[i].name, attributeName) == 0)
 		{
 			return m_IntAttributes[i].value;
 		}
@@ -265,18 +283,20 @@ GLfloat Material::GetAttributeF(char* attributeName)
 {
 	for (unsigned short i = 0; i < m_FloatAttributes.size(); i++)
 	{
-		if (m_FloatAttributes[i].name == attributeName)
+		if (strcmp(m_FloatAttributes[i].name, attributeName) == 0)
 		{
 			return m_FloatAttributes[i].value;
 		}
 	}
+
+	return 0.f;
 }
 
 float* Material::GetAttributeVec4(char* attributeName)
 {
 	for (unsigned short i = 0; i < m_Vec4Attributes.size(); i++)
 	{
-		if (m_Vec4Attributes[i].name == attributeName)
+		if (strcmp(m_Vec4Attributes[i].name, attributeName) == 0)
 		{
 			return m_Vec4Attributes[i].value;
 		}
@@ -287,9 +307,9 @@ float* Material::GetAttributeVec3(char* attributeName)
 {
 	for (unsigned short i = 0; i < m_Vec3Attributes.size(); i++)
 	{
-		if (m_Vec3Attributes[i].name == attributeName)
+		if (strcmp(m_Vec3Attributes[i].name, attributeName) == 0)
 		{
-			return m_Vec3Attributes[i].value;
+			return new float[3]{ m_Vec3Attributes[i].value[0], m_Vec3Attributes[i].value[1], m_Vec3Attributes[i].value[2] };
 		}
 	}
 }
@@ -298,7 +318,7 @@ float* Material::GetAttributeVec2(char* attributeName)
 {
 	for (unsigned short i = 0; i < m_Vec2Attributes.size(); i++)
 	{
-		if (m_Vec2Attributes[i].name == attributeName)
+		if (strcmp(m_Vec2Attributes[i].name, attributeName) == 0)
 		{
 			return m_Vec2Attributes[i].value;
 		}
@@ -309,7 +329,7 @@ Texture2D Material::GetAttributeTex(char* attributeName)
 {
 	for (unsigned short i = 0; i < m_TexAttributes.size(); i++)
 	{
-		if (m_TexAttributes[i].name == attributeName)
+		if (strcmp(m_TexAttributes[i].name, attributeName) == 0)
 		{
 			return m_TexAttributes[i].value;
 		}

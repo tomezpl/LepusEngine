@@ -1,4 +1,4 @@
-#version 430 core
+#version 330 core
 in vec3 Normal;
 in vec2 TexCoord;
 in vec3 FragPos;
@@ -11,10 +11,12 @@ uniform sampler2D _Texture1;
 uniform float _AmbientStrength;
 uniform vec3 _AmbientColor;
 uniform float _SpecularStrength;
-uniform vec3 _LightColor;
-uniform vec3 _LightPos;
 uniform vec3 _DiffColor;
 uniform int _SpecularShininess;
+uniform vec3 _LightColor;
+uniform vec3 _LightPos;
+
+uniform vec3 _ViewPos; // Camera view vector
 
 void main()
 {
@@ -26,15 +28,15 @@ void main()
 	float diff = max(dot(norm, lightDir), 0.0f);
 	vec3 diffuse = diff * _LightColor;
 
-	vec3 viewDir = normalize(ViewPos - FragPos); // view direction based on current fragment and camera position
+	vec3 viewDir = normalize(_ViewPos - FragPos); // view direction based on current fragment and camera position
 	vec3 lightReflect = reflect(-lightDir, norm); // light reflection vector
 	float specAngle = max(dot(viewDir, lightReflect), 0.0f);
-	vec3 specular = _LightColor * _SpecularStrength * pow(specAngle, _SpecularShininess);
+	vec3 specular = _LightColor * _SpecularStrength * pow(specAngle, max(1, _SpecularShininess));
 
-	vec4 textureCol = texture(_Texture1, TexCoord);
-	if(_TextureCount == 0)
+	vec4 textureCol = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	if(_TextureCount > 0)
 	{
-		textureCol = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		textureCol = texture(_Texture1, TexCoord);
 	}
 
 	color = vec4((ambient + diffuse + specular) * _DiffColor, 1.0f) * textureCol;

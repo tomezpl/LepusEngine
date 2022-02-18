@@ -4,6 +4,8 @@
 
 using namespace LepusEngine::Lepus3D;
 
+std::vector<Shader> Shader::_shaderCache = std::vector<Shader>();
+
 Shader::Shader(char* name, char* dir)
 {
 	m_Ready = false;
@@ -26,7 +28,20 @@ Shader::Shader(char* name, char* dir)
 
 bool Shader::Load(char* name, char* dir)
 {
-	m_ShaderName = name;
+	m_ShaderName = new char[strlen(name)+1];
+
+	strcpy(m_ShaderName, name);
+
+	Shader* cached = getFromShaderCache(name);
+	if (cached)
+	{
+#ifdef _DEBUG
+		std::cout << "Shader::Load(name, dir): found a cached version of " << name << ", using that instead." << std::endl;
+#endif
+		m_Compiled = cached->m_Compiled;
+		m_Ready = true;
+		return true;
+	}
 
 	// Load vertex & fragment shader source code from file
 	if (!m_VShader.Load(name, dir))
@@ -95,6 +110,8 @@ bool Shader::Load(char* name, char* dir)
 		std::cout << "Shader::Load(name, dir): compiled shader " << m_ShaderName << " failed to link (InfoLog: " << infoLog << ")" << std::endl;
 		return false; // Fail loading process if shader linking fails
 	}
+
+	_shaderCache.push_back(*this);
 
 	// Set Shader as ready to draw and return loading success
 	m_Ready = true;

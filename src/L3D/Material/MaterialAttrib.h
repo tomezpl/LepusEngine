@@ -9,10 +9,16 @@ namespace LepusEngine
 		template <class T>
 		class MaterialAttrib {
 		public:
-			const char* name;
+			char* name;
 			T value;
-			GLint location = 0;
-			MaterialAttrib(char* attribName) { this->name = attribName; };
+			GLint location = -1;
+			MaterialAttrib(char* attribName)
+			{ 
+				size_t n = strnlen_s(attribName, 1024) + 1;
+				this->name = new char[n];
+				size_t sz = n * sizeof(char);
+				strcpy_s(name, sz, attribName);
+			};
 		};
 	}
 }

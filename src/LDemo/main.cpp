@@ -19,6 +19,23 @@ using namespace LepusEngine;
 	#define NDEBUG
 #endif
 
+std::string ToString(GLfloat* vec, size_t n)
+{
+	std::string ret = "";
+
+	for (size_t i = 0; i < n; i++)
+	{
+		ret += std::to_string(vec[i]);
+		
+		if (i != n - 1)
+		{
+			ret += ", ";
+		}
+	}
+
+	return ret;
+}
+
 int main()
 {
 	const aiScene* sponza = aiImportFile("../../Content/Models/sponza_lw/sponza/objects/sponza.lwo", aiPostProcessSteps::aiProcess_Triangulate | aiPostProcessSteps::aiProcess_JoinIdenticalVertices | aiPostProcessSteps::aiProcess_GenNormals);
@@ -39,7 +56,7 @@ int main()
 	bool showDemoWindow = true;
 
 	ImGui_ImplGlfw_InitForOpenGL(engine.GetWindowPtr(), true);
-	ImGui_ImplOpenGL3_Init("#version 430 core");
+	ImGui_ImplOpenGL3_Init("#version 330 core");
 
 	// Termination condition for main loop
 	bool isRunning = true;
@@ -53,6 +70,55 @@ int main()
 	defaultMat.SetAttributeF("_SpecularStrength", 0.2f);
 	defaultMat.SetAttributeI("_SpecularShininess", 64);
 	defaultMat.SetAttributeF3("_DiffColor", Lepus3D::Color(128, 128, 128, 255).GetVector3());
+
+	std::vector<Lepus3D::Material*> sponzaMaterials;
+	sponzaMaterials.reserve(sponza->mNumMaterials);
+
+	for (size_t i = 0; i < sponza->mNumMaterials; i++)
+	{
+		aiMaterial* currentMaterial = sponza->mMaterials[i];
+
+		Lepus3D::Material* convertedMaterial = new Lepus3D::Material();
+
+		for (size_t j = 0; j < currentMaterial->mNumProperties; j++)
+		{
+			aiMaterialProperty* currentProp = currentMaterial->mProperties[j];
+
+			aiString key = currentProp->mKey;
+
+			if (key == aiString("?mat.name"))
+			{
+				char* name = new char[currentProp->mDataLength * sizeof(char)];
+
+				strcpy_s(name, currentProp->mDataLength, currentProp->mData);
+
+				convertedMaterial->SetName(name);
+			}
+
+			if (key == aiString("$clr.specular") || key == aiString("$clr.diffuse"))
+			{
+				convertedMaterial->SetShader("Phong");
+				float data[3];
+
+				memcpy_s(data, currentProp->mDataLength, currentProp->mData, currentProp->mDataLength);
+
+				if (key == aiString("$clr.specular"))
+				{
+					convertedMaterial->SetAttributeF("_SpecularStrength", (data[0] + data[1] + data[2]) / 3.f);
+				}
+				else
+				{
+					convertedMaterial->SetAttributeF3("_DiffColor", Lepus3D::Vector3(data[0], data[1], data[2]));
+				}
+			}
+			else if (key == aiString("$mat.shinpercent"))
+			{
+				convertedMaterial->SetAttributeI("_SpecularShininess", (int)std::floor(*(float*)(currentProp->mData)) * 256.f);
+			}
+		}
+
+		sponzaMaterials.push_back(convertedMaterial);
+	}
 
 	for (size_t i = 0; i < sponza->mNumMeshes; i++)
 	{
@@ -85,7 +151,7 @@ int main()
 
 		renderable->GetMesh()->SetIndices(indices);
 
-		renderable->GetMesh()->SetMaterial(defaultMat);
+		renderable->GetMesh()->SetMaterial(*sponzaMaterials[currentMesh->mMaterialIndex]);
 
 		scene.AddMesh(renderable);
 	}
@@ -139,6 +205,8 @@ int main()
 
 	double lastYRot = 0.0;
 
+	size_t materialCount = sponzaMaterials.size();
+
 	// Output start message to console
 	LepusEngine::Logger::LogInfo("", "main", "Demo starting!");
 	while (isRunning)
@@ -176,7 +244,19 @@ int main()
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		ImGui::ShowDemoWindow(&showDemoWindow);
+
+		for (size_t i = 0; i < materialCount; i++)
+		{
+			Lepus3D::Material& material = *sponzaMaterials[i];
+			ImGui::Text("Material %d: %s\n\tSpecularStrength: %d\n\tSpecularShininess: %d\n\tDiffColor: %s\n\t", 
+				i, 
+				material.GetName(), 
+				material.GetAttributeF("_SpecularStrength"),
+				material.GetAttributeI("_SpecularShininess"),
+				ToString(material.GetAttributeVec3("_DiffColor"), 3).c_str()
+			);
+		}
+
 		ImGui::Render();
 
 
@@ -216,6 +296,12 @@ int main()
 	// Close the rendering context(s), release resources
 	scene.Shutdown();
 	engine.Shutdown();
+
+	size_t nbMaterials = sponzaMaterials.size();
+	for (size_t i = 0; i < nbMaterials; i++)
+	{
+		delete sponzaMaterials[i];
+	}
 
 	return 0;
 }

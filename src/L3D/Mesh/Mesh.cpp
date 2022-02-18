@@ -14,7 +14,7 @@ Mesh::Mesh()
 	m_IndexBufferCache = nullptr;
 	m_IndexBufferCacheDirty = false;
 
-	m_IBO = m_VBO = 0;
+	m_VAO = m_IBO = m_VBO = 0;
 	m_HasGLBuffers = false;
 }
 
