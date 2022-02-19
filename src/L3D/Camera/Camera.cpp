@@ -51,10 +51,6 @@ void Camera::_CalcVectors()
 		-(2.f*(rot.x*rot.y+rot.w*rot.z)),
 		-(2.f*(rot.x*rot.z-rot.w*rot.y))
 	);*/
-
-	Logger::LogInfo("Camera", "_CalcVectors", (char*)("Forward: " + m_Target.ToString()).c_str());
-	Logger::LogInfo("Camera", "_CalcVectors", (char*)("Up: " + m_Up.ToString()).c_str());
-	Logger::LogInfo("Camera", "_CalcVectors", (char*)("Right: " + m_Right.ToString()).c_str());
 }
 
 Camera::Camera(Transform transform) : Camera()
