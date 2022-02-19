@@ -38,7 +38,7 @@ std::string ToString(GLfloat* vec, size_t n)
 
 int main()
 {
-	const aiScene* sponza = aiImportFile("../../Content/Models/sponza_lw/sponza/objects/sponza.lwo", aiPostProcessSteps::aiProcess_Triangulate | aiPostProcessSteps::aiProcess_JoinIdenticalVertices | aiPostProcessSteps::aiProcess_GenNormals);
+	const aiScene* sponza = aiImportFile("../../Content/Models/sponza/sponza.obj", aiPostProcessSteps::aiProcess_Triangulate | aiPostProcessSteps::aiProcess_JoinIdenticalVertices | aiPostProcessSteps::aiProcess_GenNormals);
 
 	std::vector<Lepus3D::Mesh> sponzaMeshes;
 
@@ -88,11 +88,11 @@ int main()
 
 			if (key == aiString("?mat.name"))
 			{
-				char* name = new char[currentProp->mDataLength * sizeof(char)];
+				aiString materialName = aiString();
 
-				strcpy_s(name, currentProp->mDataLength, currentProp->mData);
-
-				convertedMaterial->SetName(name);
+				aiGetMaterialString(currentMaterial, key.C_Str(), currentProp->mType, currentProp->mIndex, &materialName);
+				
+				convertedMaterial->SetName(materialName.C_Str());
 			}
 
 			if (key == aiString("$clr.specular") || key == aiString("$clr.diffuse"))
@@ -114,6 +114,28 @@ int main()
 			else if (key == aiString("$mat.shinpercent"))
 			{
 				convertedMaterial->SetAttributeI("_SpecularShininess", (int)std::floor(*(float*)(currentProp->mData)) * 256.f);
+			}
+			else if (key == aiString("$tex.file"))
+			{
+				aiString textureFileName = aiString();
+
+				aiGetMaterialString(currentMaterial, key.C_Str(), currentProp->mType, currentProp->mIndex, &textureFileName);
+
+				// Only interested in diffuse (albedo/colour) textures.
+				std::string strTexFn = std::string(textureFileName.C_Str());
+				if (strTexFn.find("_diff.") != std::string::npos ||
+					(
+						strTexFn.find("_bump.") == std::string::npos && 
+						strTexFn.find("_spec.") == std::string::npos &&
+						strTexFn.find("_mask.") == std::string::npos &&
+						strTexFn.find("_gloss.") == std::string::npos
+					)
+				)
+				{
+					Lepus3D::Texture2D* texture = new Lepus3D::Texture2D(textureFileName.C_Str(), "../../Content/Models/sponza");
+
+					convertedMaterial->SetAttributeTex("_Texture1", *texture);
+				}
 			}
 		}
 
@@ -152,6 +174,7 @@ int main()
 		renderable->GetMesh()->SetIndices(indices);
 
 		renderable->GetMesh()->SetMaterial(*sponzaMaterials[currentMesh->mMaterialIndex]);
+		renderable->SetScale(1.f / 100.f);
 
 		scene.AddMesh(renderable);
 	}

@@ -32,10 +32,10 @@ namespace LepusEngine
 			bool m_HasLoadedShader;
 		public:
 			Material() { m_HasLoadedShader = false; m_Name = nullptr; }
-			Material(char* materialName);
-			Material(char* materialName, char* shaderName);
+			Material(const char* materialName);
+			Material(const char* materialName, char* shaderName);
 			bool SetShader(char* shaderName);
-			void SetName(char* materialName);
+			void SetName(const char* materialName);
 			const char* GetName();
 
 			// Attribute setter functions
@@ -58,6 +58,8 @@ namespace LepusEngine
 			GLfloat* GetAttributeVec3(char* attributeName);
 			GLfloat* GetAttributeVec2(char* attributeName);
 			Texture2D GetAttributeTex(char* attributeName);
+
+			void GLUploadAllTextures();
 
 			// Apply the material for the next drawcall
 			void Use();

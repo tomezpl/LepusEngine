@@ -9,6 +9,8 @@
 #include <GLFW/glfw3.h>
 #endif
 
+#define LEPUS_MAX_TEXTURE_COUNT 16
+
 #include "Material.h"
 #include "Vertex.h"
 #include "Mesh.h"
@@ -32,7 +34,7 @@ namespace LepusEngine
 					window, 
 					renderer; 
 			} m_Ready;
-			GLuint m_TextureSet[16];
+			GLuint m_TextureSet[LEPUS_MAX_TEXTURE_COUNT];
 			double m_LastFrameTime, m_ElapsedTime;
 			Camera* m_Cam;
 

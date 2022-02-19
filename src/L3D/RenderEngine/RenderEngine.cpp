@@ -102,17 +102,6 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 {
 	bool useIndexing = mesh.IsIndexed();
 
-	/*unsigned int* iD = nullptr;
-	unsigned int eCount = mesh.GetIndexCount();
-	if(useIndexing)
-	{
-		iD = mesh.GetIndexBuffer();
-	}
-	unsigned long long vC = mesh.GetVertexCount();
-	unsigned long long vDS = vC * sizeof(Vertex);*/
-
-	//GLfloat* vArr = mesh.GetVertexBuffer();
-
 	glBindVertexArray(mesh.GLGetVAO());
 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh.GLGetVBO());
@@ -136,17 +125,6 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 		Logger::LogWarning("RenderEngine", "DrawMesh", "texture count is bigger than the texture set size!", "mesh, material");
 	}
 
-	for (auto i = 0; i < textureCount; i++)
-	{
-		glBindTexture(GL_TEXTURE_2D, m_TextureSet[i]);
-		{
-			auto currentTex = material.m_TexAttributes[i].value;
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, currentTex.GetWidth(), currentTex.GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, currentTex.GetData());
-			glGenerateMipmap(GL_TEXTURE_2D);
-		}
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-
 	// Set View position for lighting
 
 	material.SetAttributeF3("_ViewPos", m_Cam->GetTransform().GetPosition());
@@ -157,9 +135,12 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 
 	for (auto i = 0; i < textureCount; i++)
 	{
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, m_TextureSet[i]);
-		glUniform1i(glGetUniformLocation(material.m_Shader.m_Compiled, material.m_TexAttributes[i].name), i);
+		if (material.m_TexAttributes[i].value.m_HasGLTexture)
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, material.m_TexAttributes[i].value.m_GLTexture[0]);
+			glUniform1i(material.m_TexAttributes[i].location, i);
+		}
 	}
 
 	{

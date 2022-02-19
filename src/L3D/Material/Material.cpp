@@ -3,18 +3,18 @@
 
 using namespace LepusEngine::Lepus3D;
 
-Material::Material(char* name)
+Material::Material(const char* name)
 {
 	m_Name = nullptr;
 	this->SetName(name);
 }
 
-Material::Material(char* name, char* shaderName) : Material(name)
+Material::Material(const char* name, char* shaderName) : Material(name)
 {
 	this->SetShader(shaderName);
 }
 
-void Material::SetName(char* materialName)
+void Material::SetName(const char* materialName)
 {
 	if (m_Name != nullptr)
 	{
@@ -226,11 +226,14 @@ bool Material::SetAttributeTex(char* attributeName, Texture2D value, int locatio
 			index = i;
 	}
 
+	bool updatedExisting = false;
+
 	if (index >= 0)
 	{
 		m_TexAttributes[index].value = value;
 		if (location >= 0)
 			m_TexAttributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
+		updatedExisting = true;
 	}
 	else
 	{
@@ -239,10 +242,16 @@ bool Material::SetAttributeTex(char* attributeName, Texture2D value, int locatio
 		m_TexAttributes[index].value = value;
 		if (location >= 0)
 			m_TexAttributes[index].location = glGetUniformLocation(m_Shader.m_Compiled, attributeName);
-		return false;
 	}
 
-	return true;
+	if (!m_TexAttributes[index].value.m_HasGLTexture)
+	{
+		m_TexAttributes[index].value.GLCreateTexture();
+	}
+
+	m_TexAttributes[index].value.GLUploadTexture();
+
+	return updatedExisting;
 }
 
 bool Material::SetAttributeFP(char* attributeName, GLfloat* value, GLint location)
@@ -362,8 +371,29 @@ void Material::Use()
 	}
 }
 
+void Material::GLUploadAllTextures()
+{
+	size_t nbTextures = m_TexAttributes.size();
+
+	for (size_t i = 0; i < nbTextures; i++)
+	{
+		if (!m_TexAttributes[i].value.m_HasGLTexture)
+		{
+			m_TexAttributes[i].value.GLCreateTexture();
+		}
+
+		m_TexAttributes[i].value.GLUploadTexture();
+	}
+}
+
 void Material::Destroy()
 {
+	size_t nbTextures = m_TexAttributes.size();
+	for (size_t i = 0; i < nbTextures; i++)
+	{
+		m_TexAttributes[i].value.GLDestroyTexture();
+	}
+
 	m_Shader.Unload();
 }
 
