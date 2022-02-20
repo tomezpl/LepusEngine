@@ -46,7 +46,6 @@ void main()
 
 	vec4 albedoCol = vec4(1.0f, 1.0f, 1.0f, -1.0f);
 	vec4 specularCol = vec4(1.0f, 1.0f, 1.0f, -1.0f);
-	float alpha = 1.0f;
 
 	int nbTextures = min(_TextureCount, MAX_TEXTURE_COUNT);
 	for(int i = 0; i < nbTextures; i++)
@@ -66,13 +65,9 @@ void main()
 			else if(texRole == TextureRole_Mask)
 			{
 				// Determine visibility based on mask texture
-				if(max(max(pixel.r, pixel.g), max(pixel.b, pixel.a)) > 0.1f)
+				if(max(max(pixel.r, pixel.g), pixel.b) < 0.1f)
 				{
-					alpha = 1.f;
-				}
-				else
-				{
-					alpha = 0.f;
+					discard;
 				}
 			}
 			else if(texRole == TextureRole_SpecularMap)
@@ -89,5 +84,4 @@ void main()
 	vec3 specular = _LightColor * (specularCol.a > -0.5f ? specularCol.rgb : vec3(_SpecularStrength, _SpecularStrength, _SpecularStrength)) * pow(specAngle, max(1, _SpecularShininess));
 
 	color = vec4((ambient + diffuse + specular) * _DiffColor, 1.0f) * albedoCol;
-	color.a = alpha;
 }
