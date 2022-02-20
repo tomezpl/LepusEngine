@@ -61,6 +61,8 @@ bool Texture2D::Load(const char* fN, char* dir, TextureRole role)
 
 		m_Path = new char[filePath.length() + 1];
 		strcpy(m_Path, filePath.c_str());
+
+		_textureCache.push_back(this);
 	}
 	else
 	{
