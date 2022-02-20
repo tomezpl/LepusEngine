@@ -8,13 +8,15 @@ using namespace LepusEngine::Lepus3D;
 
 std::vector<Texture2D*> Texture2D::_textureCache = std::vector<Texture2D*>();
 
-Texture2D::Texture2D(const char* fileName, char* dir) : Texture2D()
+Texture2D::Texture2D(const char* fileName, char* dir, TextureRole role) : Texture2D()
 {
-	this->Load(fileName, dir);
+	this->Load(fileName, dir, role);
 }
 
-bool Texture2D::Load(const char* fN, char* dir)
+bool Texture2D::Load(const char* fN, char* dir, TextureRole role)
 {
+	SetRole(role);
+
 	std::string filePath = dir;
 	filePath.append("/");
 	filePath.append(fN);
@@ -136,4 +138,9 @@ void Texture2D::GLDestroyTexture()
 		glDeleteTextures(1, m_GLTexture);
 		m_HasGLTexture = false;
 	}
+}
+
+void Texture2D::SetRole(TextureRole role)
+{
+	m_TextureRole = role;
 }

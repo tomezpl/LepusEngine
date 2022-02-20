@@ -56,7 +56,7 @@ int main()
 	bool showDemoWindow = true;
 
 	ImGui_ImplGlfw_InitForOpenGL(engine.GetWindowPtr(), true);
-	ImGui_ImplOpenGL3_Init("#version 330 core");
+	ImGui_ImplOpenGL3_Init("#version 430 core");
 
 	// Termination condition for main loop
 	bool isRunning = true;
@@ -121,21 +121,38 @@ int main()
 
 				aiGetMaterialString(currentMaterial, key.C_Str(), currentProp->mType, currentProp->mIndex, &textureFileName);
 
+				Lepus3D::Texture2D* texture = new Lepus3D::Texture2D(textureFileName.C_Str(), "../../Content/Models/sponza");
+
 				// Only interested in diffuse (albedo/colour) textures.
 				std::string strTexFn = std::string(textureFileName.C_Str());
-				if (strTexFn.find("_diff.") != std::string::npos ||
-					(
-						strTexFn.find("_bump.") == std::string::npos && 
-						strTexFn.find("_spec.") == std::string::npos &&
-						strTexFn.find("_mask.") == std::string::npos &&
-						strTexFn.find("_gloss.") == std::string::npos
-					)
-				)
+				std::string texRole = "Texture";
+				if (strTexFn.find("_bump.") != std::string::npos)
 				{
-					Lepus3D::Texture2D* texture = new Lepus3D::Texture2D(textureFileName.C_Str(), "../../Content/Models/sponza");
-
-					convertedMaterial->SetAttributeTex("_Texture1", *texture);
+					texture->SetRole(Lepus3D::TextureRole::BumpMap);
+					texRole = "bumpmap";
 				}
+				else if (strTexFn.find("_spec.") != std::string::npos)
+				{
+					texture->SetRole(Lepus3D::TextureRole::SpecularMap);
+					texRole = "specmap";
+				}
+				else if (strTexFn.find("_gloss.") != std::string::npos)
+				{
+					texture->SetRole(Lepus3D::TextureRole::GlossMap);
+					texRole = "glossmap";
+				}
+				else if (strTexFn.find("_mask.") != std::string::npos)
+				{
+					texture->SetRole(Lepus3D::TextureRole::Mask);
+					texRole = "mask";
+				}
+				else
+				{
+					texture->SetRole(Lepus3D::TextureRole::Albedo);
+					texRole = "albedo";
+				}
+
+				convertedMaterial->SetAttributeTex(texRole.c_str(), *texture, -1);
 			}
 		}
 
@@ -153,8 +170,15 @@ int main()
 		{
 			aiVector3t currentVertex = currentMesh->mVertices[j];
 			aiVector3t currentNormal = currentMesh->mNormals[j];
+			Lepus3D::Vector2 uv = Lepus3D::Vector2::Zero();
+			if (currentMesh->GetNumUVChannels() != 0)
+			{
+				aiVector3D currentUv = currentMesh->mTextureCoords[0][j];
+				uv.x = currentUv.x;
+				uv.y = currentUv.y;
+			}
 
-			verts.push_back(Lepus3D::Vertex(currentVertex.x, currentVertex.y, currentVertex.z, 0.f, 0.f, currentNormal.x, currentNormal.y, currentNormal.z));
+			verts.push_back(Lepus3D::Vertex(currentVertex.x, currentVertex.y, currentVertex.z, uv.x, uv.y, currentNormal.x, currentNormal.y, currentNormal.z));
 		}
 
 		Lepus3D::Renderable* renderable = new Lepus3D::Renderable(Lepus3D::Mesh(verts, true));
@@ -240,7 +264,7 @@ int main()
 		elapsedTime += dTime;
 
 		// Orbit the light around the box over the application's running time
-		sceneLight.SetPosition(Lepus3D::Vector3(2.50f * sin(elapsedTime), 2.50f * sin(elapsedTime), 2.50f * cos(elapsedTime)));
+		//sceneLight.SetPosition(Lepus3D::Vector3(2.50f * sin(elapsedTime), 2.50f * sin(elapsedTime), 2.50f * cos(elapsedTime)));
 
 		if (physicsActive)
 		{

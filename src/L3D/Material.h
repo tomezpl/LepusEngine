@@ -49,7 +49,7 @@ namespace LepusEngine
 			bool SetAttributeF2(char* attributeName, GLfloat value[2], GLint location = 0);
 			bool SetAttributeF2(char* attributeName, Vector2 value, GLint location = 0);
 			bool SetAttributeFP(char* attributeName, GLfloat* value, GLint location = 0);
-			bool SetAttributeTex(char* attributeName, Texture2D value, int location = 0);
+			bool SetAttributeTex(const char* attributeName, Texture2D value, int location = 0);
 
 			// Attribute getter functions
 			GLint GetAttributeI(char* attributeName);
@@ -57,9 +57,10 @@ namespace LepusEngine
 			GLfloat* GetAttributeVec4(char* attributeName);
 			GLfloat* GetAttributeVec3(char* attributeName);
 			GLfloat* GetAttributeVec2(char* attributeName);
-			Texture2D GetAttributeTex(char* attributeName);
+			Texture2D GetAttributeTex(const char* attributeName);
 
 			void GLUploadAllTextures();
+			Texture2D* GetTextureArray(size_t& textureCount);
 
 			// Apply the material for the next drawcall
 			void Use();

@@ -12,7 +12,7 @@ namespace LepusEngine
 			char* name;
 			T value;
 			GLint location = -1;
-			MaterialAttrib(char* attribName)
+			MaterialAttrib(const char* attribName)
 			{ 
 				size_t n = strnlen_s(attribName, 1024) + 1;
 				this->name = new char[n];

@@ -216,7 +216,7 @@ bool Material::SetAttributeF2(char* attributeName, Vector2 value, GLint location
 }
 
 
-bool Material::SetAttributeTex(char* attributeName, Texture2D value, int location)
+bool Material::SetAttributeTex(const char* attributeName, Texture2D value, int location)
 {
 	short index = -1;
 
@@ -334,7 +334,7 @@ float* Material::GetAttributeVec2(char* attributeName)
 	}
 }
 
-Texture2D Material::GetAttributeTex(char* attributeName)
+Texture2D Material::GetAttributeTex(const char* attributeName)
 {
 	for (unsigned short i = 0; i < m_TexAttributes.size(); i++)
 	{
@@ -384,6 +384,34 @@ void Material::GLUploadAllTextures()
 
 		m_TexAttributes[i].value.GLUploadTexture();
 	}
+}
+
+Texture2D* Material::GetTextureArray(size_t& textureCount)
+{
+	textureCount = 0;
+	size_t nbTexAttribs = m_TexAttributes.size();
+
+	Texture2D* textures = new Texture2D[nbTexAttribs];
+
+	for (size_t i = 0; i < nbTexAttribs; i++)
+	{
+		if (m_TexAttributes[i].value.m_HasGLTexture)
+		{
+			textures[textureCount++] = m_TexAttributes[i].value;
+		}
+	}
+
+	if (textureCount == 0)
+	{
+		delete[] textures;
+		return nullptr;
+	}
+
+	Texture2D* ret = new Texture2D[textureCount];
+	memcpy(ret, textures, textureCount * sizeof(Texture2D));
+	delete[] textures;
+
+	return ret;
 }
 
 void Material::Destroy()

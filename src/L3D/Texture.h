@@ -15,6 +15,16 @@ namespace LepusEngine
 {
 	namespace Lepus3D
 	{
+		enum class TextureRole
+		{
+			Unused = 0,
+			Albedo,
+			SpecularMap,
+			BumpMap,
+			GlossMap,
+			Mask
+		};
+
 		class Texture2D {
 			friend class Material;
 			friend class RenderEngine;
@@ -30,15 +40,29 @@ namespace LepusEngine
 
 			GLuint m_GLTexture[1];
 			bool m_HasGLTexture;
+
+			TextureRole m_TextureRole;
 		public:
-			Texture2D() { m_Data = nullptr; m_Path = nullptr; m_Width = m_Height = m_Size = m_Channels = 0; m_HasGLTexture = false; m_GLTexture[0] = 0; }
-			Texture2D(const char* fileName, char* directory = "../../Content");
-			bool Load(const char* fileName, char* directory = "../../Content");
+			Texture2D() 
+			{ 
+				m_Data = nullptr; 
+				m_Path = nullptr; 
+				m_Width = m_Height = m_Size = m_Channels = 0; 
+				m_HasGLTexture = false; 
+				m_GLTexture[0] = 0; 
+				m_TextureRole = TextureRole::Unused;
+			}
+
+			Texture2D(const char* fileName, char* directory = "../../Content", TextureRole role = TextureRole::Albedo);
+			bool Load(const char* fileName, char* directory = "../../Content", TextureRole role = TextureRole::Albedo);
 			static Texture2D Default();
 			unsigned char* GetData();
 			int GetSize();
 			int GetWidth();
 			int GetHeight();
+
+			void SetRole(TextureRole role);
+			inline TextureRole GetRole() { return m_TextureRole; }
 
 			void GLCreateTexture();
 			void GLUploadTexture();

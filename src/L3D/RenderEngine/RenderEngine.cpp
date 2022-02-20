@@ -29,7 +29,7 @@ bool RenderEngine::Init(char* name, unsigned short width, unsigned short height)
 	m_Cam = nullptr;
 	m_Ready = { false, false };
 	m_WindowName = name;
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	m_Window = glfwCreateWindow(width, height, name, 0, 0);
 	m_Ready.window = (glfwGetWindowAttrib(m_Window, GLFW_VISIBLE) == 0) ? false : true;
@@ -118,30 +118,36 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	auto textureCount = material.m_TexAttributes.size();
-
-	if (textureCount > sizeof(m_TextureSet) / sizeof(GLuint))
-	{
-		Logger::LogWarning("RenderEngine", "DrawMesh", "texture count is bigger than the texture set size!", "mesh, material");
-	}
-
 	// Set View position for lighting
 
 	material.SetAttributeF3("_ViewPos", m_Cam->GetTransform().GetPosition());
 
 	material.Use();
 
-	glUniform1i(glGetUniformLocation(material.m_Shader.m_Compiled, "_TextureCount"), textureCount);
-
-	for (auto i = 0; i < textureCount; i++)
+	size_t textureCount = 0;
+	Texture2D* textures = material.GetTextureArray(textureCount);
+	char texUniformNameBuf[32];
+	for (size_t i = 0; i < textureCount; i++)
 	{
-		if (material.m_TexAttributes[i].value.m_HasGLTexture)
-		{
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, material.m_TexAttributes[i].value.m_GLTexture[0]);
-			glUniform1i(material.m_TexAttributes[i].location, i);
-		}
+		std::sprintf(texUniformNameBuf, "_Textures[%d].texRole", i);
+		GLint loc = glGetUniformLocation(material.m_Shader.m_Compiled, texUniformNameBuf);
+		glUniform1ui(loc, (GLuint)textures[i].GetRole());
+
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, textures[i].m_GLTexture[0]);
+		std::sprintf(texUniformNameBuf, "_Textures[%d].tex", i);
+		loc = glGetUniformLocation(material.m_Shader.m_Compiled, texUniformNameBuf);
+		glUniform1i(loc, i);
 	}
+
+	delete[] textures;
+
+	if (textureCount > LEPUS_MAX_TEXTURE_COUNT)
+	{
+		Logger::LogWarning("RenderEngine", "DrawMesh", "texture count is bigger than the texture set size!", "mesh, material");
+	}
+
+	glUniform1i(glGetUniformLocation(material.m_Shader.m_Compiled, "_TextureCount"), textureCount);
 
 	{
 		glm::mat4 model, view, projection;
