@@ -1,0 +1,14 @@
+{
+    "name": "lepus-engine",
+    "version": "1.0.0",
+    "dependencies": [
+        {
+            "name": "assimp",
+            "version>=": "5.2.1"
+        },
+        "glfw3",
+        "glew",
+        "bullet3"
+    ],
+    "builtin-baseline": "8dbd66f5a7821ced1ed57696b50375a977006813"
+}

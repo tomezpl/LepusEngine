@@ -10,6 +10,8 @@
 # min. required CMake version
 cmake_minimum_required (VERSION 2.6)
 
+set(VCPKG_FEATURE_FLAGS "manifests,registries,versions")
+
 # VCPKG directory
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
