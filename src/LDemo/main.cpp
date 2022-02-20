@@ -10,6 +10,7 @@
 #include <LEngine/Physics/PhysicsRigidbody.h>
 
 #include <assimp/cimport.h>
+#include <assimp/material.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
@@ -78,7 +79,50 @@ int main()
 	{
 		aiMaterial* currentMaterial = sponza->mMaterials[i];
 
+		int nbAlbedoTextures = currentMaterial->GetTextureCount(aiTextureType::aiTextureType_DIFFUSE);
+		int nbSpecularMaps = currentMaterial->GetTextureCount(aiTextureType::aiTextureType_SPECULAR);
+		int nbGlossMaps = currentMaterial->GetTextureCount(aiTextureType::aiTextureType_SHININESS);
+		int nbBumpMaps = currentMaterial->GetTextureCount(aiTextureType::aiTextureType_HEIGHT);
+		int nbMasks = currentMaterial->GetTextureCount(aiTextureType::aiTextureType_OPACITY);
+
 		Lepus3D::Material* convertedMaterial = new Lepus3D::Material();
+		aiString texturePath;
+
+		if (nbAlbedoTextures)
+		{
+			currentMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texturePath);
+			Lepus3D::Texture2D* texture = new Lepus3D::Texture2D(texturePath.C_Str(), "../../Content/Models/sponza");
+			texture->SetRole(Lepus3D::TextureRole::Albedo);
+			convertedMaterial->SetAttributeTex("albedo", *texture, -1);
+		}
+		if (nbSpecularMaps)
+		{
+			currentMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_SPECULAR, 0), texturePath);
+			Lepus3D::Texture2D* texture = new Lepus3D::Texture2D(texturePath.C_Str(), "../../Content/Models/sponza");
+			texture->SetRole(Lepus3D::TextureRole::SpecularMap);
+			convertedMaterial->SetAttributeTex("specmap", *texture, -1);
+		}
+		if (nbGlossMaps)
+		{
+			currentMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_SHININESS, 0), texturePath);
+			Lepus3D::Texture2D* texture = new Lepus3D::Texture2D(texturePath.C_Str(), "../../Content/Models/sponza");
+			texture->SetRole(Lepus3D::TextureRole::GlossMap);
+			convertedMaterial->SetAttributeTex("glossmap", *texture, -1);
+		}
+		if (nbBumpMaps)
+		{
+			currentMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_HEIGHT, 0), texturePath);
+			Lepus3D::Texture2D* texture = new Lepus3D::Texture2D(texturePath.C_Str(), "../../Content/Models/sponza");
+			texture->SetRole(Lepus3D::TextureRole::BumpMap);
+			convertedMaterial->SetAttributeTex("bumpmap", *texture, -1);
+		}
+		if (nbMasks)
+		{
+			currentMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_OPACITY, 0), texturePath);
+			Lepus3D::Texture2D* texture = new Lepus3D::Texture2D(texturePath.C_Str(), "../../Content/Models/sponza");
+			texture->SetRole(Lepus3D::TextureRole::Mask);
+			convertedMaterial->SetAttributeTex("mask", *texture, -1);
+		}
 
 		for (size_t j = 0; j < currentMaterial->mNumProperties; j++)
 		{
@@ -114,45 +158,6 @@ int main()
 			else if (key == aiString("$mat.shinpercent"))
 			{
 				convertedMaterial->SetAttributeI("_SpecularShininess", (int)std::floor(*(float*)(currentProp->mData)) * 256.f);
-			}
-			else if (key == aiString("$tex.file"))
-			{
-				aiString textureFileName = aiString();
-
-				aiGetMaterialString(currentMaterial, key.C_Str(), currentProp->mType, currentProp->mIndex, &textureFileName);
-
-				Lepus3D::Texture2D* texture = new Lepus3D::Texture2D(textureFileName.C_Str(), "../../Content/Models/sponza");
-
-				// Only interested in diffuse (albedo/colour) textures.
-				std::string strTexFn = std::string(textureFileName.C_Str());
-				std::string texRole = "Texture";
-				if (strTexFn.find("_bump.") != std::string::npos)
-				{
-					texture->SetRole(Lepus3D::TextureRole::BumpMap);
-					texRole = "bumpmap";
-				}
-				else if (strTexFn.find("_spec.") != std::string::npos)
-				{
-					texture->SetRole(Lepus3D::TextureRole::SpecularMap);
-					texRole = "specmap";
-				}
-				else if (strTexFn.find("_gloss.") != std::string::npos)
-				{
-					texture->SetRole(Lepus3D::TextureRole::GlossMap);
-					texRole = "glossmap";
-				}
-				else if (strTexFn.find("_mask.") != std::string::npos)
-				{
-					texture->SetRole(Lepus3D::TextureRole::Mask);
-					texRole = "mask";
-				}
-				else
-				{
-					texture->SetRole(Lepus3D::TextureRole::Albedo);
-					texRole = "albedo";
-				}
-
-				convertedMaterial->SetAttributeTex(texRole.c_str(), *texture, -1);
 			}
 		}
 
