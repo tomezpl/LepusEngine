@@ -263,3 +263,8 @@ genie
 CMakeCache.txt
 CMakeFiles
 CMakeFiles/**
+/cmake_install.cmake
+
+# VCPKG
+/vcpkg
+/vcpkg_installed
