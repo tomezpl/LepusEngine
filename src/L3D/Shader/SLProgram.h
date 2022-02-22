@@ -22,11 +22,20 @@ namespace LepusEngine
 			bool Load(char* name = "", char* directory = "../../Content/GLSL");
 		};
 
-		class VShader : public SLProgram {
+		class VShader : public SLProgram 
+		{
 		protected:
 			virtual bool _LoadShader(char* directory);
 		};
-		class FShader : public SLProgram {
+
+		class FShader : public SLProgram 
+		{
+		protected:
+			virtual bool _LoadShader(char* directory);
+		};
+
+		class GShader : public SLProgram 
+		{
 		protected:
 			virtual bool _LoadShader(char* directory);
 		};

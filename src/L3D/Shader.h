@@ -18,6 +18,10 @@ namespace LepusEngine
 			char* m_ShaderName; // Shader name to load (e.g. Phong)
 			VShader m_VShader; // Vertex shader
 			FShader m_FShader; // Fragment shader
+			
+			GShader m_GShader; // Geometry shader
+			bool m_HasGeometryShader;
+
 			GLuint m_Compiled; // Compiled shader
 			bool m_Ready; // Is Shader ready to use in drawcall?
 
@@ -41,7 +45,13 @@ namespace LepusEngine
 			}
 		public:
 			// Default constructor. Creates an empty, unready shader.
-			Shader() { m_ShaderName = ""; m_Ready = false; };
+			Shader()
+			{
+				m_ShaderName = ""; 
+				m_Ready = false; 
+				m_HasGeometryShader = false; 
+				m_Compiled = 0; 
+			}
 
 			// Constructor. Takes a shader name and directory to look in.
 			// Calls Load()
@@ -55,6 +65,8 @@ namespace LepusEngine
 			
 			// Provides a copy of the fragment shader source code.
 			const char* FShaderSrc();
+
+			const char* GShaderSrc();
 
 			// Returns the name of the shader that initialised this instance (e.g. Phong).
 			char* Name();

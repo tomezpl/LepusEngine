@@ -1,8 +1,12 @@
 #version 430 core
-in vec3 Normal;
-in vec2 TexCoord;
-in vec3 FragPos;
-in vec3 ViewPos;
+
+struct VERTEXFORMAT {
+	vec2 TexCoord;
+	vec3 Normal;
+	vec3 FragPos;
+};
+
+in VERTEXFORMAT fs_in;
 
 out vec4 color;
 
@@ -37,8 +41,8 @@ void main()
 {
 	vec3 ambient = _AmbientStrength * _AmbientColor;
 
-	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(_LightPos - FragPos);
+	vec3 norm = normalize(fs_in.Normal);
+	vec3 lightDir = normalize(_LightPos - fs_in.FragPos);
 
 	float diff = max(dot(norm, lightDir), 0.0f);
 	vec3 diffuse = diff * _LightColor;
@@ -57,7 +61,7 @@ void main()
 		}
 		else
 		{
-			vec4 pixel = texture(_Textures[i].tex, TexCoord);
+			vec4 pixel = texture(_Textures[i].tex, fs_in.TexCoord);
 			if(texRole == TextureRole_Albedo)
 			{
 				albedoCol = pixel;
@@ -77,7 +81,7 @@ void main()
 		}
 	}
 
-	vec3 viewDir = normalize(_ViewPos - FragPos); // view direction based on current fragment and camera position
+	vec3 viewDir = normalize(_ViewPos - fs_in.FragPos); // view direction based on current fragment and camera position
 	vec3 lightReflect = reflect(-lightDir, norm); // light reflection vector
 	float specAngle = max(dot(viewDir, lightReflect), 0.0f);
 

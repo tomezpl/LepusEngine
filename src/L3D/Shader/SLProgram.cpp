@@ -64,3 +64,12 @@ bool FShader::_LoadShader(char* dir)
 	fileName += ".frag";
 	return this->_LoadFile((char*)fileName.c_str());
 }
+
+bool GShader::_LoadShader(char* dir)
+{
+	std::string fileName = dir;
+	fileName += "/";
+	fileName += m_ProgramName;
+	fileName += ".geom";
+	return this->_LoadFile((char*)fileName.c_str());
+}
