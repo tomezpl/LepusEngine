@@ -7,6 +7,9 @@ struct VERTEXFORMAT {
 	vec2 TexCoord;
 	vec3 Normal;
 	vec3 FragPos;
+	vec3 VertPos;
+	vec3 Tangent;
+	vec3 Bitangent;
 };
 
 out VERTEXFORMAT vs_out;
@@ -21,4 +24,5 @@ void main()
 	vs_out.Normal = mat3(transpose(inverse(model))) * normal; // apply Normal Matrix for non-uniform scaling (TODO: write as CPU task)
 	vs_out.TexCoord = texCoord;
 	vs_out.FragPos = vec3(model * vec4(position, 1.0f));
+	vs_out.VertPos = position;
 }

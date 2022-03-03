@@ -11,6 +11,7 @@ Entity::Entity(Lepus3D::Renderable* renderable, LepusEngine::PhysicsRigidbody* r
 {
 	mRenderable = renderable == nullptr ? new Lepus3D::Renderable() : renderable;
 	mRigidbody = rigidbody;
+	mTransform = nullptr;
 
 	if(!HasPhysics())
 	{
@@ -28,6 +29,11 @@ Entity::Entity(Lepus3D::Renderable* renderable, LepusEngine::PhysicsRigidbody* r
 
 void Entity::CopyRigidbodyTransform()
 {
+	if (mTransform != nullptr)
+	{
+		delete mTransform;
+	}
+
 	// TODO: Adding a rigidbody AFTER an entity has been created could result in a memory leak.
 	mTransform = new Lepus3D::Transform(mRigidbody->GetTransform());
 

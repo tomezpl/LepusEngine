@@ -96,6 +96,8 @@ void RenderEngine::StartScene(Camera* cam)
 	m_Cam = cam;
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	refreshOverridenUniforms();
 }
 
 void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform)
@@ -149,6 +151,8 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 
 	glUniform1i(glGetUniformLocation(material.m_Shader.m_Compiled, "_TextureCount"), textureCount);
 
+	bindOverridenUniforms(material.m_Shader.m_Compiled);
+
 	{
 		glm::mat4 model, view, projection;
 		model = transform.GetMatrix();
@@ -173,6 +177,75 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 
 	// Release resources
 	//delete iD; // TODO: This should be released, but due to how the physics engine currently uses the same index buffer reference, it causes crashes and has to be reworked.
+}
+
+void RenderEngine::bindOverridenUniforms(GLuint& program)
+{
+	if (!m_OverridenUniforms.empty())
+	{
+		GLint nbActiveUniforms = 0;
+		glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &nbActiveUniforms);
+
+		if (nbActiveUniforms < 1)
+		{
+			return;
+		}
+
+		const char** activeUniformNames = new const char* [nbActiveUniforms];
+		GLenum* activeUniformTypes = new GLenum[nbActiveUniforms];
+
+		for (int i = 0; i < nbActiveUniforms; i++)
+		{
+			GLenum uniformType;
+			char* buf = new char[1024];
+			GLsizei charCount = 0;
+			GLint uniformSize;
+			glGetActiveUniform(program, i, 1024, &charCount, &uniformSize, &uniformType, buf);
+			
+			activeUniformNames[i] = new char[(size_t)charCount + 1];
+			strcpy_s((char*)activeUniformNames[i], ((size_t)charCount + 1) * sizeof(char), buf);
+
+			activeUniformTypes[i] = uniformType;
+
+			delete[] buf;
+		}
+
+		auto findUniformType = [&](const char* name)
+		{
+			for (size_t i = 0; i < nbActiveUniforms; i++)
+			{
+				if (strcmp(activeUniformNames[i], name) == 0)
+				{
+					return activeUniformTypes[i];
+				}
+			}
+
+			return (GLenum)GL_INVALID_ENUM;
+		};
+
+		for (auto it = m_OverridenUniforms.begin(); it != m_OverridenUniforms.end(); it++)
+		{
+			const char* uniformName = it->first;
+			GLint location = glGetUniformLocation(program, uniformName);
+			GLenum uniformType = findUniformType(uniformName);
+			
+			switch (uniformType)
+			{
+			case GL_BOOL:
+				bool* val = (bool*)(it->second);
+				glUniform1i(location, (int)(*val));
+				break;
+			}
+		}
+
+		for (size_t i = 0; i < nbActiveUniforms; i++)
+		{
+			delete[] activeUniformNames[i];
+		}
+
+		delete[] activeUniformNames;
+		delete[] activeUniformTypes;
+	}
 }
 
 // TODO: Remove SFML

@@ -62,6 +62,8 @@ int main()
 	// Termination condition for main loop
 	bool isRunning = true;
 
+	bool isBumpMappingActive = false;
+
 	// Initialise the scene
 	Lepus3D::Scene scene;
 
@@ -297,7 +299,9 @@ int main()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		for (size_t i = 0; i < materialCount; i++)
+		ImGui::Text("isBumpMappingActive: %d", isBumpMappingActive);
+
+		/*for (size_t i = 0; i < materialCount; i++)
 		{
 			Lepus3D::Material& material = *sponzaMaterials[i];
 			ImGui::Text("Material %d: %s\n\tSpecularStrength: %d\n\tSpecularShininess: %d\n\tDiffColor: %s\n\t", 
@@ -307,12 +311,12 @@ int main()
 				material.GetAttributeI("_SpecularShininess"),
 				ToString(material.GetAttributeVec3("_DiffColor"), 3).c_str()
 			);
-		}
+		}*/
 
 		ImGui::Render();
 
-
 		engine.StartScene(&cam); // Set current camera, prepare engine for drawing
+		engine.OverrideUniform<bool>("_BumpMapEnabled", isBumpMappingActive);
 		engine.DrawScene(scene); // Draw objects in scene
 
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -336,6 +340,11 @@ int main()
 		{
 			cam.LockInput = !cam.LockInput;
 			cam.UpdateCursorLock();
+		}
+
+		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_B) == GLFW_PRESS)
+		{
+			isBumpMappingActive = !isBumpMappingActive;
 		}
 	}
 	// Output shutdown message to console

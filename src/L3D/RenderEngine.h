@@ -18,6 +18,8 @@
 #include "Camera.h"
 #include "Scene.h"
 
+#include <map>
+
 namespace LepusEngine
 {
 	namespace Lepus3D
@@ -40,6 +42,20 @@ namespace LepusEngine
 
 			static GLuint m_MeshVAO;
 
+			std::map<const char*, void*> m_OverridenUniforms;
+
+			inline void refreshOverridenUniforms()
+			{
+				for (auto it = m_OverridenUniforms.begin(); it != m_OverridenUniforms.end(); it++)
+				{
+					delete it->second;
+				}
+
+				m_OverridenUniforms.clear();
+			}
+
+			void bindOverridenUniforms(GLuint& program);
+
 		public:
 			static GLuint GLGetGlobalMeshVAO();
 
@@ -52,6 +68,27 @@ namespace LepusEngine
 			void DrawScene(Scene& scene);
 			GLFWwindow* GetWindowPtr() { return m_Window; };
 			void EndScene();
+
+			template <typename T> void OverrideUniform(const char* name, T value)
+			{
+				T* valCopy = new T(value);
+				size_t nbKeyChars = strlen(name) + 1;
+				char* keyCopy = new char[nbKeyChars * sizeof(char)];
+				strcpy(keyCopy, name);
+
+				auto existingIterator = m_OverridenUniforms.find(name);
+				if (existingIterator != m_OverridenUniforms.end())
+				{
+					delete existingIterator->second;
+					existingIterator->second = (void*)valCopy;
+				}
+				else
+				{
+					m_OverridenUniforms.emplace(keyCopy, (void*)valCopy);
+				}
+
+				delete[] keyCopy;
+			}
 
 			// Runs the window's event loop, returns false if window was closed
 			// Draws the current vertex buffer to the screen

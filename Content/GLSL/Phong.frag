@@ -4,6 +4,9 @@ struct VERTEXFORMAT {
 	vec2 TexCoord;
 	vec3 Normal;
 	vec3 FragPos;
+	vec3 VertPos;
+	vec3 Tangent;
+	vec3 Bitangent;
 };
 
 in VERTEXFORMAT fs_in;
@@ -34,6 +37,7 @@ uniform vec3 _DiffColor;
 uniform int _SpecularShininess;
 uniform vec3 _LightColor;
 uniform vec3 _LightPos;
+uniform bool _BumpMapEnabled;
 
 uniform vec3 _ViewPos; // Camera view vector
 
@@ -44,12 +48,9 @@ void main()
 	vec3 norm = normalize(fs_in.Normal);
 	vec3 lightDir = normalize(_LightPos - fs_in.FragPos);
 
-	float diff = max(dot(norm, lightDir), 0.0f);
-	vec3 diffuse = diff * _LightColor;
-
-
 	vec4 albedoCol = vec4(1.0f, 1.0f, 1.0f, -1.0f);
 	vec4 specularCol = vec4(1.0f, 1.0f, 1.0f, -1.0f);
+	float height = 1.0f;
 
 	int nbTextures = min(_TextureCount, MAX_TEXTURE_COUNT);
 	for(int i = 0; i < nbTextures; i++)
@@ -78,8 +79,16 @@ void main()
 			{
 				specularCol = pixel;
 			}
+			else if(texRole == TextureRole_BumpMap && _BumpMapEnabled)
+			{
+				// Only need to read one channel from the pixel since it's a grayscale bumpmap.
+				height = pixel.x;
+			}
 		}
 	}
+
+	float diff = max(dot(norm, lightDir) * height, 0.0f);
+	vec3 diffuse = diff * _LightColor;
 
 	vec3 viewDir = normalize(_ViewPos - fs_in.FragPos); // view direction based on current fragment and camera position
 	vec3 lightReflect = reflect(-lightDir, norm); // light reflection vector
