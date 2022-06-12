@@ -31,40 +31,41 @@ void FPPCamera::ProcessInput(float deltaTime)
 		//return;
 	}
 
-	// If window is in focus, request unlimited mouse movement from the window.
-	glfwSetInputMode(m_Wnd, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// TODO: This should be moved to LepusEngine, with an input manager class.
 	const float lookSensitivity = 5.f;
 
-	// Get current camera position.
-	glm::vec3 position = m_Transform.GetPosition().vec3();
+	if (LockInput)
+	{
+		// If window is in focus, request unlimited mouse movement from the window.
+		glfwSetInputMode(m_Wnd, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	// Check for key presses (WASD).
-	// TODO: Build an input handler in LepusEngine separate from Camera classes. Replace this with calls to the handler.
-	if (glfwGetKey(m_Wnd, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		position += m_Target.vec3() * deltaTime * 2.f;
-	}
-	if (glfwGetKey(m_Wnd, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		position -= m_Target.vec3() * deltaTime * 2.f;
-	}
-	if (glfwGetKey(m_Wnd, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		position += m_Right.vec3() * 2.0f * deltaTime;
-	}
-	if (glfwGetKey(m_Wnd, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		position -= m_Right.vec3() * 2.0f * deltaTime;
+		// Get current camera position.
+		glm::vec3 position = m_Transform.GetPosition().vec3();
+
+		// Check for key presses (WASD).
+		// TODO: Build an input handler in LepusEngine separate from Camera classes. Replace this with calls to the handler.
+		if (glfwGetKey(m_Wnd, GLFW_KEY_W) == GLFW_PRESS)
+		{
+			position += m_Target.vec3() * deltaTime * 2.f;
+		}
+		if (glfwGetKey(m_Wnd, GLFW_KEY_S) == GLFW_PRESS)
+		{
+			position -= m_Target.vec3() * deltaTime * 2.f;
+		}
+		if (glfwGetKey(m_Wnd, GLFW_KEY_A) == GLFW_PRESS)
+		{
+			position += m_Right.vec3() * 2.0f * deltaTime;
+		}
+		if (glfwGetKey(m_Wnd, GLFW_KEY_D) == GLFW_PRESS)
+		{
+			position -= m_Right.vec3() * 2.0f * deltaTime;
+		}
+
+		// Update the position after reading WASD input.
+		m_Transform.SetPosition(Vector3(position.x, position.y, position.z));
 	}
 
-	// Update the position after reading WASD input.
-	m_Transform.SetPosition(Vector3(position.x, position.y, position.z));
-
-	// Get current camera rotation.
-	Quaternion rotation = m_Transform.GetRotation();
-	
 	double mouseX = 0.0, mouseY = 0.0;
 	glfwGetCursorPos(m_Wnd, &mouseX, &mouseY); // Get XY coordinates of the cursor in the window, in pixels.
 
@@ -75,39 +76,45 @@ void FPPCamera::ProcessInput(float deltaTime)
 	mouseX /= wndWidth;
 	mouseY /= wndHeight;
 
-	// Calculate the relative rotation value
-	Vector2 mouseRot((mouseX - 0.5) * -1.f, (mouseY - 0.5) * -1.f);
+	if (LockInput)
+	{
+		// Get current camera rotation.
+		Quaternion rotation = m_Transform.GetRotation();
 
-	// Add the relative rotation to the camera's rotation
-	glm::quat newRotation = glm::quat(rotation.w, rotation.x, rotation.y, rotation.z);
-	newRotation *= glm::angleAxis(-mouseRot.x / (10.f / lookSensitivity), Vector3(0.f, 1.f, 0.f).vec3());
-	newRotation *= glm::angleAxis(mouseRot.y / (10.f / lookSensitivity), m_Right.vec3());
-	
-	m_Transform.SetRotation(Quaternion(newRotation.x, newRotation.y, newRotation.z, newRotation.w));
+		// Calculate the relative rotation value
+		Vector2 mouseRot((mouseX - 0.5) * -1.f, (mouseY - 0.5) * -1.f);
 
-	// Normalise target vector
-	glm::vec3 eye = glm::vec3(0.f, 0.f, 1.f) * newRotation;
-	glm::vec3 normTarget = glm::normalize(eye);
+		// Add the relative rotation to the camera's rotation
+		glm::quat newRotation = glm::quat(rotation.w, rotation.x, rotation.y, rotation.z);
+		newRotation *= glm::angleAxis(-mouseRot.x / (10.f / lookSensitivity), Vector3(0.f, 1.f, 0.f).vec3());
+		newRotation *= glm::angleAxis(mouseRot.y / (10.f / lookSensitivity), m_Right.vec3());
 
-	glm::vec3 right = glm::vec3(1.f, 0.f, 0.f) * newRotation;
-	glm::vec3 normRight = glm::normalize(right);
+		m_Transform.SetRotation(Quaternion(newRotation.x, newRotation.y, newRotation.z, newRotation.w));
+
+		// Normalise target vector
+		glm::vec3 eye = glm::vec3(0.f, 0.f, 1.f) * newRotation;
+		glm::vec3 normTarget = glm::normalize(eye);
+
+		glm::vec3 right = glm::vec3(1.f, 0.f, 0.f) * newRotation;
+		glm::vec3 normRight = glm::normalize(right);
 
 
-	// Update target vector with new values
-	m_Target.x = normTarget.x;
-	m_Target.y = normTarget.y;
-	m_Target.z = normTarget.z;
+		// Update target vector with new values
+		m_Target.x = normTarget.x;
+		m_Target.y = normTarget.y;
+		m_Target.z = normTarget.z;
 
-	m_Right.x = normRight.x;
-	m_Right.y = normRight.y;
-	m_Right.z = normRight.z;
+		m_Right.x = normRight.x;
+		m_Right.y = normRight.y;
+		m_Right.z = normRight.z;
 
-	glm::vec3 up = glm::cross(normTarget, normRight);
-	m_Up.x = up.x;
-	m_Up.y = up.y;
-	m_Up.z = up.z;
-	// Calculate vectors
-	//this->_CalcVectors();
+		glm::vec3 up = glm::cross(normTarget, normRight);
+		m_Up.x = up.x;
+		m_Up.y = up.y;
+		m_Up.z = up.z;
+		// Calculate vectors
+		//this->_CalcVectors();
+	}
 
 	// Update last cursor position
 	m_LastX = mouseX;

@@ -63,6 +63,7 @@ int main()
 	bool isRunning = true;
 
 	bool isBumpMappingActive = false;
+	bool bPressed = false, tabPressed = false;
 
 	// Initialise the scene
 	Lepus3D::Scene scene;
@@ -289,7 +290,7 @@ int main()
 
 		engine.Update(); // Update window before drawing
 
-		if (cam.LockInput)
+		//if (cam.LockInput)
 		{
 			cam.ProcessInput(dTime); // Move camera according to input using delta time to maintain consistent speed
 		}
@@ -336,14 +337,26 @@ int main()
 			physicsActive = !physicsActive;
 		}
 
-		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_TAB) == GLFW_PRESS)
+		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_TAB) == GLFW_RELEASE)
 		{
+			tabPressed = false;
+		}
+
+		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_TAB) == GLFW_PRESS && !tabPressed)
+		{
+			tabPressed = true;
 			cam.LockInput = !cam.LockInput;
 			cam.UpdateCursorLock();
 		}
 
-		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_B) == GLFW_PRESS)
+		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_B) == GLFW_RELEASE)
 		{
+			bPressed = false;
+		}
+
+		if (glfwGetKey(engine.GetWindowPtr(), GLFW_KEY_B) == GLFW_PRESS && !bPressed)
+		{
+			bPressed = true;
 			isBumpMappingActive = !isBumpMappingActive;
 		}
 	}
