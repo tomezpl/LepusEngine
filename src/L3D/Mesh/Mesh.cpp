@@ -7,6 +7,7 @@ Mesh::Mesh()
 {
 	m_Indexed = false;
 	m_Mat = new Material("Default", "PerVertexUnlit");
+	m_OwnsMaterial = true;
 
 	m_VertexBufferCache = nullptr;
 	m_VertexBufferCacheDirty = false;
@@ -80,8 +81,41 @@ Mesh::Mesh(VertexArray verts, bool ignoreIndexing) : Mesh()
 	GLUpdateVBO();
 }
 
+Mesh::Mesh(const Mesh& other)
+{
+	m_Indexed = other.m_Indexed;
+
+	m_VertexBufferCache = new float[sizeof(other.m_VertexBufferCache) / sizeof(float)];
+	m_VertexBufferCacheDirty = true;
+
+	m_IndexBufferCache = new unsigned int[sizeof(other.m_IndexBufferCache) / sizeof(unsigned int)];
+	m_IndexBufferCacheDirty = true;
+
+	m_Vertices = std::vector<float>(other.m_Vertices);
+	m_Indices = Lepus3D::IndexArray(other.m_Indices);
+
+	m_VAO = m_IBO = m_VBO = 0;
+	m_HasGLBuffers = false;
+
+	// If the copy source owns its material, that means it can get destroyed at any time so we need to create our own instance.
+	if (other.m_OwnsMaterial && other.m_Mat)
+	{
+		m_Mat = new Material(other.m_Mat->GetName(), other.m_Mat->GetShaderName());
+		m_OwnsMaterial = true;
+	}
+	else if(other.m_Mat)
+	{
+		m_Mat = other.m_Mat;
+		m_OwnsMaterial = false;
+	}
+
+	GLUpdateIBO();
+	GLUpdateVBO();
+}
+
 float* Mesh::GetVertexBuffer()
 {
+	// Update the cache if it's different from latest vertices data.
 	if(!HasCachedVertexBuffer() || m_VertexBufferCacheDirty)
 	{
 		if (HasCachedVertexBuffer())
@@ -98,6 +132,23 @@ float* Mesh::GetVertexBuffer()
 	}
 
 	return m_VertexBufferCache;
+}
+
+float* Mesh::CopyXYZ()
+{
+	size_t nbVertices = GetVertexCount();
+
+	float* pointsData = new float[GetVertexCount() * 3];
+	float* vertices = GetVertexBuffer();
+
+	// Copy first 3 floats (xyz) from each Vertex
+	for (unsigned int i = 0, j = 0; i < nbVertices * 3, j < nbVertices * 8; i += 3, j += 8)
+	{
+		memcpy(pointsData + i, vertices + j, sizeof(float) * 3);
+	}
+	delete vertices;
+
+	return pointsData;
 }
 
 size_t Mesh::GetVertexCount() const
@@ -177,6 +228,12 @@ void Mesh::GLUpdateVBO()
 
 void Mesh::SetMaterial(Material& mat)
 {
+	if (m_Mat && m_Mat != &mat)
+	{
+		m_OwnsMaterial = false;
+		delete m_Mat;
+	}
+
 	m_Mat = &mat;
 }
 
@@ -213,5 +270,23 @@ void Mesh::ScaleVertices(Lepus3D::Vector3 scale)
 		m_Vertices[i] *= scale.x;
 		m_Vertices[i + 1] *= scale.y;
 		m_Vertices[i + 2] *= scale.z;
+	}
+}
+
+Mesh::~Mesh()
+{
+	if (HasCachedVertexBuffer())
+	{
+		delete[] m_VertexBufferCache;
+	}
+	
+	if (HasCachedIndexBuffer())
+	{
+		delete[] m_IndexBufferCache;
+	}
+
+	if (m_OwnsMaterial)
+	{
+		delete m_Mat;
 	}
 }

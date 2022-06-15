@@ -43,6 +43,16 @@ namespace LepusEngine
 
 				return nullptr;
 			}
+
+			static void cleanupShaderCache()
+			{
+				size_t nbShaders = _shaderCache.size();
+
+				for (size_t i = 0; i < nbShaders; i++)
+				{
+					_shaderCache[i].Unload();
+				}
+			}
 		public:
 			// Default constructor. Creates an empty, unready shader.
 			Shader()
@@ -55,10 +65,10 @@ namespace LepusEngine
 
 			// Constructor. Takes a shader name and directory to look in.
 			// Calls Load()
-			Shader(char* name, char* directory = "../../Content/GLSL");
+			Shader(const char* name, const char* directory = "../../Content/GLSL");
 
 			// Loads in the shader from a file and compiles it.
-			bool Load(char* name = "", char* directory = "../../Content/GLSL");
+			bool Load(const char* name = "", const char* directory = "../../Content/GLSL");
 
 			// Provides a copy of the vertex shader source code.
 			const char* VShaderSrc();
@@ -69,7 +79,7 @@ namespace LepusEngine
 			const char* GShaderSrc();
 
 			// Returns the name of the shader that initialised this instance (e.g. Phong).
-			char* Name();
+			const char* Name();
 
 			// Calls OpenGL to set this shader as the active program.
 			bool Run();

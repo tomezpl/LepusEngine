@@ -18,7 +18,7 @@ PhysicsRigidbody::PhysicsRigidbody()
 	mBtMotionState = nullptr;
 }
 
-PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform, float mass)
+PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Geometry* geometry, Lepus3D::Transform& transform, float mass)
 {
 	m_PhysicsEngine = &physicsEngine;
 
@@ -40,21 +40,14 @@ PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geomet
 	m_PxRigidbody->setLinearVelocity(physx::PxVec3(0.0f));*/
 }
 
-void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform)
+void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Geometry* geometry, Lepus3D::Transform& transform)
 {
 	/*physx::PxDefaultMemoryOutputStream outStream;
 	physx::PxConvexMeshDesc desc;
 
 	desc.points.count = geometry.GetVertexCount();*/
 	// Initialise a float array for the data. count * 3 because we're only storing xyz of each vertex - UVs and the normals don't matter.
-	float* pointsData = new float[unsigned long long(geometry.GetVertexCount()) * 3];
-	float* vertices = geometry.GetVertexBuffer();
-	// Copy first 3 floats (xyz) from each Vertex
-	for (unsigned int i = 0, j = 0; i < geometry.GetVertexCount() * 3, j < geometry.GetVertexCount() * 8; i += 3, j += 8)
-	{
-		memcpy(pointsData + i, vertices + j, sizeof(float) * 3);
-	}
-	delete vertices;
+	float* pointsData = geometry->CopyXYZ();
 	/*desc.points.data = pointsData;
 	desc.points.stride = sizeof(float) * 3;
 	
@@ -65,7 +58,7 @@ void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geome
 	physx::PxConvexMesh* mesh = physicsEngine.m_API->m_PxPhysics->createConvexMesh(convexMeshData);*/
 	Lepus3D::Vector3 scale = transform.GetScale();
 	//m_PxCollider = new physx::PxConvexMeshGeometry(mesh, physx::PxMeshScale(physx::PxVec3(scale.x, scale.y, scale.z)));
-	mBtCollider = new btConvexHullShape(pointsData, geometry.GetVertexCount(), 3 * sizeof(float));
+	mBtCollider = new btConvexHullShape(pointsData, geometry->GetVertexCount(), 3 * sizeof(float));
 	mBtCollider->setLocalScaling(btVector3(scale.x, scale.y, scale.z));
 #ifdef _DEBUG
 	/*int nbVertices = mesh->getNbVertices();

@@ -14,6 +14,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <thread>
+
 using namespace LepusEngine;
 
 #ifndef _DEBUG
@@ -35,6 +37,11 @@ std::string ToString(GLfloat* vec, size_t n)
 	}
 
 	return ret;
+}
+
+void deleteMaterial(Lepus3D::Material* toDelete)
+{
+	delete toDelete;
 }
 
 int main()
@@ -167,12 +174,17 @@ int main()
 		sponzaMaterials.push_back(convertedMaterial);
 	}
 
+	char** meshNames = new char*[sponza->mNumMeshes];
+	Lepus3D::Vector3* meshNameLocations = new Lepus3D::Vector3[sponza->mNumMeshes];
+
 	for (size_t i = 0; i < sponza->mNumMeshes; i++)
 	{
 		aiMesh* currentMesh = sponza->mMeshes[i];
 
 		Lepus3D::VertexArray verts;
 		verts.reserve(currentMesh->mNumVertices);
+
+		Lepus3D::Vector3 median;
 
 		for (size_t j = 0; j < currentMesh->mNumVertices; j++)
 		{
@@ -187,6 +199,10 @@ int main()
 			}
 
 			verts.push_back(Lepus3D::Vertex(currentVertex.x, currentVertex.y, currentVertex.z, uv.x, uv.y, currentNormal.x, currentNormal.y, currentNormal.z));
+
+			median.x += currentVertex.x / currentMesh->mNumVertices;
+			median.y += currentVertex.y / currentMesh->mNumVertices;
+			median.z += currentVertex.z / currentMesh->mNumVertices;
 		}
 
 		Lepus3D::Renderable* renderable = new Lepus3D::Renderable(Lepus3D::Mesh(verts, true));
@@ -208,6 +224,10 @@ int main()
 		renderable->GetMesh()->SetMaterial(*sponzaMaterials[currentMesh->mMaterialIndex]);
 		renderable->SetScale(1.f / 100.f);
 
+		meshNameLocations[i] = median;
+		meshNames[i] = new char[currentMesh->mName.length + 1];
+		strcpy(meshNames[i], currentMesh->mName.C_Str());
+
 		scene.AddMesh(renderable);
 	}
 
@@ -223,11 +243,11 @@ int main()
 
 	// A box that's going to fall down from (0, 0, 0).
 	// It will be 1/4 of the original size.
-	LepusEngine::Entity box = LepusEngine::Entity(new Lepus3D::Renderable(Lepus3D::BoxMesh()), new PhysicsRigidbody(physicsEngine, Lepus3D::BoxMeshUnindexed(), Lepus3D::Transform()));
+	LepusEngine::Entity box = LepusEngine::Entity(new Lepus3D::Renderable(Lepus3D::BoxMesh()), new PhysicsRigidbody(physicsEngine, (Lepus3D::Geometry*)&Lepus3D::BoxGeometry(), Lepus3D::Transform()));
 	box.SetScale(0.25f);
 
 	// This will be our static box placed below the first box to test collisions and dynamics
-	LepusEngine::Entity box2 = LepusEngine::Entity(new Lepus3D::Renderable(Lepus3D::BoxMesh()), new PhysicsRigidbody(physicsEngine, Lepus3D::BoxMeshUnindexed(), Lepus3D::Transform(Lepus3D::Vector3(0.3f, -15.f, 0.f), Lepus3D::Vector3::Zero(), Lepus3D::Vector3(3.f/2.f, 3.f/2.f, 3.f/2.f)), 0.f));
+	LepusEngine::Entity box2 = LepusEngine::Entity(new Lepus3D::Renderable(Lepus3D::BoxMesh()), new PhysicsRigidbody(physicsEngine, (Lepus3D::Geometry*)&Lepus3D::BoxGeometry(), Lepus3D::Transform(Lepus3D::Vector3(0.3f, -15.f, 0.f), Lepus3D::Vector3::Zero(), Lepus3D::Vector3(3.f/2.f, 3.f/2.f, 3.f/2.f)), 0.f));
 
 	// Prepare the lighting
 	// A Light is created at xyz(0, 2.5, 0) with a white RGBA colour and intensity 1.0
@@ -372,9 +392,15 @@ int main()
 	engine.Shutdown();
 
 	size_t nbMaterials = sponzaMaterials.size();
+	std::thread* cleanupThreads = new std::thread[nbMaterials];
 	for (size_t i = 0; i < nbMaterials; i++)
 	{
-		delete sponzaMaterials[i];
+		cleanupThreads[i] = std::thread(deleteMaterial, sponzaMaterials[i]);
+	}
+
+	for (size_t i = 0; i < nbMaterials; i++)
+	{
+		cleanupThreads[i].join();
 	}
 
 	return 0;

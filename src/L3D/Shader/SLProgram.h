@@ -14,30 +14,30 @@ namespace LepusEngine
 			friend class Shader;
 		protected:
 			std::string m_ProgramStr, m_ProgramName;
-			virtual bool _LoadShader(char* directory) {return false;};
-			bool _LoadFile(char* fileName);
+			virtual bool _LoadShader(const char* directory) {return false;};
+			bool _LoadFile(const char* fileName);
 			GLuint m_Program;
 		public:
-			SLProgram(char* name = "", char* directory = "../../Content/GLSL");
-			bool Load(char* name = "", char* directory = "../../Content/GLSL");
+			SLProgram(const char* name = "", const char* directory = "../../Content/GLSL");
+			bool Load(const char* name = "", const char* directory = "../../Content/GLSL");
 		};
 
 		class VShader : public SLProgram 
 		{
 		protected:
-			virtual bool _LoadShader(char* directory);
+			virtual bool _LoadShader(const char* directory);
 		};
 
 		class FShader : public SLProgram 
 		{
 		protected:
-			virtual bool _LoadShader(char* directory);
+			virtual bool _LoadShader(const char* directory);
 		};
 
 		class GShader : public SLProgram 
 		{
 		protected:
-			virtual bool _LoadShader(char* directory);
+			virtual bool _LoadShader(const char* directory);
 		};
 	}
 }

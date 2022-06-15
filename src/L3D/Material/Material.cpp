@@ -9,7 +9,7 @@ Material::Material(const char* name)
 	this->SetName(name);
 }
 
-Material::Material(const char* name, char* shaderName) : Material(name)
+Material::Material(const char* name, const char* shaderName) : Material(name)
 {
 	this->SetShader(shaderName);
 }
@@ -31,7 +31,12 @@ const char* Material::GetName()
 	return m_Name;
 }
 
-bool Material::SetShader(char* shaderName)
+const char* Material::GetShaderName()
+{
+	return m_Shader.Name();
+}
+
+bool Material::SetShader(const char* shaderName)
 {
 	if (!m_Shader.m_Ready)
 	{
@@ -422,7 +427,7 @@ void Material::Destroy()
 		m_TexAttributes[i].value.GLDestroyTexture();
 	}
 
-	m_Shader.Unload();
+	delete[] m_Name;
 }
 
 Material::~Material()

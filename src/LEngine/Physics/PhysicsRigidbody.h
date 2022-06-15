@@ -10,6 +10,7 @@ namespace LepusEngine
 	{
 		class Transform;
 		class Mesh;
+		class Geometry;
 	}
 
 	class Physics;
@@ -33,8 +34,8 @@ namespace LepusEngine
 			Physics* m_PhysicsEngine;
         public:
 			PhysicsRigidbody();
-            PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform, float mass = 1.f);
-            void InitCollider(Physics& physicsEngine, Lepus3D::Mesh& geometry, Lepus3D::Transform& transform);
+            PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Geometry* geometry, Lepus3D::Transform& transform, float mass = 1.f);
+            void InitCollider(Physics& physicsEngine, Lepus3D::Geometry* geometry, Lepus3D::Transform& transform);
 
 			// Returns the underlying Bullet3 rigidbody data
 			btRigidBody* const GetBtRigidbody();

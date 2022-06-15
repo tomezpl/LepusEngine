@@ -14,9 +14,9 @@ namespace LepusEngine {
 			Mesh* mMesh;
 		public:
 			Renderable();
-			Renderable(Mesh mesh);
+			Renderable(Mesh& mesh);
 			Mesh* GetMesh();
-			void SetMesh(Mesh mesh);
+			void SetMesh(Mesh& mesh);
 			~Renderable();
 		};
 	}

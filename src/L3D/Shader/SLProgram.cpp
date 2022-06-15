@@ -3,7 +3,7 @@
 
 using namespace LepusEngine::Lepus3D;
 
-SLProgram::SLProgram(char* name, char* dir)
+SLProgram::SLProgram(const char* name, const char* dir)
 {
 #ifdef _DEBUG
 	if (name == "")
@@ -13,7 +13,7 @@ SLProgram::SLProgram(char* name, char* dir)
 	this->Load(name, dir);
 }
 
-bool SLProgram::Load(char* name, char* dir)
+bool SLProgram::Load(const char* name, const char* dir)
 {
 	if (name == "")
 		return false;
@@ -21,7 +21,7 @@ bool SLProgram::Load(char* name, char* dir)
 		return this->_LoadShader(dir);
 }
 
-bool SLProgram::_LoadFile(char* fileName)
+bool SLProgram::_LoadFile(const char* fileName)
 {
 	std::ifstream fs;
 	fs.open(fileName, std::ios::in);
@@ -47,29 +47,29 @@ bool SLProgram::_LoadFile(char* fileName)
 	return true;
 }
 
-bool VShader::_LoadShader(char* dir)
+bool VShader::_LoadShader(const char* dir)
 {
 	std::string fileName = dir;
 	fileName += "/";
 	fileName += m_ProgramName;
 	fileName += ".vert";
-	return this->_LoadFile((char*)fileName.c_str());
+	return this->_LoadFile(fileName.c_str());
 }
 
-bool FShader::_LoadShader(char* dir)
+bool FShader::_LoadShader(const char* dir)
 {
 	std::string fileName = dir;
 	fileName += "/";
 	fileName += m_ProgramName;
 	fileName += ".frag";
-	return this->_LoadFile((char*)fileName.c_str());
+	return this->_LoadFile(fileName.c_str());
 }
 
-bool GShader::_LoadShader(char* dir)
+bool GShader::_LoadShader(const char* dir)
 {
 	std::string fileName = dir;
 	fileName += "/";
 	fileName += m_ProgramName;
 	fileName += ".geom";
-	return this->_LoadFile((char*)fileName.c_str());
+	return this->_LoadFile(fileName.c_str());
 }

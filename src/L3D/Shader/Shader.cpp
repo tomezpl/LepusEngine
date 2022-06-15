@@ -6,7 +6,7 @@ using namespace LepusEngine::Lepus3D;
 
 std::vector<Shader> Shader::_shaderCache = std::vector<Shader>();
 
-Shader::Shader(char* name, char* dir) : Shader()
+Shader::Shader(const char* name, const char* dir) : Shader()
 {
 	m_Ready = false;
 
@@ -26,7 +26,7 @@ Shader::Shader(char* name, char* dir) : Shader()
 	}
 }
 
-bool Shader::Load(char* name, char* dir)
+bool Shader::Load(const char* name, const char* dir)
 {
 	m_ShaderName = new char[strlen(name)+1];
 
@@ -177,14 +177,14 @@ const char* Shader::GShaderSrc()
 	return ret;
 }
 
-char* Shader::Name()
+const char* Shader::Name()
 {
 	// The VShader and FShader share the names, so it doesn't matter which one we call.
-	char* ret = (char*)m_VShader.m_ProgramName.c_str();
+	const char* ret = m_VShader.m_ProgramName.c_str();
 
 	// Should the Vertex shader return a blank name, try retrieving it from the Fragment shader.
 	if (ret == "")
-		ret = (char*)m_FShader.m_ProgramName.c_str();
+		return m_FShader.m_ProgramName.c_str();
 
 	return ret;
 }

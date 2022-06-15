@@ -10,12 +10,12 @@ Renderable::Renderable()
 	mMesh = nullptr;
 }
 
-Renderable::Renderable(Mesh m)
+Renderable::Renderable(Mesh& m)
 {
 	SetMesh(m);
 }
 
-void Renderable::SetMesh(Mesh m)
+void Renderable::SetMesh(Mesh& m)
 {
 	mMesh = new Mesh(m);
 }

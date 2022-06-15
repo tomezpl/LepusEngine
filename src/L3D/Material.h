@@ -33,10 +33,11 @@ namespace LepusEngine
 		public:
 			Material() { m_HasLoadedShader = false; m_Name = nullptr; }
 			Material(const char* materialName);
-			Material(const char* materialName, char* shaderName);
-			bool SetShader(char* shaderName);
+			Material(const char* materialName, const char* shaderName);
+			bool SetShader(const char* shaderName);
 			void SetName(const char* materialName);
 			const char* GetName();
+			const char* GetShaderName();
 
 			// Attribute setter functions
 			// Location will only be modified if it's >= 0
