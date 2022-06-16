@@ -12,6 +12,8 @@ namespace LepusEngine
 		public:
 			virtual float* CopyXYZ() = 0;
 			virtual size_t GetVertexCount() const = 0;
+
+			~Geometry() { m_Vertices.clear(); }
 		};
 	}
 }

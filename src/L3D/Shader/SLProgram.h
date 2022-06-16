@@ -20,6 +20,10 @@ namespace LepusEngine
 		public:
 			SLProgram(const char* name = "", const char* directory = "../../Content/GLSL");
 			bool Load(const char* name = "", const char* directory = "../../Content/GLSL");
+
+			SLProgram(const SLProgram&);
+
+			~SLProgram();
 		};
 
 		class VShader : public SLProgram 

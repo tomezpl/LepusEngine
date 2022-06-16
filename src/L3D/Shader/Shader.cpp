@@ -28,6 +28,18 @@ Shader::Shader(const char* name, const char* dir) : Shader()
 
 bool Shader::Load(const char* name, const char* dir)
 {
+	if (name == nullptr || *name == 0 || strcmp(name, "") == 0)
+	{
+#ifdef _DEBUG
+		std::cout << "Shader::Load(name, dir): null shader name provided!" << std::endl;
+#endif
+
+		m_Ready = false;
+		return false;
+	}
+
+	_ASSERT((strlen(name) + 1) > 0);
+
 	m_ShaderName = new char[strlen(name)+1];
 
 	strcpy(m_ShaderName, name);
@@ -217,4 +229,43 @@ void Shader::Unload()
 
 	glDeleteProgram(m_Compiled);
 	m_Ready = false;
+
+	if (m_ShaderName != nullptr)
+	{
+		delete[] m_ShaderName;
+
+		m_ShaderName = nullptr;
+	}
+}
+
+Shader::~Shader()
+{
+	if (m_ShaderName != nullptr)
+	{
+		if (*m_ShaderName == 0)
+		{
+			delete m_ShaderName;
+		}
+		else
+		{
+			delete[] m_ShaderName;
+		}
+
+		m_ShaderName = nullptr;
+	}
+}
+
+Shader::Shader(const Shader& src)
+{
+	m_Compiled = src.m_Compiled;
+	m_HasGeometryShader = src.m_HasGeometryShader;
+	m_Ready = src.m_Ready;
+
+	m_FShader = FShader(src.m_FShader);
+	if(m_HasGeometryShader)
+	m_GShader = GShader(src.m_GShader);
+	m_VShader = VShader(src.m_VShader);
+
+	m_ShaderName = new char[strlen(src.m_ShaderName) + 1];
+	strcpy(m_ShaderName, src.m_ShaderName);
 }

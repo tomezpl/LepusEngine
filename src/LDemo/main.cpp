@@ -244,6 +244,9 @@ int main()
 	// A box that's going to fall down from (0, 0, 0).
 	// It will be 1/4 of the original size.
 	LepusEngine::Entity box = LepusEngine::Entity(new Lepus3D::Renderable(Lepus3D::BoxMesh()), new PhysicsRigidbody(physicsEngine, (Lepus3D::Geometry*)&Lepus3D::BoxGeometry(), Lepus3D::Transform()));
+
+	// TODO: so creating a box renderable causes the shader in testMat to get corrupted?
+
 	box.SetScale(0.25f);
 
 	// This will be our static box placed below the first box to test collisions and dynamics
@@ -280,7 +283,7 @@ int main()
 
 	double lastYRot = 0.0;
 
-	size_t materialCount = sponzaMaterials.size();
+	//size_t materialCount = sponzaMaterials.size();
 
 	// Output start message to console
 	LepusEngine::Logger::LogInfo("", "main", "Demo starting!");
@@ -402,6 +405,8 @@ int main()
 	{
 		cleanupThreads[i].join();
 	}
+
+	Lepus3D::Shader::CleanupShaderCache();
 
 	return 0;
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#define LEPUS_MATERIAL_ATTRIB_MAX_NAME_LENGTH 1024
+
 namespace LepusEngine
 {
 	namespace Lepus3D
@@ -12,13 +14,39 @@ namespace LepusEngine
 			char* name;
 			T value;
 			GLint location = -1;
-			MaterialAttrib(const char* attribName)
+
+			MaterialAttrib()
+			{
+				name = nullptr;
+			}
+
+			MaterialAttrib(const char* attribName) : MaterialAttrib()
 			{ 
-				size_t n = strnlen_s(attribName, 1024) + 1;
+				size_t n = strnlen_s(attribName, LEPUS_MATERIAL_ATTRIB_MAX_NAME_LENGTH) + 1;
 				this->name = new char[n];
 				size_t sz = n * sizeof(char);
 				strcpy_s(name, sz, attribName);
 			};
+
+			MaterialAttrib(const MaterialAttrib& other)
+			{
+				name = nullptr;
+				
+				if (other.name != nullptr)
+				{
+					size_t n = strnlen_s(other.name, LEPUS_MATERIAL_ATTRIB_MAX_NAME_LENGTH) + 1;
+					name = new char[n];
+					strcpy_s(name, sizeof(char) * n, other.name);
+				}
+			}
+
+			~MaterialAttrib()
+			{
+				if (name != nullptr)
+				{
+					delete[] name;
+				}
+			}
 		};
 	}
 }

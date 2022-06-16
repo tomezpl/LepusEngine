@@ -43,6 +43,19 @@ namespace LepusEngine
 
 			TextureRole m_TextureRole;
 		public:
+			void static ClearTextureCache()
+			{
+				size_t nbTextures = _textureCache.size();
+
+				for (size_t i = 0; i < nbTextures; i++)
+				{
+					delete _textureCache[i];
+					_textureCache[i] = nullptr;
+				}
+
+				_textureCache.clear();
+			}
+
 			Texture2D() 
 			{ 
 				m_Data = nullptr; 
@@ -67,6 +80,10 @@ namespace LepusEngine
 			void GLCreateTexture();
 			void GLUploadTexture();
 			void GLDestroyTexture();
+
+			Texture2D(const Texture2D&);
+
+			~Texture2D();
 		};
 	}
 }

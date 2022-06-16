@@ -126,23 +126,23 @@ void RenderEngine::DrawMesh(Mesh& mesh, Material& material, Transform& transform
 
 	material.Use();
 
-	size_t textureCount = 0;
-	Texture2D* textures = material.GetTextureArray(textureCount);
+	size_t textureCount = material.m_TexAttributes.size();
+	//Texture2D* textures = material.GetTextureArray(textureCount);
 	char texUniformNameBuf[32];
 	for (size_t i = 0; i < textureCount; i++)
 	{
 		std::sprintf(texUniformNameBuf, "_Textures[%d].texRole", i);
 		GLint loc = glGetUniformLocation(material.m_Shader.m_Compiled, texUniformNameBuf);
-		glUniform1ui(loc, (GLuint)textures[i].GetRole());
+		glUniform1ui(loc, (GLuint)material.m_TexAttributes[i].value.GetRole());
 
 		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, textures[i].m_GLTexture[0]);
+		glBindTexture(GL_TEXTURE_2D, material.m_TexAttributes[i].value.m_GLTexture[0]);
 		std::sprintf(texUniformNameBuf, "_Textures[%d].tex", i);
 		loc = glGetUniformLocation(material.m_Shader.m_Compiled, texUniformNameBuf);
 		glUniform1i(loc, i);
 	}
 
-	delete[] textures;
+	//delete[] textures;
 
 	if (textureCount > LEPUS_MAX_TEXTURE_COUNT)
 	{

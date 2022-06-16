@@ -50,7 +50,7 @@ namespace LepusEngine
 			bool SetAttributeF2(char* attributeName, GLfloat value[2], GLint location = 0);
 			bool SetAttributeF2(char* attributeName, Vector2 value, GLint location = 0);
 			bool SetAttributeFP(char* attributeName, GLfloat* value, GLint location = 0);
-			bool SetAttributeTex(const char* attributeName, Texture2D value, int location = 0);
+			bool SetAttributeTex(const char* attributeName, Texture2D& value, int location = 0);
 
 			// Attribute getter functions
 			GLint GetAttributeI(char* attributeName);

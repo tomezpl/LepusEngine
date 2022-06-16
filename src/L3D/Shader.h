@@ -43,8 +43,8 @@ namespace LepusEngine
 
 				return nullptr;
 			}
-
-			static void cleanupShaderCache()
+		public:
+			static void CleanupShaderCache()
 			{
 				size_t nbShaders = _shaderCache.size();
 
@@ -53,11 +53,11 @@ namespace LepusEngine
 					_shaderCache[i].Unload();
 				}
 			}
-		public:
+
 			// Default constructor. Creates an empty, unready shader.
 			Shader()
 			{
-				m_ShaderName = ""; 
+				m_ShaderName = new char[1]{ 0 };
 				m_Ready = false; 
 				m_HasGeometryShader = false; 
 				m_Compiled = 0; 
@@ -69,6 +69,8 @@ namespace LepusEngine
 
 			// Loads in the shader from a file and compiles it.
 			bool Load(const char* name = "", const char* directory = "../../Content/GLSL");
+
+			Shader(const Shader&);
 
 			// Provides a copy of the vertex shader source code.
 			const char* VShaderSrc();
@@ -86,6 +88,8 @@ namespace LepusEngine
 
 			// Unloads the shader from memory.
 			void Unload();
+
+			~Shader();
 		};
 	}
 }

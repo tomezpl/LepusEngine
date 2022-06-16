@@ -28,7 +28,7 @@ bool Texture2D::Load(const char* fN, char* dir, TextureRole role)
 	size_t foundCached = 0;
 	for (size_t i = 0; i < nbCached; i++)
 	{
-		if (strcmp(_textureCache[i]->m_Path, filePath.c_str()) == 0)
+		if (_textureCache[i]->m_Path != nullptr && strcmp(_textureCache[i]->m_Path, filePath.c_str()) == 0)
 		{
 			foundCached = i + 1;
 			break;
@@ -43,11 +43,13 @@ bool Texture2D::Load(const char* fN, char* dir, TextureRole role)
 		if (!file.good())
 		{
 			Texture2D default = Texture2D::Default();
-			m_Data = default.m_Data;
+			m_Data = new unsigned char[sizeof(default.m_Data) / sizeof(unsigned char)];
+			memcpy(m_Data, default.m_Data, sizeof(m_Data));
 			m_Size = default.m_Size;
 			m_Channels = default.m_Channels;
 			m_Width = default.m_Width;
 			m_Height = default.m_Height;
+			m_Path = nullptr;
 
 			return false;
 		}
@@ -62,13 +64,14 @@ bool Texture2D::Load(const char* fN, char* dir, TextureRole role)
 		m_Path = new char[filePath.length() + 1];
 		strcpy(m_Path, filePath.c_str());
 
-		_textureCache.push_back(this);
+		_textureCache.push_back(new Texture2D(*this));
 	}
 	else
 	{
 		// foundCached is actually index + 1 because it's unsigned. Normally if it was signed we'd just use -1 for not found.
-		m_Data = _textureCache[foundCached - 1]->m_Data;
 		m_Size = _textureCache[foundCached - 1]->m_Size;
+		m_Data = new unsigned char[m_Size / sizeof(unsigned char)];
+		memcpy(m_Data, _textureCache[foundCached - 1]->m_Data, m_Size);
 		m_Width = _textureCache[foundCached - 1]->m_Width;
 		m_Height = _textureCache[foundCached - 1]->m_Height;
 		m_Channels = _textureCache[foundCached - 1]->m_Channels;
@@ -145,4 +148,37 @@ void Texture2D::GLDestroyTexture()
 void Texture2D::SetRole(TextureRole role)
 {
 	m_TextureRole = role;
+}
+
+Texture2D::~Texture2D()
+{
+	if (m_Path)
+	{
+		delete[] m_Path;
+		m_Path = nullptr;
+	}
+}
+
+Texture2D::Texture2D(const Texture2D& src)
+{
+	m_Data = new unsigned char[src.m_Size / sizeof(unsigned char)];
+	memcpy(m_Data, src.m_Data, src.m_Size);
+	m_Size = src.m_Size;
+	m_Channels = src.m_Channels;
+	m_Width = src.m_Width;
+	m_Height = src.m_Height;
+	if (src.m_Path != nullptr)
+	{
+		m_Path = new char[strlen(src.m_Path) + 1];
+		strcpy(m_Path, src.m_Path);
+	}
+	else
+	{
+		m_Path = nullptr;
+	}
+
+	m_TextureRole = src.m_TextureRole;
+
+	m_HasGLTexture = false;
+	GLCreateTexture();
 }

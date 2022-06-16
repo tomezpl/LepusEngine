@@ -13,6 +13,13 @@ SLProgram::SLProgram(const char* name, const char* dir)
 	this->Load(name, dir);
 }
 
+SLProgram::SLProgram(const SLProgram& src)
+{
+	m_Program = src.m_Program;
+	m_ProgramName = src.m_ProgramName;
+	m_ProgramStr = src.m_ProgramStr;
+}
+
 bool SLProgram::Load(const char* name, const char* dir)
 {
 	if (name == "")
@@ -43,6 +50,9 @@ bool SLProgram::_LoadFile(const char* fileName)
 			line += "\n";
 		m_ProgramStr.append(line);
 	}
+
+	fs.close();
+
 	Logger::LogInfo("SLProgram", "_LoadFile", "file loaded successfully", "fileName");
 	return true;
 }
@@ -72,4 +82,9 @@ bool GShader::_LoadShader(const char* dir)
 	fileName += m_ProgramName;
 	fileName += ".geom";
 	return this->_LoadFile(fileName.c_str());
+}
+
+SLProgram::~SLProgram()
+{
+	m_ProgramName.clear();
 }

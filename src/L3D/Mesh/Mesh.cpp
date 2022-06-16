@@ -85,10 +85,10 @@ Mesh::Mesh(const Mesh& other)
 {
 	m_Indexed = other.m_Indexed;
 
-	m_VertexBufferCache = new float[sizeof(other.m_VertexBufferCache) / sizeof(float)];
+	m_VertexBufferCache = nullptr;
 	m_VertexBufferCacheDirty = true;
 
-	m_IndexBufferCache = new unsigned int[sizeof(other.m_IndexBufferCache) / sizeof(unsigned int)];
+	m_IndexBufferCache = nullptr;
 	m_IndexBufferCacheDirty = true;
 
 	m_Vertices = std::vector<float>(other.m_Vertices);
