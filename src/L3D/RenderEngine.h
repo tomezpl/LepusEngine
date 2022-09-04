@@ -40,8 +40,6 @@ namespace LepusEngine
 			double m_LastFrameTime, m_ElapsedTime;
 			Camera* m_Cam;
 
-			static GLuint m_MeshVAO;
-
 			std::map<const char*, void*> m_OverridenUniforms;
 
 			inline void refreshOverridenUniforms()
@@ -59,7 +57,16 @@ namespace LepusEngine
 		public:
 			static GLuint GLGetGlobalMeshVAO();
 
-			RenderEngine() { m_Ready = { false, false }; };
+			RenderEngine() 
+			{ 
+				m_Ready = { false, false }; 
+				m_Cam = nullptr;
+				m_Window = nullptr;
+				m_WindowName = nullptr;
+				m_VBO = m_IBO = m_VAO = 0;
+				m_eCount = 0;
+				m_LastFrameTime = m_ElapsedTime = 0.0;
+			};
 			RenderEngine(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
 			bool Init();
 			bool Init(char* windowName, unsigned short windowWidth, unsigned short windowHeight);
@@ -67,6 +74,13 @@ namespace LepusEngine
 			void DrawMesh(Mesh& mesh, Material& material, Transform& transform);
 			void DrawScene(Scene& scene);
 			GLFWwindow* GetWindowPtr() { return m_Window; };
+
+			/*	
+				Performs back buffer swap, updates timers and polls for window events.
+				Make sure you're not calling this after the window's been destroyed, it will throw an exception.
+				To prevent this, check if calls to Update() return false; if so, the window's already destroyed
+				and you should not be performing any draws.
+			*/
 			void EndScene();
 
 			template <typename T> void OverrideUniform(const char* name, T value)

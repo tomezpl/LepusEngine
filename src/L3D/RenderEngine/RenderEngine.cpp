@@ -7,13 +7,6 @@
 
 using namespace LepusEngine::Lepus3D;
 
-GLuint RenderEngine::m_MeshVAO = 0;
-
-GLuint RenderEngine::GLGetGlobalMeshVAO()
-{
-	return m_MeshVAO;
-}
-
 RenderEngine::RenderEngine(char* name, unsigned short width, unsigned short height)
 {
 	this->Init(name, width, height);
@@ -63,11 +56,6 @@ bool RenderEngine::Init()
 	glGenBuffers(1, &m_IBO);
 	glGenVertexArrays(1, &m_VAO);
 	glGenTextures(sizeof(m_TextureSet) / sizeof(GLuint), m_TextureSet);
-
-	if (m_MeshVAO == 0)
-	{
-		m_MeshVAO = m_VAO;
-	}
 
 	glBindVertexArray(m_VAO);
 
