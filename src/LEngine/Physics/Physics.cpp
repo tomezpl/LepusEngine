@@ -9,7 +9,7 @@ Physics::Physics()
 	//m_Scene->m_PhysicsEngine = this;
 }
 
-void Physics::Init(Lepus3D::Vector3 gravity)
+void Physics::Init(/*Lepus3D::Vector3 gravity*/)
 {
 	mCollisionConfig = new btDefaultCollisionConfiguration();
 	mCollisionDispatch = new btCollisionDispatcher(mCollisionConfig);
@@ -18,7 +18,7 @@ void Physics::Init(Lepus3D::Vector3 gravity)
 
 	// TODO: Generalise for adapting to Discrete/CCD?
 	mWorld = new btDiscreteDynamicsWorld(mCollisionDispatch, mBroadphase, mConstraintSolver, mCollisionConfig);
-	mWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
+	//TODO: mWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 
 	size_t renderableCount = 0/*m_Scene->GetRenderableCount()*/;
 

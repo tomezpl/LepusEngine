@@ -1,6 +1,6 @@
 #pragma once
 
-#include <L3D/Scene.h>
+//#include <L3D/Scene.h>
 #include <bullet/btBulletDynamicsCommon.h>
 
 #define LEPUS_PHYSICS_DEFAULT_GRAVITY -9.81f
@@ -27,7 +27,7 @@ namespace LepusEngine
     public:
         Physics();
 
-        void Init(Lepus3D::Vector3 gravity = Lepus3D::Vector3(0.0f, LEPUS_PHYSICS_DEFAULT_GRAVITY, 0.0f));
+        void Init(/*Lepus3D::Vector3 gravity = Lepus3D::Vector3(0.0f, LEPUS_PHYSICS_DEFAULT_GRAVITY, 0.0f)*/);
 
 		void AddObject(PhysicsRigidbody& rigidbody);
         

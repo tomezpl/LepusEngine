@@ -1,5 +1,5 @@
 #include <LEngine/World.h>
-#include <L3D/Scene.h>
+//#include <L3D/Scene.h>
 #include <LEngine/Entity.h>
 
 using namespace LepusEngine;
@@ -8,7 +8,7 @@ World::World(Lepus3D::Scene* scene, bool create3DScene)
 {
 	if (scene == nullptr && create3DScene)
 	{
-		mScene = new Lepus3D::Scene();
+		//TODO: mScene = new Lepus3D::Scene();
 		mIsSceneShared = false;
 	}
 	else {
