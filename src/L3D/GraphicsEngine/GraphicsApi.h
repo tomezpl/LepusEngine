@@ -69,7 +69,6 @@ namespace LepusEngine
 
 				return *reinterpret_cast<TGraphicsApiOptions*>(m_Options);
 			}
-
 		public:
 			/// @brief Default constructor. Does nothing, so Init(GraphicsApiOptions*) needs to be called manually.
 			GraphicsApi()
@@ -89,6 +88,12 @@ namespace LepusEngine
 			virtual void Init(GraphicsApiOptions* options) = 0;
 
 			virtual void Shutdown() = 0;
+
+			virtual ~GraphicsApi() {};
+
+#define L3D_GRAPHICSAPI_IMPL(GraphicsApiDerivedClassName) \
+/* Implements some boilerplate class members, such as a destructor calling Shutdown().*/ \
+~GraphicsApiDerivedClassName() override { Shutdown(); }
 		};
 	}
 }

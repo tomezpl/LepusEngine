@@ -40,8 +40,6 @@ TEST_P(GraphicsApiOptionsTest, TestValueIsUpdated)
 
 	stubApi.setOptionsTestValue(options.testValue);
 	ASSERT_EQ(options.testValue, stubApi.getOptionsTestValue());
-
-	stubApi.Shutdown();
 }
 
 INSTANTIATE_TEST_SUITE_P

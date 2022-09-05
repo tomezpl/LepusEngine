@@ -33,11 +33,17 @@ public:
 		return GetOptions<GraphicsApiStubOptions>().testValue;
 	}
 
-	void Shutdown()
+	void Shutdown() override
 	{
-		// TODO: is this cast needed?
-		delete reinterpret_cast<GraphicsApiStubOptions*>(m_Options);
+		if (m_Options)
+		{
+			// TODO: is this cast needed?
+			delete reinterpret_cast<GraphicsApiStubOptions*>(m_Options);
+			m_Options = nullptr;
+		}
 	}
+
+	L3D_GRAPHICSAPI_IMPL(GraphicsApiStub);
 };
 
 #endif
