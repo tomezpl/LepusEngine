@@ -63,43 +63,27 @@ include_directories(${CMAKE_SOURCE_DIR}/3rdparty/imgui)
 # Demo executable
 add_executable(LepusDemo src/LDemo/main.cpp)
 
+# LepusUtility
+file(GLOB_RECURSE LEPUSUTILITY_HEADERS ${CMAKE_SOURCE_DIR}/src/LUtility/*.h)
+add_custom_target(LepusUtility SOURCES ${LEPUSUTILITY_HEADERS})
+
 # Lepus3D shaders
 file(GLOB LEPUS3D_SHADERS_SRC ${CMAKE_SOURCE_DIR}/Content/GLSL/*.frag ${CMAKE_SOURCE_DIR}/Content/GLSL/*.vert)
 add_custom_target(Lepus3D_Shaders SOURCES ${LEPUS3D_SHADERS_SRC})
 
 # Lepus3D sources
 set(Lepus3D_SRC
-	src/L3D/Assets.h
-		src/L3D/Assets/ModelImporter.h src/L3D/Assets/ModelImporter.cpp
-	src/L3D/Camera.h
-		src/L3D/Camera/FPPCamera.h src/L3D/Camera/Camera.cpp src/L3D/Camera/FPPCamera.cpp
-	src/L3D/Color.h
-		src/L3D/Color/Color.cpp
-	src/L3D/Light.h
-		src/L3D/Light/Light.cpp
-	src/L3D/Material.h
-		src/L3D/Material/MaterialAttrib.h src/L3D/Material/Material.cpp
-	src/L3D/Mesh.h
-		src/L3D/Mesh/Mesh.cpp
-	src/L3D/Renderable.h
-		src/L3D/Renderable/Renderable.cpp
-	src/L3D/RenderEngine.h
-		src/L3D/RenderEngine/RenderEngine.cpp
-	src/L3D/Scene.h
-		src/L3D/Scene/Scene.cpp
-	src/L3D/Shader.h
-		src/L3D/Shader/SLProgram.h src/L3D/Shader/Shader.cpp src/L3D/Shader/SLProgram.cpp
-	src/L3D/Texture.h
-		src/L3D/Texture/Texture2D.cpp
-	src/L3D/Transform.h
-		src/L3D/Transform/Transform.cpp src/L3D/Transform/Vector.h
-	src/L3D/Quaternion.h
-		src/L3D/Quaternion/Quaternion.cpp
-	src/L3D/Vertex.h
+	src/L3D/GraphicsEngine.h
+		src/L3D/GraphicsEngine/GraphicsEngine.cpp
+		src/L3D/GraphicsEngine/GraphicsApi.h
+		src/L3D/GraphicsEngine/Apis.h
+			src/L3D/GraphicsEngine/Apis/ApiGL.h
+			src/L3D/GraphicsEngine/Apis/ApiGL/ApiGL.cpp
 )
 
 add_library(Lepus3D ${Lepus3D_SRC})
 
+# LepusEngine sources
 add_library(LepusEngine
 	src/LEngine/Logger.h
 		src/LEngine/Logger/Logger.cpp
@@ -108,20 +92,23 @@ add_library(LepusEngine
 		src/LEngine/Physics/PhysicsRigidbody.h
 		src/LEngine/Physics/PhysicsRigidbody.cpp
 	src/LEngine/Entity.h
-		src/LEngine/Entity/Entity.cpp
 	src/LEngine/World.h
 		src/LEngine/World.cpp
 )
 
-add_dependencies(Lepus3D LepusEngine)
+#add_dependencies(Lepus3D)
+# TODO: Get LepusEngine to build add_dependencies(Lepus3D LepusEngine LepusUtility)
 add_dependencies(LepusDemo Lepus3D)
 
 # Dependency libraries
 ## Lepus3D: OpenGL libraries
 find_library(OpenGL REQUIRED)
-## Lepus3D: GLEW libraries
-find_package(GLEW REQUIRED)
-target_link_libraries(Lepus3D PRIVATE GLEW::GLEW)
+## Lepus3D: GL3W (core profile loading)
+add_library(GL3W
+	3rdparty/gl3w/src/gl3w.c
+)
+include_directories(3rdparty/gl3w/include)
+target_link_libraries(Lepus3D PRIVATE GL3W)
 ## Lepus3D: GLFW libraries
 find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(Lepus3D PRIVATE glfw)
