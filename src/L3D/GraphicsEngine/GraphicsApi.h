@@ -8,10 +8,20 @@ namespace LepusEngine
 {
 	namespace Lepus3D
 	{
+		/// @brief Types of graphics APIs.
+		/// These are passed in GraphicsApiOptions structs to indicate which API should be initialised by the GraphicsEngine.
 		enum GraphicsApiType
 		{
+			/// @brief Do not use outside of unit tests.
+			GraphicsApiTest = -1,
+
+			/// @brief Unspecified graphics API. Results in an exception, or undefined behaviour.
 			GraphicsApiUnknown = 0,
+
+			/// @brief Modern OpenGL implementation.
 			GraphicsApiOpenGL,
+
+			/// @brief Not implemented.
 			GraphicsApiVulkan
 		};
 
@@ -24,11 +34,18 @@ namespace LepusEngine
 			LepusUtility::Types::Viewport mainViewport = {};
 		};
 
+		/// @brief API wrapper to be used by GraphicsEngine.
+		/// The purpose of this class is to obfuscate API-specific calls,
+		/// so that GraphicsEngine code can focus on implementing drawing techniques,
+		/// not a variety of D3D/GL/VK methods.
 		class GraphicsApi
 		{
-		private:
+		protected:
 			GraphicsApiOptions* m_Options;
 		protected:
+			/// @brief Performs internal, boilerplate setup for all API wrappers.
+			/// @tparam TGraphicsApiOptions An options type derived from GraphicsApiOptions for a specific graphics API.
+			/// @param options Pointer to an options object (using the type matching the requested graphics API).
 			template <class TGraphicsApiOptions>
 			void InitInternal(TGraphicsApiOptions* options)
 			{
@@ -37,15 +54,41 @@ namespace LepusEngine
 				memcpy(m_Options, options, optionsSz);
 			}
 
+			/// @brief Obtains the options object this GraphicsApi was initialised with.
+			/// 
+			/// @tparam TGraphicsApiOptions An options type derived from GraphicsApiOptions 
+			/// (typically a GraphicsApiOptions derived class matching the API).
+			/// 
+			/// @return A reference to the internal options object.
+			/// cast to the requested API-specific TGraphicsApiOptions type.
+			template <class TGraphicsApiOptions>
+			TGraphicsApiOptions& GetOptions() 
+			{
+				// The internal options object NEEDS to have been allocated.
+				assert(m_Options != nullptr);
+
+				return *reinterpret_cast<TGraphicsApiOptions*>(m_Options);
+			}
+
 		public:
+			/// @brief Default constructor. Does nothing, so Init(GraphicsApiOptions*) needs to be called manually.
+			GraphicsApi()
+			{
+				m_Options = nullptr;
+			}
+
+			GraphicsApi(GraphicsApiOptions* options)
+			{
+				Init(options);
+			}
+
+			/// @brief Initialises the API with the provided options.
+			/// @param options An options object using a GraphicsApiOptions type for the requested API.
+			/// Make sure you don't pass a pointer to a new object here. Implementations of this class must copy the options,
+			/// not reference a pointer, so there's a potential risk of a memory leak there.
 			virtual void Init(GraphicsApiOptions* options) = 0;
 
 			virtual void Shutdown() = 0;
-
-			virtual ~GraphicsApi()
-			{
-				Shutdown();
-			}
 		};
 	}
 }

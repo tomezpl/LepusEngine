@@ -2,9 +2,7 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
-#include <L3D/RenderEngine.h>
-#include <L3D/Camera/FPPCamera.h>
-#include <L3D/Assets.h>
+#include <L3D/GraphicsEngine.h>
 #include <LEngine/Logger.h>
 #include <LEngine/Physics.h>
 #include <LEngine/Physics/PhysicsRigidbody.h>
@@ -29,7 +27,7 @@ int main()
 	LepusEngine::Logger::Enabled = true;
 
 	// Create new graphics engine instance
-	Lepus3D::RenderEngine engine("LepusDemo", 800, 600);
+	Lepus3D::GraphicsEngine engine("LepusDemo", 800, 600);
 
 	// Test camera.
 	Lepus3D::Camera camera;

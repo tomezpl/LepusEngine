@@ -8,7 +8,7 @@
 ### Be sure to define your system's triplet to ensure correct target architecture (32/64-bit). https://vcpkg.readthedocs.io/en/latest/users/triplets/#additional-remarks
 
 # min. required CMake version
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.14)
 
 set(VCPKG_FEATURE_FLAGS "manifests,registries,versions")
 
@@ -76,6 +76,7 @@ set(Lepus3D_SRC
 	src/L3D/GraphicsEngine.h
 		src/L3D/GraphicsEngine/GraphicsEngine.cpp
 		src/L3D/GraphicsEngine/GraphicsApi.h
+			src/L3D/GraphicsEngine/GraphicsApi/GraphicsApi.cpp
 		src/L3D/GraphicsEngine/Apis.h
 			src/L3D/GraphicsEngine/Apis/ApiGL.h
 			src/L3D/GraphicsEngine/Apis/ApiGL/ApiGL.cpp
@@ -165,3 +166,27 @@ target_link_libraries(LepusDemo PRIVATE DearImgui assimp::assimp Lepus3D LepusEn
 # Copy content (models, GLSL, etc.)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Content)
 add_custom_command(TARGET LepusDemo POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Content" ${CMAKE_BINARY_DIR}/Content)
+
+# Unit testing framework
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG release-1.12.1
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+# Unit test projects for each library
+add_executable(Lepus3D_Tests
+	tests/L3D/GraphicsEngine/GraphicsApiTests.h
+		tests/L3D/GraphicsEngine/GraphicsApiTests.cpp
+)
+
+target_link_libraries(Lepus3D_Tests GTest::gtest_main Lepus3D)
+
+include(GoogleTest)
+gtest_discover_tests(Lepus3D_Tests)

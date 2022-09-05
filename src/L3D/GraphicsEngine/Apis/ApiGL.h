@@ -20,8 +20,8 @@ namespace LepusEngine
 				Init(&options);
 			}
 
-			void Init(GraphicsApiOptions* options);
-			void Shutdown();
+			void Init(GraphicsApiOptions* options) override;
+			void Shutdown() override;
 		};
 	}
 }
