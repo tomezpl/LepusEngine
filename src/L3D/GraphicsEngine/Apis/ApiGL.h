@@ -7,9 +7,10 @@ namespace LepusEngine
 {
 	namespace Lepus3D
 	{
-		struct GraphicsApiGLOptions : GraphicsApiOptions
+		class GraphicsApiGLOptions : public GraphicsApiOptions
 		{
-			GraphicsApiType type = GraphicsApiOpenGL;
+		public:
+			GraphicsApiType GetType() override { return GraphicsApiOpenGL; }
 		};
 
 		class GraphicsApiGL : public GraphicsApi

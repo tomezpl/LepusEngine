@@ -25,10 +25,11 @@ namespace LepusEngine
 			GraphicsApiVulkan
 		};
 
-		struct GraphicsApiOptions
+		class GraphicsApiOptions
 		{
+		public:
 			// Type of API to instantiate.
-			GraphicsApiType type = GraphicsApiType::GraphicsApiUnknown;
+			virtual GraphicsApiType GetType() { return GraphicsApiUnknown; }
 
 			// Main viewport used by the application.
 			LepusUtility::Types::Viewport mainViewport = {};

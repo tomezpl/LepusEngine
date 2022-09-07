@@ -11,7 +11,7 @@ void GraphicsEngine::InitApi(GraphicsApiOptions* options)
 	// Check that an API wasn't initialised before. For now, only one API can be initialised at runtime.
 	assert(m_Api == nullptr);
 
-	switch (options->type)
+	switch (options->GetType())
 	{
 	case GraphicsApiType::GraphicsApiOpenGL:
 		m_Api = new GraphicsApiGL(*reinterpret_cast<GraphicsApiGLOptions*>(options));

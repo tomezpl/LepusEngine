@@ -3,9 +3,10 @@
 
 #include <L3D/GraphicsEngine/GraphicsApi.h>
 
-struct GraphicsApiStubOptions : LepusEngine::Lepus3D::GraphicsApiOptions
+class GraphicsApiStubOptions : public LepusEngine::Lepus3D::GraphicsApiOptions
 {
-	LepusEngine::Lepus3D::GraphicsApiType type = LepusEngine::Lepus3D::GraphicsApiType::GraphicsApiTest;
+public:
+	LepusEngine::Lepus3D::GraphicsApiType GetType() override { return LepusEngine::Lepus3D::GraphicsApiType::GraphicsApiTest; }
 
 	long long testValue = 0;
 };

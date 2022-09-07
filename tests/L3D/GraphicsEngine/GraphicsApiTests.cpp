@@ -28,6 +28,15 @@ std::array<GraphicsApiStubOptions, 3> getTestOptions()
 	return testOptions;
 }
 
+TEST(GraphicsApiOptionsTest, TypeMatchesApi)
+{
+	LepusEngine::Lepus3D::GraphicsApiOptions* options = new GraphicsApiStubOptions();
+
+	ASSERT_EQ(options->GetType(), LepusEngine::Lepus3D::GraphicsApiType::GraphicsApiTest);
+
+	delete options;
+}
+
 // Checks that the GraphicsApi.GetOptions<T> method returns a valid reference,
 // such that modifying its member values results in them persisting when we call GetOptions<T> again.
 TEST_P(GraphicsApiOptionsTest, TestValueIsUpdated)
@@ -48,7 +57,7 @@ INSTANTIATE_TEST_SUITE_P
 	GraphicsApiOptionsTest, 
 	testing::ValuesIn(getTestOptions()), [](const testing::TestParamInfo<GraphicsApiStubOptions>& paramInfo)
 	{
-		std::string name(std::to_string(paramInfo.index) + "_" + "type" + std::to_string((int)paramInfo.param.type) + "_testValue" + std::to_string(paramInfo.param.testValue));
+		std::string name(std::to_string(paramInfo.index) + "_testValue" + std::to_string(paramInfo.param.testValue));
 
 		// Replace minus signs with 'minus'.
 		// Is this horrible code? Yes.
