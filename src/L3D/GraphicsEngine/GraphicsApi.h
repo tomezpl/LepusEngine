@@ -50,6 +50,7 @@ namespace LepusEngine
 			template <class TGraphicsApiOptions>
 			void InitInternal(TGraphicsApiOptions* options)
 			{
+				// TODO: This might be a bad idea actually. If options contain pointers, they will be reused, and ownership conflicts may emerge.
 				const size_t optionsSz = sizeof(TGraphicsApiOptions);
 				m_Options = new TGraphicsApiOptions();
 				memcpy(m_Options, options, optionsSz);

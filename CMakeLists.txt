@@ -97,6 +97,13 @@ add_library(LepusEngine
 		src/LEngine/World.cpp
 )
 
+add_library(LepusSystem
+	src/LSystem/Windowing.h
+		src/LSystem/Windowing/Windowing.cpp
+		src/LSystem/Windowing/GLFW.h
+			src/LSystem/Windowing/GLFW/GLFW.cpp
+)
+
 #add_dependencies(Lepus3D)
 # TODO: Get LepusEngine to build add_dependencies(Lepus3D LepusEngine LepusUtility)
 add_dependencies(LepusDemo Lepus3D)
@@ -160,7 +167,7 @@ endif()
 
 target_link_libraries(Lepus3D ${OPENGL_LIBRARIES})
 target_link_libraries(Lepus3D PRIVATE DearImgui)
-target_link_libraries(Lepus3D PRIVATE LepusEngine)
+target_link_libraries(Lepus3D PRIVATE LepusEngine LepusSystem)
 target_link_libraries(LepusDemo PRIVATE DearImgui assimp::assimp Lepus3D LepusEngine)
 
 # Copy content (models, GLSL, etc.)
