@@ -28,8 +28,7 @@ int main()
 	// Enable logging
 	LepusEngine::Logger::Enabled = true;
 
-	std::shared_ptr<LepusEngine::LepusSystem::WindowingGLFW> windowing = std::make_shared<LepusSystem::WindowingGLFW>();
-	windowing->Init(800, 600);
+	std::shared_ptr<LepusEngine::LepusSystem::WindowingGLFW> windowing = std::make_shared<LepusSystem::WindowingGLFW>(800, 600);
 
 	// Create new graphics engine instance
 	Lepus3D::GraphicsApiGLOptions options = {};
