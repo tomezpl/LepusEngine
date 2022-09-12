@@ -29,6 +29,11 @@ bool WindowingGLFW::Update()
 	return !glfwWindowShouldClose(m_Window);
 }
 
+void WindowingGLFW::SwapBuffers()
+{
+	glfwSwapBuffers(m_Window);
+}
+
 void WindowingGLFW::Shutdown()
 {
 	if (m_Window && !m_WindowDestroyed)

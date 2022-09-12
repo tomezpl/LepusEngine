@@ -24,6 +24,9 @@ namespace LepusEngine
 			void Init(GraphicsApiOptions* options) override;
 
 			void ClearFrameBuffer(float r, float g, float b) override;
+			
+			/// @brief Dummy method as OpenGL itself doesn't need to do anything for the swap chain to work.
+			void SwapBuffers() override {}
 
 			void Shutdown() override;
 		};

@@ -27,6 +27,9 @@ namespace LepusEngine
 			/// 
 			/// @return A raw pointer to the window object/handle, cast to a void pointer to make it platform/API-agnostic.
 			virtual void* GetWindowPtr() = 0;
+
+			/// @brief Performs back/front buffer swap. This usually needs to be called after rendering a frame.
+			virtual void SwapBuffers() = 0;
 		};
 	}
 }

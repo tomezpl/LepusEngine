@@ -91,6 +91,12 @@ namespace LepusEngine
 
 			virtual void ClearFrameBuffer(float r, float g, float b) = 0;
 
+			/// @brief Invokes any API-specific code for back/front buffer swap.
+			/// This is usually a task for the Windowing class; GraphicsApi provides a dummy method
+			/// that can perform the API-specific swap chain operations before the call to Windowing,
+			/// but it does not need to be used or implemented.
+			virtual void SwapBuffers() {};
+
 			virtual void Shutdown() = 0;
 
 			virtual ~GraphicsApi() {};

@@ -51,6 +51,8 @@ namespace LepusEngine
 				assert(!gl3wInit());
 			}
 
+			void SwapBuffers() override;
+
 			bool Update();
 
 			void Shutdown();

@@ -34,4 +34,7 @@ void GraphicsEngine::InitApi(GraphicsApiOptions* options)
 void GraphicsEngine::Render(float r, float g, float b)
 {
 	m_Api->ClearFrameBuffer(r, g, b);
+
+	m_Api->SwapBuffers();
+	m_Windowing->SwapBuffers();
 }

@@ -62,6 +62,12 @@ m_OutputInfo = {}; \
 				RGBA32 = 256
 			};
 
+			/// @brief Renders the scene and performs buffer swap to display the results in the window.
+			/// @tparam T Numerical type used for the solid clear colour.
+			/// @tparam bits Number of allowed integer values for a single colour channel in a pixel format, e.g. 256 for RGBA32
+			/// @param r Solid clear colour value (red)
+			/// @param g Solid clear colour value (green)
+			/// @param b Solid clear colour value (blue)
 			template<typename T, PixelFormat bits>
 			void Render(T r, T g, T b)
 			{
@@ -69,6 +75,10 @@ m_OutputInfo = {}; \
 				Render((float)r / max, (float)g / max, (float)b / max);
 			}
 
+			/// @brief Renders the scene and performs buffer swap to display the results in the window.
+			/// @param r Solid clear colour value (red, range [0, 1])
+			/// @param g Solid clear colour value (green, range [0, 1])
+			/// @param b Solid clear colour value (blue, range [0, 1])
 			void Render(float r, float g, float b);
 		};
 	}

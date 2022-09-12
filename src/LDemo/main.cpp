@@ -35,9 +35,6 @@ int main()
 	options.mainViewport = { 800, 600 };
 	Lepus3D::GraphicsEngine engine(&options, windowing);
 
-	// Test camera.
-	//Lepus3D::Camera camera;
-
 	// Termination condition for main loop
 	bool isRunning = true;
 	
@@ -46,18 +43,15 @@ int main()
 
 	// Output start message to console
 	LepusEngine::Logger::LogInfo("", "main", "Demo starting!");
+
 	while (isRunning)
 	{
 		windowing->Update(); // Update window before drawing
 		engine.Render<unsigned char, Lepus3D::GraphicsEngine::PixelFormat::RGBA32>(100, 149, 237);
 
-		glfwSwapBuffers((GLFWwindow*)windowing->GetWindowPtr());
-
-		//engine.StartScene(&camera);
-		//engine.EndScene();
-
 		isRunning = windowing->Update();
 	}
+
 	// Output shutdown message to console
 	LepusEngine::Logger::LogInfo("", "main", "Demo shutting down!");
 
