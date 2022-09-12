@@ -40,12 +40,18 @@ int main()
 
 	// Termination condition for main loop
 	bool isRunning = true;
+	
+	// Set the window as the current OpenGL context.
+	windowing->SetAsCurrentContext();
 
 	// Output start message to console
 	LepusEngine::Logger::LogInfo("", "main", "Demo starting!");
 	while (isRunning)
 	{
 		windowing->Update(); // Update window before drawing
+		engine.Render<unsigned char, Lepus3D::GraphicsEngine::PixelFormat::RGBA32>(100, 149, 237);
+
+		glfwSwapBuffers((GLFWwindow*)windowing->GetWindowPtr());
 
 		//engine.StartScene(&camera);
 		//engine.EndScene();
@@ -55,7 +61,6 @@ int main()
 	// Output shutdown message to console
 	LepusEngine::Logger::LogInfo("", "main", "Demo shutting down!");
 
-	//engine.Shutdown();
 	windowing->Shutdown();
 
 	glfwTerminate();

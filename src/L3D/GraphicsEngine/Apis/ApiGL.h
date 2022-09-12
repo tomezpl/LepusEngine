@@ -22,6 +22,9 @@ namespace LepusEngine
 			}
 
 			void Init(GraphicsApiOptions* options) override;
+
+			void ClearFrameBuffer(float r, float g, float b) override;
+
 			void Shutdown() override;
 		};
 	}

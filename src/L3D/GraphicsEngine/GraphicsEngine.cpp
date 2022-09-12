@@ -30,3 +30,8 @@ void GraphicsEngine::InitApi(GraphicsApiOptions* options)
 		break;
 	}
 }
+
+void GraphicsEngine::RenderInternal(float r = 0.f, float g = 0.f, float b = 0.f)
+{
+	m_Api->ClearFrameBuffer(r, g, b);
+}

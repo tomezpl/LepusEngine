@@ -24,6 +24,8 @@ namespace LepusEngine
 				LepusUtility::Types::String windowName;
 				LepusUtility::Types::Viewport viewport;
 			} m_OutputInfo;
+
+			void RenderInternal(float r, float g, float b);
 		public:
 #define INIT_DEFAULT() \
 m_Api = nullptr; \
@@ -57,7 +59,17 @@ m_OutputInfo = {}; \
 
 #undef INIT_DEFAULT()
 
-			void Render();
+			enum PixelFormat
+			{
+				RGBA32 = 256
+			};
+
+			template<typename T, PixelFormat bits>
+			void Render(T r = 0, T g = 0, T b = 0)
+			{
+				const float max = bits - 1.f;
+				RenderInternal((float)r / max, (float)g / max, (float)b / max);
+			}
 		};
 	}
 }

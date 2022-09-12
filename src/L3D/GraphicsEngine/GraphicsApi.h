@@ -89,6 +89,8 @@ namespace LepusEngine
 			/// not reference a pointer, so there's a potential risk of a memory leak there.
 			virtual void Init(GraphicsApiOptions* options) = 0;
 
+			virtual void ClearFrameBuffer(float r, float g, float b) = 0;
+
 			virtual void Shutdown() = 0;
 
 			virtual ~GraphicsApi() {};
