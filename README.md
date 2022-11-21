@@ -1,5 +1,7 @@
 # LepusEngine
 ## OpenGL-based game engine
+![image](https://user-images.githubusercontent.com/4386963/203175017-1d7aa7d7-2614-49a1-82fb-0fbceff5353c.png)
+
 ### About
 LepusEngine is a game engine developed in C++ and modern OpenGL (versions >= 3.3).
 
