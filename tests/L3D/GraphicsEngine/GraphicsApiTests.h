@@ -44,6 +44,11 @@ public:
 		}
 	}
 
+	void ClearFrameBuffer(float r, float g, float b) override
+	{
+		// Do nothing.
+	}
+
 	L3D_GRAPHICSAPI_IMPL(GraphicsApiStub);
 };
 
