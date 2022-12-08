@@ -1,5 +1,5 @@
 #include "PhysicsRigidbody.h"
-#include <LEngine/Logger.h>
+#include <LEngine/ConsoleLogger.h>
 //#include <L3D/Vertex.h>
 //#include <L3D/Transform.h>
 #include <algorithm>

@@ -6,7 +6,7 @@
 #include <L3D/GraphicsEngine/Apis/ApiGL.h>
 #include <L3D/GraphicsEngine.h>
 
-#include <LEngine/Logger.h>
+#include <LEngine/ConsoleLogger.h>
 #include <LEngine/Physics.h>
 #include <LEngine/Physics/PhysicsRigidbody.h>
 
@@ -26,7 +26,7 @@ using namespace LepusEngine;
 int main()
 {
 	// Enable logging
-	LepusEngine::Logger::Enabled = true;
+	LepusEngine::ConsoleLogger::Enabled = true;
 
 	std::shared_ptr<LepusEngine::LepusSystem::WindowingGLFW> windowing = std::make_shared<LepusSystem::WindowingGLFW>(800, 600);
 
@@ -42,7 +42,7 @@ int main()
 	windowing->SetAsCurrentContext();
 
 	// Output start message to console
-	LepusEngine::Logger::LogInfo("", "main", "Demo starting!");
+	LepusEngine::ConsoleLogger::LogInfo("", "main", "Demo starting!");
 
 	while (isRunning)
 	{
@@ -53,7 +53,7 @@ int main()
 	}
 
 	// Output shutdown message to console
-	LepusEngine::Logger::LogInfo("", "main", "Demo shutting down!");
+	LepusEngine::ConsoleLogger::LogInfo("", "main", "Demo shutting down!");
 
 	windowing->Shutdown();
 

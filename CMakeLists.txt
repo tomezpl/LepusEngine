@@ -86,8 +86,9 @@ add_library(Lepus3D ${Lepus3D_SRC})
 
 # LepusEngine sources
 add_library(LepusEngine
-	src/LEngine/Logger.h
-		src/LEngine/Logger/Logger.cpp
+	src/LEngine/ILogger.h
+	src/LEngine/ConsoleLogger.h
+		src/LEngine/Logger/ConsoleLogger.cpp
 	src/LEngine/Physics.h
 		src/LEngine/Physics/Physics.cpp
 		src/LEngine/Physics/PhysicsRigidbody.h
