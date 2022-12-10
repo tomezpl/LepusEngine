@@ -57,6 +57,12 @@ namespace LepusEngine
 
 			void Shutdown();
 
+			/// @brief Calls GLFW functions to destroy contexts and release any resources used by the library.
+			static inline void Terminate()
+			{
+				glfwTerminate();
+			}
+
 			~WindowingGLFW()
 			{
 				Shutdown();

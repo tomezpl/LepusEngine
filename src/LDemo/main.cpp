@@ -61,7 +61,7 @@ int main()
 
 	windowing->Shutdown();
 
-	glfwTerminate();
+	LepusEngine::LepusSystem::WindowingGLFW::Terminate();
 
 	return 0;
 }
