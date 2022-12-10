@@ -28,10 +28,11 @@ namespace LepusEngine
 		class GraphicsApiOptions
 		{
 		public:
-			// Type of API to instantiate.
+			/// @brief Indicates what API type this options object is used for.
+			/// @return The GraphicsApiType enum value for this GraphicsApiOptions.
 			virtual GraphicsApiType GetType() { return GraphicsApiUnknown; }
 
-			// Main viewport used by the application.
+			/// @brief Main viewport used by the application.
 			LepusUtility::Types::Viewport mainViewport = {};
 		};
 
@@ -98,7 +99,7 @@ namespace LepusEngine
 			virtual void SwapBuffers() {};
 
 			virtual void Shutdown() = 0;
-
+			
 			virtual ~GraphicsApi() {};
 
 #define L3D_GRAPHICSAPI_IMPL(GraphicsApiDerivedClassName) \
