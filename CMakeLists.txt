@@ -8,7 +8,8 @@
 ### Be sure to define your system's triplet to ensure correct target architecture (32/64-bit). https://vcpkg.readthedocs.io/en/latest/users/triplets/#additional-remarks
 
 # min. required CMake version
-cmake_minimum_required (VERSION 3.14)
+cmake_minimum_required (VERSION 3.26)
+include(FindOpenGL)
 
 set(VCPKG_FEATURE_FLAGS "manifests,registries,versions")
 
@@ -110,18 +111,13 @@ add_library(LepusSystem
 add_dependencies(LepusDemo Lepus3D)
 
 # Dependency libraries
-## Lepus3D: OpenGL libraries
-find_library(OpenGL REQUIRED)
 ## Lepus3D: GL3W (core profile loading)
 add_library(GL3W
 	3rdparty/gl3w/src/gl3w.c
 )
 include_directories(3rdparty/gl3w/include)
-target_link_libraries(Lepus3D PRIVATE GL3W)
 ## Lepus3D: GLFW libraries
 find_package(glfw3 CONFIG REQUIRED)
-target_link_libraries(Lepus3D PRIVATE glfw)
-
 
 # Assimp
 find_package(assimp CONFIG REQUIRED)
@@ -160,15 +156,7 @@ file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/Debug)
 # Set working directory for debugger
 set_property(TARGET LepusDemo PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}/Debug")
 
-if(${CMAKE_HOST_WIN32})
-	target_link_libraries(Lepus3D PRIVATE opengl32.lib)
-else()
-	find_library(OpenGL REQUIRED)
-endif()
-
-target_link_libraries(Lepus3D ${OPENGL_LIBRARIES})
-target_link_libraries(Lepus3D PRIVATE DearImgui)
-target_link_libraries(Lepus3D PRIVATE LepusEngine LepusSystem)
+target_link_libraries(Lepus3D PRIVATE GL3W glfw ${OPENGL_gl_LIBRARY} DearImgui LepusEngine LepusSystem)
 target_link_libraries(LepusDemo PRIVATE DearImgui assimp::assimp Lepus3D LepusEngine)
 
 # Copy content (models, GLSL, etc.)
