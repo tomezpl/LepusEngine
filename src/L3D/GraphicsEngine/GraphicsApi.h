@@ -3,6 +3,7 @@
 
 #include <LUtility/Types/Viewport.h>
 #include <memory>
+#include <cassert>
 
 namespace LepusEngine
 {
@@ -42,6 +43,8 @@ namespace LepusEngine
 		/// not a variety of D3D/GL/VK methods.
 		class GraphicsApi
 		{
+		private:
+			bool m_ShutdownCalled;
 		protected:
 			GraphicsApiOptions* m_Options;
 		protected:
@@ -77,11 +80,13 @@ namespace LepusEngine
 			GraphicsApi()
 			{
 				m_Options = nullptr;
+				m_ShutdownCalled = false;
 			}
 
 			GraphicsApi(GraphicsApiOptions* options)
 			{
 				Init(options);
+				m_ShutdownCalled = false;
 			}
 
 			/// @brief Initialises the API with the provided options.
@@ -96,15 +101,18 @@ namespace LepusEngine
 			/// This is usually a task for the Windowing class; GraphicsApi provides a dummy method
 			/// that can perform the API-specific swap chain operations before the call to Windowing,
 			/// but it does not need to be used or implemented.
-			virtual void SwapBuffers() {};
+			virtual void SwapBuffers() {}
 
-			virtual void Shutdown() = 0;
+			virtual void Shutdown() 
+			{
+				m_ShutdownCalled = true;
+			}
 			
-			virtual ~GraphicsApi() {};
-
-#define L3D_GRAPHICSAPI_IMPL(GraphicsApiDerivedClassName) \
-/* Implements some boilerplate class members, such as a destructor calling Shutdown().*/ \
-~GraphicsApiDerivedClassName() override { Shutdown(); }
+			~GraphicsApi() 
+			{ 
+				assert(m_ShutdownCalled == true);
+				Shutdown(); 
+			}
 		};
 	}
 }
