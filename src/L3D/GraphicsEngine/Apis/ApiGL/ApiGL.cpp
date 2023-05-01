@@ -16,5 +16,5 @@ void GraphicsApiGL::ClearFrameBuffer(float r, float g, float b)
 
 void GraphicsApiGL::Shutdown()
 {
-
+	GraphicsApi::Shutdown();
 }
