@@ -29,6 +29,7 @@ namespace LepusEngine
 			WindowingGLFW()
 			{
 				m_WindowDestroyed = false;
+				m_Window = nullptr;
 			}
 
 			WindowingGLFW(unsigned short windowWidth, unsigned short windowHeight)
