@@ -2,21 +2,20 @@
 #define LTESTS_L3D_GRAPHICSENGINE_GRAPHICSAPI
 
 #include <L3D/GraphicsEngine/GraphicsApi.h>
-
-class GraphicsApiStubOptions : public LepusEngine::Lepus3D::GraphicsApiOptions
-{
-public:
-	LepusEngine::Lepus3D::GraphicsApiType GetType() override { return LepusEngine::Lepus3D::GraphicsApiType::GraphicsApiTest; }
-
-	long long testValue = 0;
-};
+#include "GraphicsApiOptionsTests.h"
 
 class GraphicsApiStub : public LepusEngine::Lepus3D::GraphicsApi
 {
+private:
+	/// @brief Pointer to a bool that will be set to true upon Shutdown being called.
+	bool* m_ShutdownReceiver = nullptr;
+
 public:
-	GraphicsApiStub(GraphicsApiStubOptions* options)
+	GraphicsApiStub(GraphicsApiStubOptions* options, bool* shutdownReceiver = nullptr)
 	{
 		Init(options);
+
+		m_ShutdownReceiver = shutdownReceiver;
 	}
 
 	void Init(LepusEngine::Lepus3D::GraphicsApiOptions* options) override
@@ -36,8 +35,15 @@ public:
 
 	void Shutdown() override
 	{
+		GraphicsApi::Shutdown();
+
 		if (m_Options)
 		{
+			if (m_ShutdownReceiver)
+			{
+				*m_ShutdownReceiver = true;
+			}
+
 			// TODO: is this cast needed?
 			delete reinterpret_cast<GraphicsApiStubOptions*>(m_Options);
 			m_Options = nullptr;
@@ -48,8 +54,6 @@ public:
 	{
 		// Do nothing.
 	}
-
-	L3D_GRAPHICSAPI_IMPL(GraphicsApiStub);
 };
 
 #endif

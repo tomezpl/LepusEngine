@@ -180,6 +180,8 @@ enable_testing()
 add_executable(Lepus3D_Tests
 	tests/L3D/GraphicsEngine/GraphicsApiTests.h
 		tests/L3D/GraphicsEngine/GraphicsApiTests.cpp
+	tests/L3D/GraphicsEngine/GraphicsApiOptionsTests.h
+		tests/L3D/GraphicsEngine/GraphicsApiOptionsTests.cpp
 )
 
 target_link_libraries(Lepus3D_Tests GTest::gtest_main Lepus3D)
