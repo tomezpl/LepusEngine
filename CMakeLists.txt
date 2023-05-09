@@ -65,8 +65,9 @@ include_directories(${CMAKE_SOURCE_DIR}/3rdparty/imgui)
 add_executable(LepusDemo src/LDemo/main.cpp)
 
 # LepusUtility
-file(GLOB_RECURSE LEPUSUTILITY_HEADERS ${CMAKE_SOURCE_DIR}/src/LUtility/*.h)
+file(GLOB_RECURSE LEPUSUTILITY_HEADERS ${CMAKE_SOURCE_DIR}/src/LUtility/*.h ${CMAKE_SOURCE_DIR}/src/LUtility/**/*.h)
 add_custom_target(LepusUtility SOURCES ${LEPUSUTILITY_HEADERS})
+source_group(TREE ${CMAKE_SOURCE_DIR}/src/LUtility FILES ${LEPUSUTILITY_HEADERS})
 
 # Lepus3D shaders
 file(GLOB LEPUS3D_SHADERS_SRC ${CMAKE_SOURCE_DIR}/Content/GLSL/*.frag ${CMAKE_SOURCE_DIR}/Content/GLSL/*.vert)
@@ -80,29 +81,14 @@ add_library(Lepus3D ${Lepus3D_SRC})
 source_group(TREE ${CMAKE_SOURCE_DIR}/src/L3D FILES ${Lepus3D_SRC})
 
 # LepusEngine sources
-add_library(LepusEngine
-	src/LEngine/ISingleton.h
-	src/LEngine/ILogger.h
-	src/LEngine/ConsoleLogger.h
-		src/LEngine/Logger/ConsoleLogger.cpp
-	src/LEngine/Physics.h
-		src/LEngine/Physics/Physics.cpp
-		src/LEngine/Physics/PhysicsRigidbody.h
-		src/LEngine/Physics/PhysicsRigidbody.cpp
-	src/LEngine/Entity.h
-	src/LEngine/World.h
-		src/LEngine/World.cpp
-)
+file(GLOB_RECURSE LepusEngine_SRC src/LEngine/*.h src/LEngine/*.cpp src/LEngine/**/*.h src/LEngine/**/*.cpp)
+add_library(LepusEngine ${LepusEngine_SRC})
+source_group(TREE ${CMAKE_SOURCE_DIR}/src/LEngine FILES ${LepusEngine_SRC})
 
-add_library(LepusSystem
-	src/LSystem/Windowing.h
-		src/LSystem/Windowing/Windowing.cpp
-		src/LSystem/Windowing/GLFW.h
-			src/LSystem/Windowing/GLFW/GLFW.cpp
-	src/LSystem/IO.h
-		src/LSystem/IO/FileSystem.h
-			src/LSystem/IO/FileSystem/FileSystem.cpp
-)
+# LepusSystem sources
+file(GLOB_RECURSE LepusSystem_SRC src/LSystem/*.h src/LSystem/*.cpp src/LSystem/**/*.h src/LSystem/**/*.cpp)
+add_library(LepusSystem ${LepusSystem_SRC})
+source_group(TREE ${CMAKE_SOURCE_DIR}/src/LSystem FILES ${LepusSystem_SRC})
 
 # Unit test example files
 file(GLOB_RECURSE LEPUS_TESTS_CONTENT_SRC ${CMAKE_SOURCE_DIR}/tests/Content/*.* ${CMAKE_SOURCE_DIR}/tests/Content/**.*)
