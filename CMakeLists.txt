@@ -73,20 +73,15 @@ file(GLOB LEPUS3D_SHADERS_SRC ${CMAKE_SOURCE_DIR}/Content/GLSL/*.frag ${CMAKE_SO
 add_custom_target(Lepus3D_Shaders SOURCES ${LEPUS3D_SHADERS_SRC})
 
 # Lepus3D sources
-set(Lepus3D_SRC
-	src/L3D/GraphicsEngine.h
-		src/L3D/GraphicsEngine/GraphicsEngine.cpp
-		src/L3D/GraphicsEngine/GraphicsApi.h
-			src/L3D/GraphicsEngine/GraphicsApi/GraphicsApi.cpp
-		src/L3D/GraphicsEngine/Apis.h
-			src/L3D/GraphicsEngine/Apis/ApiGL.h
-			src/L3D/GraphicsEngine/Apis/ApiGL/ApiGL.cpp
-)
+file(GLOB_RECURSE Lepus3D_SRC src/L3D/*.h src/L3D/*.cpp src/L3D/**/*.h src/L3D/**/*.cpp)
+list(FILTER Lepus3D_SRC EXCLUDE REGEX ".*(3rdparty)+.*")
 
 add_library(Lepus3D ${Lepus3D_SRC})
+source_group(TREE ${CMAKE_SOURCE_DIR}/src/L3D FILES ${Lepus3D_SRC})
 
 # LepusEngine sources
 add_library(LepusEngine
+	src/LEngine/ISingleton.h
 	src/LEngine/ILogger.h
 	src/LEngine/ConsoleLogger.h
 		src/LEngine/Logger/ConsoleLogger.cpp
@@ -104,7 +99,14 @@ add_library(LepusSystem
 		src/LSystem/Windowing/Windowing.cpp
 		src/LSystem/Windowing/GLFW.h
 			src/LSystem/Windowing/GLFW/GLFW.cpp
+	src/LSystem/IO.h
+		src/LSystem/IO/FileSystem.h
+			src/LSystem/IO/FileSystem/FileSystem.cpp
 )
+
+# Unit test example files
+file(GLOB_RECURSE LEPUS_TESTS_CONTENT_SRC ${CMAKE_SOURCE_DIR}/tests/Content/*.* ${CMAKE_SOURCE_DIR}/tests/Content/**.*)
+add_custom_target(Lepus_Tests_Content SOURCES ${LEPUS_TESTS_CONTENT_SRC})
 
 #add_dependencies(Lepus3D)
 # TODO: Get LepusEngine to build add_dependencies(Lepus3D LepusEngine LepusUtility)
@@ -184,7 +186,16 @@ add_executable(Lepus3D_Tests
 		tests/L3D/GraphicsEngine/GraphicsApiOptionsTests.cpp
 )
 
+add_executable(LepusSystem_Tests
+	tests/LSystem/IO/FileSystemTests.h
+		tests/LSystem/IO/FileSystemTests.cpp
+)
+
+add_custom_command(TARGET LepusSystem_Tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/tests/Content" ${CMAKE_BINARY_DIR}/tests/Content)
+
 target_link_libraries(Lepus3D_Tests GTest::gtest_main Lepus3D)
+target_link_libraries(LepusSystem_Tests GTest::gtest_main LepusSystem)
 
 include(GoogleTest)
 gtest_discover_tests(Lepus3D_Tests)
+gtest_discover_tests(LepusSystem_Tests)

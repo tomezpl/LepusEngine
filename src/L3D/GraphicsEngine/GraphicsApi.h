@@ -59,22 +59,6 @@ namespace LepusEngine
 				m_Options = new TGraphicsApiOptions();
 				memcpy(m_Options, options, optionsSz);
 			}
-
-			/// @brief Obtains the options object this GraphicsApi was initialised with.
-			/// 
-			/// @tparam TGraphicsApiOptions An options type derived from GraphicsApiOptions 
-			/// (typically a GraphicsApiOptions derived class matching the API).
-			/// 
-			/// @return A reference to the internal options object.
-			/// cast to the requested API-specific TGraphicsApiOptions type.
-			template <class TGraphicsApiOptions>
-			TGraphicsApiOptions& GetOptions() 
-			{
-				// The internal options object NEEDS to have been allocated.
-				assert(m_Options != nullptr);
-
-				return *reinterpret_cast<TGraphicsApiOptions*>(m_Options);
-			}
 		public:
 			/// @brief Default constructor. Does nothing, so Init(GraphicsApiOptions*) needs to be called manually.
 			GraphicsApi()
@@ -94,6 +78,26 @@ namespace LepusEngine
 			/// Make sure you don't pass a pointer to a new object here. Implementations of this class must copy the options,
 			/// not reference a pointer, so there's a potential risk of a memory leak there.
 			virtual void Init(GraphicsApiOptions* options) = 0;
+
+			/// @brief Obtains the options object this GraphicsApi was initialised with.
+			/// 
+			/// @tparam TGraphicsApiOptions An options type derived from GraphicsApiOptions 
+			/// (typically a GraphicsApiOptions derived class matching the API).
+			/// 
+			/// @return A reference to the internal options object.
+			/// cast to the requested API-specific TGraphicsApiOptions type.
+			template <class TGraphicsApiOptions>
+			TGraphicsApiOptions& GetOptions()
+			{
+				// The internal options object NEEDS to have been allocated.
+				assert(m_Options != nullptr);
+
+				return *reinterpret_cast<TGraphicsApiOptions*>(m_Options);
+			}
+
+			virtual void CreatePipeline() = 0;
+
+			virtual void Draw() = 0;
 
 			virtual void ClearFrameBuffer(float r, float g, float b) = 0;
 

@@ -23,6 +23,16 @@ public:
 		InitInternal<GraphicsApiStubOptions>(reinterpret_cast<GraphicsApiStubOptions*>(options));
 	}
 
+	void CreatePipeline() override
+	{
+
+	}
+
+	void Draw() override
+	{
+
+	}
+
 	void setOptionsTestValue(long long testValue)
 	{
 		GetOptions<GraphicsApiStubOptions>().testValue = testValue;

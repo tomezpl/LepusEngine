@@ -62,6 +62,14 @@ m_OutputInfo = {}; \
 				RGBA32 = 256
 			};
 
+			template <class TGraphicsApi>
+			inline TGraphicsApi& GetApi()
+			{
+				return *((TGraphicsApi*)m_Api);
+			}
+
+			void Setup();
+
 			/// @brief Renders the scene and performs buffer swap to display the results in the window.
 			/// @tparam T Numerical type used for the solid clear colour.
 			/// @tparam bits Number of allowed integer values for a single colour channel in a pixel format, e.g. 256 for RGBA32

@@ -9,10 +9,13 @@
 #include <LSystem/Windowing/GLFW.h>
 #include <L3D/GraphicsEngine/Apis/ApiGL.h>
 #include <L3D/GraphicsEngine.h>
+#include <L3D/GraphicsEngine/ShaderCompilers/ShaderCompilerGLSL.h>
 
 #include <LEngine/ConsoleLogger.h>
 #include <LEngine/Physics.h>
 #include <LEngine/Physics/PhysicsRigidbody.h>
+
+#include <LSystem/IO.h>
 
 #include <assimp/cimport.h>
 #include <assimp/material.h>
@@ -47,6 +50,18 @@ int main()
 
 	// Output start message to console
 	LepusEngine::ConsoleLogger::LogInfo("", "main", "Demo starting!");
+
+	// Load & compile shaders.
+	std::string vertShaderSrc = LepusSystem::FileSystem::Read("../../Content/GLSL/Unlit.vert"), fragShaderSrc = LepusSystem::FileSystem::Read("../../Content/GLSL/Unlit.frag");
+	Lepus3D::ShaderCompiledResult
+		vertShader = Lepus3D::ShaderCompilerGLSL::Singleton().CompileShader(vertShaderSrc.c_str(), vertShaderSrc.length(), Lepus3D::VertexShader),
+		fragShader = Lepus3D::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc.c_str(), fragShaderSrc.length(), Lepus3D::FragmentShader);
+	
+	// Register shader with the API.
+	engine.GetApi<Lepus3D::GraphicsApiGL>().GetOptions<Lepus3D::GraphicsApiGLOptions>().RegisterShader(&vertShader, &fragShader);
+
+	// Set up engine for drawing.
+	engine.Setup();
 
 	while (isRunning)
 	{
