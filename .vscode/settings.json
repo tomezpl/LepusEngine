@@ -1,0 +1,6 @@
+{
+    "cmake.preferredGenerators": [
+        "Visual Studio"
+    ],
+    "cmake.configureOnOpen": false
+}
