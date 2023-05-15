@@ -21,7 +21,7 @@ void GraphicsApiGL::SetupBuffers()
 
 	// Create a global VBO and upload triangle data to it.
 	glCreateBuffers(1, &m_Pipeline.vbo);
-	const GLfloat vertices[] = {-0.5f, -0.5f, 0.f, 0.5f, -0.5f, 0.f, 0.f, 0.5f, 1.f, 0.f};
+	const GLfloat vertices[] = { -0.5f, -0.5f, 0.f, 0.5f, -0.5f, 0.f, 0.f, 0.5f, 0.f };
 	glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, 0);
