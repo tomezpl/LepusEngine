@@ -2,13 +2,14 @@
 #include <array>
 #include <string>
 #include "FileSystemTests.h"
+#include <cstdlib>
 
 class FileSystemTests : public testing::Test
 {};
 
 TEST(FileSystemTests, TextFileIsReadCorrectly)
 {
-	std::string contents = LepusEngine::LepusSystem::FileSystem::Read("../../tests/Content/SampleFile.txt");
+	std::string contents = LepusEngine::LepusSystem::FileSystem::Read("./tests/Content/SampleFile.txt");
 
 	ASSERT_STREQ(contents.c_str(), "hello world");
 }
