@@ -7,7 +7,7 @@ namespace LepusEngine
 {
 	namespace LepusSystem
 	{
-		static class FileSystem
+		class FileSystem
 		{
 		public:
 			static std::string Read(const char* path);
