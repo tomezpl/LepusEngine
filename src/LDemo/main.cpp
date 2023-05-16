@@ -27,7 +27,7 @@
 using namespace LepusEngine;
 
 #ifndef _DEBUG
-	#define NDEBUG
+#define NDEBUG
 #endif
 
 int main()
@@ -44,7 +44,7 @@ int main()
 
 	// Termination condition for main loop
 	bool isRunning = true;
-	
+
 	// Set the window as the current OpenGL context.
 	windowing->SetAsCurrentContext();
 
@@ -52,11 +52,11 @@ int main()
 	LepusEngine::ConsoleLogger::LogInfo("", "main", "Demo starting!");
 
 	// Load & compile shaders.
-	std::string vertShaderSrc = LepusSystem::FileSystem::Read("../../Content/GLSL/Unlit.vert"), fragShaderSrc = LepusSystem::FileSystem::Read("../../Content/GLSL/Unlit.frag");
+	std::string vertShaderSrc = LepusSystem::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.vert"), fragShaderSrc = LepusSystem::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.frag");
 	Lepus3D::ShaderCompiledResult
 		vertShader = Lepus3D::ShaderCompilerGLSL::Singleton().CompileShader(vertShaderSrc.c_str(), vertShaderSrc.length(), Lepus3D::VertexShader),
 		fragShader = Lepus3D::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc.c_str(), fragShaderSrc.length(), Lepus3D::FragmentShader);
-	
+
 	// Register shader with the API.
 	engine.GetApi<Lepus3D::GraphicsApiGL>().GetOptions<Lepus3D::GraphicsApiGLOptions>().RegisterShader(&vertShader, &fragShader);
 
