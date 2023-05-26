@@ -4,6 +4,7 @@
 #include "../GraphicsApi.h"
 #include "../ShaderCompilers/ShaderCompilerGLSL.h"
 #include "../../GraphicsEngine.h"
+#include <LUtility/Primitives.h>
 
 typedef unsigned int GLuint;
 
@@ -13,13 +14,13 @@ namespace LepusEngine
 	{
 		class GraphicsApiGLOptions : public GraphicsApiOptions
 		{
-		public:
+			public:
 			static const size_t ProgramCount = 8;
-		private:
+			private:
 			GLuint m_FragmentShaders[ProgramCount];
 			GLuint m_VertexShaders[ProgramCount];
 			size_t m_ShaderCount = 0;
-		public:
+			public:
 			GraphicsApiType GetType() override { return GraphicsApiOpenGL; }
 
 			GraphicsApiGLOptions() : GraphicsApiOptions()
@@ -40,7 +41,7 @@ namespace LepusEngine
 				{
 					m_VertexShaders[m_ShaderCount] = vertexShader->GetShaderHandle<GLuint>();
 				}
-				
+
 				if (fragShader)
 				{
 					m_FragmentShaders[m_ShaderCount] = fragShader->GetShaderHandle<GLuint>();
@@ -60,12 +61,12 @@ namespace LepusEngine
 		class GraphicsApiGL : public GraphicsApi
 		{
 			friend class GraphicsApiGLOptions;
-		private:
+			private:
 			struct
 			{
 				/// @brief Handle to the vertex array objects.
 				GLuint vao;
-				
+
 				/// @brief Handle to the global VBO.
 				GLuint vbo;
 
@@ -74,11 +75,13 @@ namespace LepusEngine
 			} m_Pipeline;
 
 			GLuint m_Programs[GraphicsApiGLOptions::ProgramCount];
-		private:
+
+			LepusUtility::Primitive m_CubeGeometry = LepusUtility::Primitives::Cube();
+			private:
 			void SetupVertexArrays();
 			void SetupBuffers();
 			void SetupShaders();
-		public:
+			public:
 			GraphicsApiGL(GraphicsApiGLOptions options)
 			{
 				Init(&options);
@@ -91,7 +94,7 @@ namespace LepusEngine
 			void Draw() override;
 
 			void ClearFrameBuffer(float r, float g, float b) override;
-			
+
 			/// @brief Dummy method as OpenGL itself doesn't need to do anything for the swap chain to work.
 			void SwapBuffers() override {}
 
