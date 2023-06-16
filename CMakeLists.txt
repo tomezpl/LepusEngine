@@ -177,11 +177,18 @@ add_executable(LepusSystem_Tests
 		tests/LSystem/IO/FileSystemTests.cpp
 )
 
+add_executable(LepusUtility_Tests
+	tests/LUtility/MathTests/MatrixTests.cpp
+	tests/LUtility/MathTests/VectorTests.cpp
+)
+
 add_custom_command(TARGET LepusSystem_Tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/tests/Content" ${CMAKE_BINARY_DIR}/tests/Content)
 
 target_link_libraries(Lepus3D_Tests GTest::gtest_main Lepus3D)
 target_link_libraries(LepusSystem_Tests GTest::gtest_main LepusSystem)
+target_link_libraries(LepusUtility_Tests GTest::gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(Lepus3D_Tests)
 gtest_discover_tests(LepusSystem_Tests)
+gtest_discover_tests(LepusUtility_Tests)
