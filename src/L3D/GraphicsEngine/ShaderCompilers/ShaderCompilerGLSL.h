@@ -4,12 +4,20 @@
 #include "../ShaderCompiler.h"
 #include <GL/gl3w.h>
 #include <cassert>
+#include <climits>
+
+
+#ifndef MAXINT
+#define MAXINT ULLONG_MAX
+#endif
 
 namespace LepusEngine
 {
 	namespace Lepus3D
 	{
-		class ShaderCompilerGLSL : public ShaderCompiler
+		typedef ShaderCompiledResult<GLuint> GLShaderCompiledResult;
+
+		class ShaderCompilerGLSL : public ShaderCompiler<GLuint>
 		{
 		private:
 			static ShaderCompilerGLSL* m_Instance;
@@ -17,7 +25,7 @@ namespace LepusEngine
 			// Inherited via ShaderCompiler
 			virtual void Init() override {}
 
-			inline ShaderCompiledResult CompileShader(const char* shaderSource, size_t shaderSrcLength, ShaderType type) override
+			inline GLShaderCompiledResult CompileShader(const char* shaderSource, size_t shaderSrcLength, ShaderType type) override
 			{
 				assert(shaderSrcLength <= MAXINT);
 
@@ -37,7 +45,7 @@ namespace LepusEngine
 				}
 
 				GLuint shaderHandle = glCreateShader(shaderType);
-				glShaderSource(shaderHandle, 1, &((const char*)shaderSource), (const GLint*)(&shaderSrcLength));
+				glShaderSource(shaderHandle, 1, ((const char**)&shaderSource), (const GLint*)(&shaderSrcLength));
 				glCompileShader(shaderHandle);
 				ShaderCompiledResult compiled(shaderHandle);
 

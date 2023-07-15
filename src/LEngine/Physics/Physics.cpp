@@ -29,12 +29,12 @@ void Physics::Init(/*Lepus3D::Vector3 gravity*/)
 	}
 }
 
-void LepusEngine::Physics::AddObject(PhysicsRigidbody & rigidbody)
+/*void LepusEngine::Physics::AddObject(PhysicsRigidbody & rigidbody)
 {
 	//m_PxScene->addActor(*rigidbody.m_PxRigidbody);
 	mWorld->addRigidBody(rigidbody.GetBtRigidbody());
 	rigidbody.SetPhysicsEngine(this);
-}
+}*/
 
 void Physics::Run(float dTime)
 {

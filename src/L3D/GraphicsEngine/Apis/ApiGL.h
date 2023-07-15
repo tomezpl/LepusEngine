@@ -33,18 +33,18 @@ namespace LepusEngine
 			inline GLuint const GetFragmentShader(size_t index) { return m_FragmentShaders[index]; }
 			inline GLuint const GetVertexShader(size_t index) { return m_VertexShaders[index]; }
 
-			const size_t RegisterShader(ShaderCompiledResult const* vertexShader = nullptr, ShaderCompiledResult const* fragShader = nullptr, ShaderCompiledResult const* geomShader = nullptr)
+			const size_t RegisterShader(GLShaderCompiledResult const* vertexShader = nullptr, GLShaderCompiledResult const* fragShader = nullptr, GLShaderCompiledResult const* geomShader = nullptr)
 			{
 				assert(m_ShaderCount < ProgramCount);
 
 				if (vertexShader)
 				{
-					m_VertexShaders[m_ShaderCount] = vertexShader->GetShaderHandle<GLuint>();
+					m_VertexShaders[m_ShaderCount] = vertexShader->ShaderHandle;
 				}
 
 				if (fragShader)
 				{
-					m_FragmentShaders[m_ShaderCount] = fragShader->GetShaderHandle<GLuint>();
+					m_FragmentShaders[m_ShaderCount] = fragShader->ShaderHandle;
 				}
 
 				if (geomShader)

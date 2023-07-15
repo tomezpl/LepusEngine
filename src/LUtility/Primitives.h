@@ -21,7 +21,7 @@ namespace LepusUtility
         // Move constructor
         Primitive(Primitive&& other)
         {
-            Primitive::Primitive();
+            Primitive();
 
             m_Verts = other.m_Verts;
             m_VertCount = other.m_VertCount;
@@ -103,7 +103,7 @@ namespace LepusUtility
             return m_Indices;
         }
 
-        const size_t const inline VertexCount()
+        const size_t inline VertexCount()
         {
             return m_VertCount;
         }
@@ -118,7 +118,7 @@ namespace LepusUtility
             return m_IndexCount * sizeof(uint32_t);
         }
 
-        const size_t const inline IndexCount()
+        const size_t inline IndexCount()
         {
             return m_IndexCount;
         }

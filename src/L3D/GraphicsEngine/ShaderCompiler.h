@@ -1,6 +1,8 @@
 #ifndef L3D_GRAPHICSENGINE_SHADERCOMPILER
 #define L3D_GRAPHICSENGINE_SHADERCOMPILER
 
+#include <stddef.h>
+
 namespace LepusEngine
 {
 	namespace Lepus3D
@@ -12,26 +14,27 @@ namespace LepusEngine
 			GeometryShader
 		};
 
+		template <typename TShaderHandle>
 		class ShaderCompiledResult
 		{
 		public:
-			template <typename TShaderHandle>
 			inline ShaderCompiledResult(TShaderHandle shaderHandle)
 			{
-				ShaderHandle = (void*)shaderHandle;
+				ShaderHandle = shaderHandle;
 			}
 
-			void* ShaderHandle = nullptr;
+			TShaderHandle ShaderHandle;
 
-			template <typename TShaderHandle>
-			inline TShaderHandle GetShaderHandle() const { return (TShaderHandle)ShaderHandle; }
+			/*template <typename TShaderHandle>
+			inline TShaderHandle GetShaderHandle() const { return reinterpret_cast<TShaderHandle>(ShaderHandle); }*/
 		};
 		
+		template <typename TShaderHandle>
 		class ShaderCompiler
 		{
 		public:
 			virtual void Init() = 0;
-			virtual ShaderCompiledResult CompileShader(const char* shaderSource, size_t shaderSourceLength, ShaderType type) = 0;
+			virtual ShaderCompiledResult<TShaderHandle> CompileShader(const char* shaderSource, size_t shaderSourceLength, ShaderType type) = 0;
 		};
 	}
 }

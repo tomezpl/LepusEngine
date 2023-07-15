@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "LUtility/Types/Vector.h"
+#include <cmath>
 
 class MathVectorTests : public testing::Test
 {

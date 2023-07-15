@@ -17,11 +17,6 @@
 
 #include <LSystem/IO.h>
 
-#include <assimp/cimport.h>
-#include <assimp/material.h>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 #include <thread>
 
 using namespace LepusEngine;
@@ -33,7 +28,7 @@ using namespace LepusEngine;
 int main()
 {
 	// Enable logging
-	LepusEngine::ConsoleLogger::Enabled = true;
+	LepusEngine::ConsoleLogger.Enabled = true;
 
 	std::shared_ptr<LepusEngine::LepusSystem::WindowingGLFW> windowing = std::make_shared<LepusSystem::WindowingGLFW>(800, 600);
 
@@ -49,7 +44,7 @@ int main()
 	windowing->SetAsCurrentContext();
 
 	// Output start message to console
-	LepusEngine::ConsoleLogger::LogInfo("", "main", "Demo starting!");
+	LepusEngine::ConsoleLogger.LogInfo("", "main", "Demo starting!");
 
 	// Load & compile shaders.
 	std::string vertShaderSrc = LepusSystem::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.vert"), fragShaderSrc = LepusSystem::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.frag");
@@ -72,7 +67,7 @@ int main()
 	}
 
 	// Output shutdown message to console
-	LepusEngine::ConsoleLogger::LogInfo("", "main", "Demo shutting down!");
+	LepusEngine::ConsoleLogger.LogInfo("", "main", "Demo shutting down!");
 
 	windowing->Shutdown();
 

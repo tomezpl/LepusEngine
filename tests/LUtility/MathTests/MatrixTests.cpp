@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <LUtility/Math.h>
 #include <iostream>
+#include <cmath>
 
 class MathMatrixTests : public testing::Test {};
 

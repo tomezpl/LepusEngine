@@ -1,4 +1,5 @@
 #include "../FileSystem.h"
+#include <cstring>
 
 using namespace LepusEngine::LepusSystem;
 

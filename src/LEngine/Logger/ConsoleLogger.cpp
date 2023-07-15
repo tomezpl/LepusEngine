@@ -5,9 +5,7 @@
 using namespace LepusEngine;
 using namespace std;
 
-bool ConsoleLogger::Enabled = false;
-
-void ConsoleLogger::LogInternal(char* cN, char* fN, int eT, char* msg, char* fP)
+void ConsoleLoggerImpl::LogInternal(char* cN, char* fN, int eT, char* msg, char* fP)
 {
 	if (Enabled)
 	{

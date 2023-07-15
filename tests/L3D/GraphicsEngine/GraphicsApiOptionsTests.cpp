@@ -2,6 +2,7 @@
 #include "GraphicsApiOptionsTests.h"
 #include "GraphicsApiTests.h"
 #include <array>
+#include <climits>
 
 class GraphicsApiOptionsTest : public testing::TestWithParam<GraphicsApiStubOptions>
 {

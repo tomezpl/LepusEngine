@@ -29,7 +29,7 @@ namespace LepusEngine
 
         void Init(/*Lepus3D::Vector3 gravity = Lepus3D::Vector3(0.0f, LEPUS_PHYSICS_DEFAULT_GRAVITY, 0.0f)*/);
 
-		void AddObject(PhysicsRigidbody& rigidbody);
+		//void AddObject(PhysicsRigidbody& rigidbody);
         
         void Run(float deltaTime);
 

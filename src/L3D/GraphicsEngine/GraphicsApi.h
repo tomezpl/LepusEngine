@@ -3,6 +3,7 @@
 
 #include <LUtility/Types/Viewport.h>
 #include <memory>
+#include <cstring>
 #include <cassert>
 
 namespace LepusEngine

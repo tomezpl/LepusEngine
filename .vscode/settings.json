@@ -1,6 +1,10 @@
 {
     "cmake.preferredGenerators": [
-        "Visual Studio"
+        "Visual Studio",
+        "Unix Makefiles"
     ],
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "cmake.configureArgs": [
+        "--toolchain ${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+    ]
 }
