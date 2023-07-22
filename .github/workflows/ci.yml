@@ -6,4 +6,4 @@ jobs:
         steps:
             - 
                 name: setup-env
-                run: cd ~ && ${{github.workspace}}/scripts/install-ubuntu.sh
+                run: cd ~ && ls ${{github.workspace}} && ${{github.workspace}}/scripts/install-ubuntu.sh
