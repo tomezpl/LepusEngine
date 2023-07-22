@@ -4,6 +4,7 @@ jobs:
     run-ci:
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v3
             - 
                 name: setup-env
-                run: cd ~ && ls ${{github.workspace}} && ${{github.workspace}}/scripts/install-ubuntu.sh
+                run: cd ~ && ${{github.workspace}}/scripts/install-ubuntu.sh
