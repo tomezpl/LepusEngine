@@ -1,5 +1,4 @@
 #include "PhysicsRigidbody.h"
-#include <LEngine/ConsoleLogger.h>
 //#include <L3D/Vertex.h>
 //#include <L3D/Transform.h>
 #include <algorithm>
@@ -11,10 +10,10 @@ using namespace LepusEngine;
 PhysicsRigidbody::PhysicsRigidbody()
 {
 	// Initialise material, geometry and rigidbody 
-	m_Active = false; 
-	m_PhysicsEngine = nullptr; 
-	mBtCollider = nullptr; 
-	mBtRigidbody = nullptr; 
+	m_Active = false;
+	m_PhysicsEngine = nullptr;
+	mBtCollider = nullptr;
+	mBtRigidbody = nullptr;
 	mBtMotionState = nullptr;
 }
 
@@ -22,7 +21,7 @@ PhysicsRigidbody::PhysicsRigidbody(Physics& physicsEngine, Lepus3D::Geometry* ge
 {
 	m_PhysicsEngine = &physicsEngine;
 
-    InitCollider(physicsEngine, geometry, transform);
+	InitCollider(physicsEngine, geometry, transform);
 	//m_PxMat = physicsEngine.m_API->m_PxPhysics->createMaterial(0.5f, 0.5f, 0.6f); // TODO: these are only test parameters - change them, or provide a way to override.
 	//TODO: Lepus3D::Vector3 position = transform.GetPosition();
 	//TODO: Lepus3D::Quaternion rot = transform.GetRotation();
@@ -51,7 +50,7 @@ void PhysicsRigidbody::InitCollider(Physics& physicsEngine, Lepus3D::Geometry* g
 	// TODO
 	/*desc.points.data = pointsData;
 	desc.points.stride = sizeof(float) * 3;
-	
+
 	desc.flags = physx::PxConvexFlag::eCOMPUTE_CONVEX;
 	physicsEngine.m_API->m_PxCooking->cookConvexMesh(desc, outStream);
 
@@ -128,5 +127,5 @@ btRigidBody* const LepusEngine::PhysicsRigidbody::GetBtRigidbody()
 */
 LepusEngine::PhysicsRigidbody::~PhysicsRigidbody()
 {
-	
+
 }

@@ -1,19 +1,34 @@
-#pragma once
+#ifndef LENGINE_CONSOLE_LOGGER_INSTANCE
+#define LENGINE_CONSOLE_LOGGER_INSTANCE
 
 #include "ILogger.h"
 
-namespace LepusEngine 
+namespace LepusEngine
 {
 	// An stdout-based ILogger implementation.
 	// LEPUS_ALLOW_STDOUT needs to be defined and LepusEngine::ConsoleLogger::Enabled needs to be true for the logs to appear.
-	class ConsoleLoggerImpl : ILogger {
-	private:
+	class ConsoleLogger : ILogger
+	{
+		private:
 		void LogInternal(char* className, char* funcName, int eventType, char* message, char* funcParams);
-	public:
+		static ILogger* m_Instance;
+
+		public:
 		bool Enabled;
 
-		ConsoleLoggerImpl() {
+		ConsoleLogger()
+		{
 			Enabled = false;
+		}
+
+		static ConsoleLogger& Global()
+		{
+			if (!m_Instance)
+			{
+				m_Instance = new ConsoleLogger();
+			}
+
+			return *reinterpret_cast<ConsoleLogger*>(m_Instance);
 		}
 
 		inline void Log(char* className, char* funcName, int eventType, char* message, char* funcParams)
@@ -26,7 +41,15 @@ namespace LepusEngine
 		void LogError(char* className, char* funcName, char* message, char* funcParams = "") { Log(className, funcName, LogEventTypes::LEPUS_ERROR, message, funcParams); }
 		void LogInfo(char* className, char* funcName, char* message, char* funcParams = "") { Log(className, funcName, LogEventTypes::LEPUS_INFO, message, funcParams); }
 		void LogWarning(char* className, char* funcName, char* message, char* funcParams = "") { Log(className, funcName, LogEventTypes::LEPUS_WARNING, message, funcParams); }
-	};
 
-	ConsoleLoggerImpl ConsoleLogger;
+		static void Shutdown()
+		{
+			if (m_Instance)
+			{
+				delete m_Instance;
+				m_Instance = nullptr;
+			}
+		}
+	};
 }
+#endif

@@ -5,9 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "LepusDemo Debug",
+            "name": "LepusDemo Debug (Linux)",
             "program": "${workspaceRoot}/build/bin/LepusDemo",
+            "windows": {
+                // Use the Windows variant instead.
+                "program": ""
+            },
             "type": "cppdbg",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/build/bin/Debug"
+        },
+        {
+            "name": "LepusDemo Debug (Windows)",
+            "type": "cppvsdbg",
+            "windows": {
+                "program": "${workspaceRoot}/build/bin/Debug/LepusDemo.exe"
+            },
             "request": "launch",
             "cwd": "${workspaceRoot}/build/bin/Debug"
         }
