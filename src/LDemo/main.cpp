@@ -28,7 +28,7 @@ using namespace LepusEngine;
 int main()
 {
 	// Enable logging
-	LepusEngine::ConsoleLogger.Enabled = true;
+	LepusEngine::ConsoleLogger::Global().Enabled = true;
 
 	std::shared_ptr<LepusEngine::LepusSystem::WindowingGLFW> windowing = std::make_shared<LepusSystem::WindowingGLFW>(800, 600);
 
@@ -44,7 +44,7 @@ int main()
 	windowing->SetAsCurrentContext();
 
 	// Output start message to console
-	LepusEngine::ConsoleLogger.LogInfo("", "main", "Demo starting!");
+	LepusEngine::ConsoleLogger::Global().LogInfo("", "main", "Demo starting!");
 
 	// Load & compile shaders.
 	std::string vertShaderSrc = LepusSystem::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.vert"), fragShaderSrc = LepusSystem::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.frag");
@@ -67,11 +67,13 @@ int main()
 	}
 
 	// Output shutdown message to console
-	LepusEngine::ConsoleLogger.LogInfo("", "main", "Demo shutting down!");
+	LepusEngine::ConsoleLogger::Global().LogInfo("", "main", "Demo shutting down!");
 
 	windowing->Shutdown();
 
 	LepusEngine::LepusSystem::WindowingGLFW::Terminate();
+
+	LepusEngine::ConsoleLogger::Shutdown();
 
 	return 0;
 }

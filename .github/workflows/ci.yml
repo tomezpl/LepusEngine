@@ -1,0 +1,31 @@
+name: ci
+on: [push]
+jobs:
+    run-ci-linux:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+              with: 
+                submodules: true
+            - 
+                name: setup-env
+                run: |
+                    cd ~ 
+                    sudo chmod +x ${{github.workspace}}/scripts/install-ubuntu.sh 
+                    ${{github.workspace}}/scripts/install-ubuntu.sh
+            - 
+                name: build
+                run: |
+                    cd ${{github.workspace}}
+                    mkdir build
+                    cmake -B ./build -S ./ -G "Unix Makefiles" --toolchain ~/vcpkg/scripts/buildsystems/vcpkg.cmake
+                    cd build
+                    make
+            - 
+                name: test
+                run: |
+                    cd ${{github.workspace}}
+                    cd build
+                    ./bin/LepusUtility_Tests
+                    ./bin/LepusSystem_Tests
+                    ./bin/Lepus3D_Tests
