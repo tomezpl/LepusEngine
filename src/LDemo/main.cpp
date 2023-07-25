@@ -12,8 +12,6 @@
 #include <L3D/GraphicsEngine/ShaderCompilers/ShaderCompilerGLSL.h>
 
 #include <LEngine/ConsoleLogger.h>
-#include <LEngine/Physics.h>
-#include <LEngine/Physics/PhysicsRigidbody.h>
 
 #include <LSystem/IO.h>
 
