@@ -15,6 +15,8 @@
 
 #include <LSystem/IO.h>
 
+#include <L3D/Camera.h>
+
 #include <thread>
 
 using namespace LepusEngine;
@@ -55,6 +57,9 @@ int main()
 
 	// Set up engine for drawing.
 	engine.Setup();
+
+	lepus::gfx::Camera camera = lepus::gfx::Camera();
+	lepus::math::Matrix4x4 projMatrix = camera.BuildMatrix();
 
 	while (isRunning)
 	{

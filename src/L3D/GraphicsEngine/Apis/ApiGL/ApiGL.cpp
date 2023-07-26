@@ -58,6 +58,12 @@ void GraphicsApiGL::CreatePipeline()
 	SetupVertexArrays();
 	SetupBuffers();
 	SetupShaders();
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_DEPTH_CLAMP);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 }
 
 void GraphicsApiGL::Draw()
