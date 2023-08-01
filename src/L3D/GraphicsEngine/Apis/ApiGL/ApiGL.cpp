@@ -64,6 +64,7 @@ void GraphicsApiGL::CreatePipeline()
 	glEnable(GL_DEPTH_CLAMP);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+	glFrontFace(GL_CW);
 }
 
 void GraphicsApiGL::Draw()
@@ -74,7 +75,7 @@ void GraphicsApiGL::Draw()
 	glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo);
 
-	glDrawElements(GL_TRIANGLE_STRIP, m_CubeGeometry.IndexCount(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_CubeGeometry.IndexCount(), GL_UNSIGNED_INT, 0);
 }
 
 void GraphicsApiGL::ClearFrameBuffer(float r, float g, float b)

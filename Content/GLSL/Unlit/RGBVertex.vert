@@ -11,7 +11,8 @@ out vec3 vertColor;
 
 void main()
 {
-	float hypot = tan((90.0 / 2.0) * DEG2RAD);
+	float fov = 110;
+	float hypot = tan((180 - fov) * 0.5 * DEG2RAD);
 	float far = 100.0;
 	float near = 0.1;
 
@@ -21,7 +22,7 @@ void main()
 	PROJ[2] = vec4(0.0, 0.0, -(far / (far - near)), -((far * near) / (far - near)));
 	PROJ[3] = vec4(0.0, 0.0, -1.0, 0.0);
 
-	vec3 offsetPos = position + vec3(0.0, 0.0, 2.0);
+	vec3 offsetPos = position + vec3(0.0, 0.0, 1.5);
 	gl_Position = (vec4(offsetPos, 1.0f) / offsetPos.z) * PROJ;
 	gl_Position.w *= 1.0 / gl_Position.z;
 

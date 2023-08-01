@@ -132,66 +132,68 @@ namespace LepusUtility
             // Assuming negative left and negative up
             const float cubeVertices[] = {
                 // Front:
-                -0.5f, -0.5f, -0.5f, // top-left (0)
-                0.5f, -0.5f, -0.5f, // top-right (1)
-                -0.5f, 0.5f, -0.5f, // bottom-left (2)
-                0.5f, 0.5f, -0.5f, // bottom-right (3)
+                -0.5f, 0.5f, -0.5f, // top-left (0)
+                0.5f, 0.5f, -0.5f, // top-right (1)
+                -0.5f, -0.5f, -0.5f, // bottom-left (2)
+                0.5f, -0.5f, -0.5f, // bottom-right (3)
 
                 // Left:
-                -0.5f, -0.5f, 0.5f, // top-left (4)
-                // use front top-left as top-right
-                -0.5f, 0.5f, 0.5f, // bottom-left (5)
-                // use front bottom-left as bottom-right
+                -0.5f, 0.5f, 0.5f, // top-left (4)
+                // use front top-left (0) as top-right
+                -0.5f, -0.5f, 0.5f, // bottom-left (5)
+                // use front bottom-left (2) as bottom-right
 
                 // Back:
-                0.5f, -0.5f, 0.5f, // top-left (6)
-                // reuse left top-left as top-right
-                0.5f, 0.5f, 0.5f, // bottom-left (7)
-                // use left bottom-left as bottom-right
+                0.5f, 0.5f, 0.5f, // top-left (6)
+                // reuse left top-left (4) as top-right
+                0.5f, -0.5f, 0.5f, // bottom-left (7)
+                // use left bottom-left (5) as bottom-right
 
                 // Top:
-                // use left top-left as top-left
-                // use back top-left as top-right
-                // use left top-right as bottom-left
-                // use front top-right as bottom-right
+                // use left top-left (4) as top-left
+                // use back top-left (6) as top-right
+                // use left top-right (0) as bottom-left
+                // use front top-right (1) as bottom-right
 
                 // Right:
-                // use front top-right as top-left
-                // use back top-left as top-right
-                // use front bottom-right as bottom-left
-                // use back bottom-left as bottom-right
+                // use front top-right (1) as top-left
+                // use back top-left (6) as top-right
+                // use front bottom-right (3) as bottom-left
+                // use back bottom-left (7) as bottom-right
 
                 // Bottom:
-                // use front bottom-left as top-left
-                // use front bottom-right as top-right
-                // use back bottom-right as bottom-left
-                // use back bottom-left as bottom-right
+                // use front bottom-left (2) as top-left
+                // use front bottom-right (3) as top-right
+                // use back bottom-right (5) as bottom-left
+                // use back bottom-left (7) as bottom-right
             };
 
             const uint32_t indices[] = {
                 // Front:
-                0, 1, 2,
-                2, 1, 3,
+                1, 3, 0,
+                3, 2, 0,
+
 
                 // Left:
-                4, 0, 5,
-                2, 5, 1,
+                0, 2, 4,
+                2, 5, 4,
+
 
                 // Back:
-                6, 4, 7,
-                7, 4, 2,
+                5, 6, 4,
+                5, 7, 6,
 
                 // Top:
-                4, 6, 0,
-                0, 6, 1,
+                1, 4, 6,
+                1, 0, 4,
 
                 // Right:
-                2, 6, 3,
-                3, 6, 7,
+                7, 1, 6,
+                7, 3, 1,
 
                 // Bottom:
-                2, 3, 5,
-                5, 3, 7
+                7, 2, 3,
+                7, 5, 2
             };
 
             return Primitive(cubeVertices, sizeof(cubeVertices) / sizeof(float) / 3, indices, sizeof(indices) / sizeof(uint32_t));
