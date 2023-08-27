@@ -53,13 +53,15 @@ int main()
 		fragShader = Lepus3D::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc.c_str(), fragShaderSrc.length(), Lepus3D::FragmentShader);
 
 	// Register shader with the API.
-	engine.GetApi<Lepus3D::GraphicsApiGL>().GetOptions<Lepus3D::GraphicsApiGLOptions>().RegisterShader(&vertShader, &fragShader);
+	auto& api = engine.GetApi<Lepus3D::GraphicsApiGL>();
+	api.GetOptions<Lepus3D::GraphicsApiGLOptions>().RegisterShader(&vertShader, &fragShader);
 
 	// Set up engine for drawing.
 	engine.Setup();
 
 	lepus::gfx::Camera camera = lepus::gfx::Camera();
 	lepus::math::Matrix4x4 projMatrix = camera.BuildMatrix();
+	((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>("PROJ"))->Value((float*)projMatrix.data());
 
 	while (isRunning)
 	{

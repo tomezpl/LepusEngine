@@ -1,9 +1,9 @@
 #ifndef LEPUS_GFX_CAMERA
 #define LEPUS_GFX_CAMERA
 
-#define LEPUS_GFX_CAMERA_DEFAULT_FOV 60.f
-#define LEPUS_GFX_CAMERA_DEFAULT_CLIP_NEAR 0.003f
-#define LEPUS_GFX_CAMERA_DEFAULT_CLIP_FAR 1000.f
+#define LEPUS_GFX_CAMERA_DEFAULT_FOV 110.f
+#define LEPUS_GFX_CAMERA_DEFAULT_CLIP_NEAR 0.1f
+#define LEPUS_GFX_CAMERA_DEFAULT_CLIP_FAR 100.f
 
 #include "../LUtility/Math.h"
 
@@ -31,15 +31,15 @@ namespace lepus
             {
                 lepus::math::Matrix4x4 projMatrix = lepus::math::Matrix4x4();
 
-                float hypot = tanf((m_FOV / 2.f) * DEG2RAD);
+                float hypot = tanf((180.f - m_FOV) * DEG2RAD * 0.5f);
 
                 projMatrix.set<0, 0>(hypot);
                 projMatrix.set<1, 1>(hypot);
 
                 projMatrix.set<2, 2>(-(m_Far / (m_Far - m_Near)));
-                projMatrix.set<3, 2>(-((m_Far * m_Near) / (m_Far - m_Near)));
+                projMatrix.set<2, 3>(-((m_Far * m_Near) / (m_Far - m_Near)));
 
-                projMatrix.set<2, 3>(-1.f);
+                projMatrix.set<2, 2>(-1.f);
 
                 return projMatrix;
             }

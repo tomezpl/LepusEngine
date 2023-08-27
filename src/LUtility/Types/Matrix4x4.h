@@ -74,6 +74,11 @@ namespace lepus
 
                 return ret;
             }
+
+            inline const float* data() const
+            {
+                return m_Elements;
+            }
         };
     }
 }

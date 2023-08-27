@@ -5,7 +5,7 @@
 
 layout (location = 0) in vec3 position;
 
-//uniform mat4 PROJ;
+uniform mat4 PROJ;
 
 out vec3 vertColor;
 
@@ -16,15 +16,15 @@ void main()
 	float far = 100.0;
 	float near = 0.1;
 
-	mat4 PROJ;
+	/*mat4 PROJ;
 	PROJ[0] = vec4(hypot, 0.0, 0.0, 0.0);
 	PROJ[1] = vec4(0.0, hypot, 0.0, 0.0);
 	PROJ[2] = vec4(0.0, 0.0, -(far / (far - near)), -((far * near) / (far - near)));
-	PROJ[3] = vec4(0.0, 0.0, -1.0, 0.0);
+	PROJ[3] = vec4(0.0, 0.0, -1.0, 0.0);*/
 
 	vec3 offsetPos = position + vec3(0.0, 0.0, 1.5);
-	gl_Position = (vec4(offsetPos, 1.0f) / offsetPos.z) * PROJ;
-	gl_Position.w *= 1.0 / gl_Position.z;
+	gl_Position = vec4(offsetPos, 1.0f) * PROJ;
+	gl_Position.w = offsetPos.z;
 
 	float normalisedIndex = mod(float(gl_VertexID), 3.0f);
 	float r = step(normalisedIndex, 0.0f);

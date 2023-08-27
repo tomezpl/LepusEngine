@@ -5,6 +5,7 @@
 #include <memory>
 #include <cstring>
 #include <cassert>
+#include "GraphicsApi/BaseBindings.h"
 
 namespace LepusEngine
 {
@@ -29,7 +30,7 @@ namespace LepusEngine
 
 		class GraphicsApiOptions
 		{
-		public:
+			public:
 			/// @brief Indicates what API type this options object is used for.
 			/// @return The GraphicsApiType enum value for this GraphicsApiOptions.
 			virtual GraphicsApiType GetType() { return GraphicsApiUnknown; }
@@ -44,11 +45,11 @@ namespace LepusEngine
 		/// not a variety of D3D/GL/VK methods.
 		class GraphicsApi
 		{
-		private:
+			private:
 			bool m_ShutdownCalled;
-		protected:
+			protected:
 			GraphicsApiOptions* m_Options;
-		protected:
+			protected:
 			/// @brief Performs internal, boilerplate setup for all API wrappers.
 			/// @tparam TGraphicsApiOptions An options type derived from GraphicsApiOptions for a specific graphics API.
 			/// @param options Pointer to an options object (using the type matching the requested graphics API).
@@ -60,7 +61,9 @@ namespace LepusEngine
 				m_Options = new TGraphicsApiOptions();
 				memcpy(m_Options, options, optionsSz);
 			}
-		public:
+
+			virtual void* GetUniformInternal(char* name) = 0;
+			public:
 			/// @brief Default constructor. Does nothing, so Init(GraphicsApiOptions*) needs to be called manually.
 			GraphicsApi()
 			{
@@ -98,6 +101,14 @@ namespace LepusEngine
 
 			virtual void CreatePipeline() = 0;
 
+			template<typename TUniformHandle = void*, class TUniformBinding = lepus::gfx::UniformBinding<TUniformHandle>>
+			inline const TUniformBinding* GetUniform(char* name)
+			{
+				return reinterpret_cast<const TUniformBinding*>(GetUniformInternal(name));
+			}
+
+			virtual void UpdateUniforms() = 0;
+
 			virtual void Draw() = 0;
 
 			virtual void ClearFrameBuffer(float r, float g, float b) = 0;
@@ -108,15 +119,15 @@ namespace LepusEngine
 			/// but it does not need to be used or implemented.
 			virtual void SwapBuffers() {}
 
-			virtual void Shutdown() 
+			virtual void Shutdown()
 			{
 				m_ShutdownCalled = true;
 			}
-			
-			~GraphicsApi() 
-			{ 
+
+			~GraphicsApi()
+			{
 				assert(m_ShutdownCalled == true);
-				Shutdown(); 
+				Shutdown();
 			}
 		};
 	}

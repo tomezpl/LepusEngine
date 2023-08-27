@@ -53,11 +53,20 @@ void GraphicsApiGL::SetupShaders()
 	}
 }
 
+void GraphicsApiGL::SetupUniforms()
+{
+	// Proj matrix
+	lepus::gfx::GLMatrixUniformBinding* proj = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], "PROJ"));
+	m_Pipeline.uniforms.push_front(proj);
+	m_Pipeline.uniformMap.emplace("PROJ", *proj);
+}
+
 void GraphicsApiGL::CreatePipeline()
 {
 	SetupVertexArrays();
 	SetupBuffers();
 	SetupShaders();
+	SetupUniforms();
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
@@ -65,6 +74,24 @@ void GraphicsApiGL::CreatePipeline()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CW);
+}
+
+void GraphicsApiGL::UpdateUniforms()
+{
+	for (auto uniform = m_Pipeline.uniforms.begin(); uniform != m_Pipeline.uniforms.end(); uniform++)
+	{
+		if ((*uniform)->IsDirty())
+		{
+			switch ((*uniform)->Type())
+			{
+				// TODO: with more shaders, we'll want to wrap the uniform objects in "instances" that specify a program handle and hold a reference to the uniform data
+				// However, it'll work for now given there is only ever one GL program in use.
+				case lepus::gfx::UniformType::MATRIX4:
+					glUniformMatrix4fv((*uniform)->Location, 1, true, (reinterpret_cast<lepus::gfx::GLMatrixUniformBinding*>(*uniform))->Value());
+					break;
+			}
+		}
+	}
 }
 
 void GraphicsApiGL::Draw()
