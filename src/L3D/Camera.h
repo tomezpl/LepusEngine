@@ -27,6 +27,16 @@ namespace lepus
                 m_Transform = lepus::math::Transform();
             }
 
+            inline float FOV()
+            {
+                return m_FOV;
+            }
+
+            inline void FOV(float fov)
+            {
+                m_FOV = fov;
+            }
+
             lepus::math::Matrix4x4 BuildMatrix()
             {
                 lepus::math::Matrix4x4 projMatrix = lepus::math::Matrix4x4();
@@ -39,7 +49,7 @@ namespace lepus
                 projMatrix.set<2, 2>(-(m_Far / (m_Far - m_Near)));
                 projMatrix.set<2, 3>(-((m_Far * m_Near) / (m_Far - m_Near)));
 
-                projMatrix.set<2, 2>(-1.f);
+                projMatrix.set<3, 2>(-1.f);
 
                 return projMatrix;
             }

@@ -22,9 +22,8 @@ void main()
 	PROJ[2] = vec4(0.0, 0.0, -(far / (far - near)), -((far * near) / (far - near)));
 	PROJ[3] = vec4(0.0, 0.0, -1.0, 0.0);*/
 
-	vec3 offsetPos = position + vec3(0.0, 0.0, 1.5);
-	gl_Position = vec4(offsetPos, 1.0f) * PROJ;
-	gl_Position.w = offsetPos.z;
+	vec3 offsetPos = position + vec3(0.0, 0.0, -1.5);
+	gl_Position = PROJ * vec4(offsetPos, 1.0);
 
 	float normalisedIndex = mod(float(gl_VertexID), 3.0f);
 	float r = step(normalisedIndex, 0.0f);

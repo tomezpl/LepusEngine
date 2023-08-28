@@ -69,8 +69,7 @@ void GraphicsApiGL::CreatePipeline()
 	SetupUniforms();
 
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	glEnable(GL_DEPTH_CLAMP);
+	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CW);
@@ -108,7 +107,7 @@ void GraphicsApiGL::Draw()
 void GraphicsApiGL::ClearFrameBuffer(float r, float g, float b)
 {
 	glClearColor(r, g, b, 1.f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GraphicsApiGL::Shutdown()
