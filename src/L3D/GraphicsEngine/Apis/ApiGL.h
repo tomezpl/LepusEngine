@@ -77,11 +77,11 @@ namespace LepusEngine
 
 				/// @brief List with all uniforms used by the API.
 				// TODO: Change to array - might get better cache/locality to improve access times.
-				std::forward_list<lepus::gfx::GLUniformBinding*> uniforms;
+				std::forward_list<lepus::gfx::GLUniformBinding<void*>*> uniforms;
 
 				/// @brief Uniform map to update the values.
 				// TODO: Move to a Material class?
-				std::unordered_map<const char*, lepus::gfx::GLUniformBinding&> uniformMap;
+				std::unordered_map<const char*, lepus::gfx::GLUniformBinding<void*>*> uniformMap;
 			} m_Pipeline;
 
 			GLuint m_Programs[GraphicsApiGLOptions::ProgramCount];
@@ -106,11 +106,22 @@ namespace LepusEngine
 					size_t keyLength = strlen(it->first);
 					if (targetKeyLength == keyLength && !strcmp(name, it->first))
 					{
-						return &(it->second);
+						return it->second;
 					}
 				}
 
 				return nullptr;
+
+				/*if (!strcmp("PROJ", name))
+				{
+					return *(++m_Pipeline.uniforms.begin());
+				}
+				else if (!strcmp("runningTime", name))
+				{
+					return *(m_Pipeline.uniforms.begin());
+				}
+
+				return nullptr;*/
 			}
 
 			public:
@@ -135,7 +146,7 @@ namespace LepusEngine
 			void Shutdown() override;
 		};
 
-		template const lepus::gfx::GLUniformBinding* GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding*>(char* name);
+		template const lepus::gfx::GLUniformBinding<void*>* GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(char* name);
 
 		template GraphicsApiGL& GraphicsEngine::GetApi<GraphicsApiGL>();
 	}

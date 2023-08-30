@@ -6,6 +6,7 @@
 layout (location = 0) in vec3 position;
 
 uniform mat4 PROJ;
+uniform float runningTime;
 
 out vec3 vertColor;
 
@@ -16,13 +17,23 @@ void main()
 	float far = 100.0;
 	float near = 0.1;
 
-	/*mat4 PROJ;
-	PROJ[0] = vec4(hypot, 0.0, 0.0, 0.0);
-	PROJ[1] = vec4(0.0, hypot, 0.0, 0.0);
-	PROJ[2] = vec4(0.0, 0.0, -(far / (far - near)), -((far * near) / (far - near)));
-	PROJ[3] = vec4(0.0, 0.0, -1.0, 0.0);*/
+	/*mat3 rot;*/
+	float angle = runningTime;
+	float c = cos(angle);
+	float s = sin(angle);
 
-	vec3 offsetPos = position + vec3(0.0, 0.0, -1.5);
+	vec2 rotated = vec2(c * position.x - s * position.y, s * position.x + c * position.y);
+	
+	// has to be unit length
+	vec3 axis = normalize(vec3(1.0, 0.0, 1.0));
+
+	mat3 rot;
+	rot[0] = vec3(c+axis.x*axis.x*(1.0 - c), axis.y*axis.x*(1.0 - c)+axis.z*s, axis.z*axis.x*(1.0 - c)-axis.y*s);
+	rot[1] = vec3(axis.y*axis.x*(1.0 - c)-axis.z*s, c+axis.y*axis.y*(1.0 - c), axis.z*axis.y*(1.0 - c)+axis.x*s);
+	rot[2] = vec3(axis.z*axis.x*(1.0 - c)+axis.y*s, axis.z*axis.y*(1.0 - c)-axis.x*s, c+axis.z*axis.z*(1.0 - c));
+
+	vec3 offsetPos = rot * position;
+	offsetPos = offsetPos + vec3(0.0, 0.0, -2.0);
 	gl_Position = PROJ * vec4(offsetPos, 1.0);
 
 	float normalisedIndex = mod(float(gl_VertexID), 3.0f);

@@ -7,7 +7,8 @@ namespace lepus
     {
         enum UniformType
         {
-            MATRIX4
+            MATRIX4,
+            FLOAT
         };
     }
 }

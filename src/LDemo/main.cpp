@@ -18,12 +18,21 @@
 #include <L3D/Camera.h>
 
 #include <thread>
+#include <string>
 
 using namespace LepusEngine;
 
 #ifndef _DEBUG
 #define NDEBUG
 #endif
+
+float fov = 0.f;
+
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	fov = fmax(1.f, fmin(179.f, fov + (float)yoffset));
+	LepusEngine::ConsoleLogger::Global().LogInfo("", "scrollCallback", "yoffset", (char*)std::to_string(xoffset).append(", ").append(std::to_string(yoffset)).append("FOV: ").append(std::to_string(fov)).c_str());
+}
 
 int main()
 {
@@ -63,8 +72,17 @@ int main()
 	lepus::math::Matrix4x4 projMatrix = camera.BuildMatrix();
 	((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>("PROJ"))->Value((float*)projMatrix.data());
 
+	fov = camera.FOV();
+
+	glfwSetScrollCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), scrollCallback);
+
 	while (isRunning)
 	{
+		camera.FOV(fov);
+		projMatrix = camera.BuildMatrix();
+		((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>("PROJ"))->Value((float*)projMatrix.data());
+		((lepus::gfx::GLFloatUniformBinding*)api.GetUniform<lepus::gfx::GLFloatUniformBinding>("runningTime"))->Value(glfwGetTime());
+
 		windowing->Update(); // Update window before drawing
 		engine.Render<unsigned char, Lepus3D::GraphicsEngine::PixelFormat::RGBA32>(100, 149, 237);
 

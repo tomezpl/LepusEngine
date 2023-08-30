@@ -56,9 +56,14 @@ void GraphicsApiGL::SetupShaders()
 void GraphicsApiGL::SetupUniforms()
 {
 	// Proj matrix
-	lepus::gfx::GLMatrixUniformBinding* proj = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], "PROJ"));
-	m_Pipeline.uniforms.push_front(proj);
-	m_Pipeline.uniformMap.emplace("PROJ", *proj);
+	auto* proj = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], "PROJ"));
+	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(proj));
+	m_Pipeline.uniformMap.insert_or_assign("PROJ", reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(proj));
+
+	// temp
+	auto* runningTime = new lepus::gfx::GLFloatUniformBinding(glGetUniformLocation(m_Programs[0], "runningTime"));
+	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(runningTime));
+	m_Pipeline.uniformMap.insert_or_assign("runningTime", reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(runningTime));
 }
 
 void GraphicsApiGL::CreatePipeline()
@@ -72,21 +77,26 @@ void GraphicsApiGL::CreatePipeline()
 	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glFrontFace(GL_CW);
+	glFrontFace(GL_CCW);
 }
 
 void GraphicsApiGL::UpdateUniforms()
 {
 	for (auto uniform = m_Pipeline.uniforms.begin(); uniform != m_Pipeline.uniforms.end(); uniform++)
 	{
-		if ((*uniform)->IsDirty())
+		auto uniformVal = *uniform;
+		if (uniformVal->IsDirty())
 		{
-			switch ((*uniform)->Type())
+			const GLint& location = uniformVal->Location();
+			switch (uniformVal->Type())
 			{
 				// TODO: with more shaders, we'll want to wrap the uniform objects in "instances" that specify a program handle and hold a reference to the uniform data
 				// However, it'll work for now given there is only ever one GL program in use.
 				case lepus::gfx::UniformType::MATRIX4:
-					glUniformMatrix4fv((*uniform)->Location, 1, true, (reinterpret_cast<lepus::gfx::GLMatrixUniformBinding*>(*uniform))->Value());
+					glUniformMatrix4fv(location, 1, true, (reinterpret_cast<lepus::gfx::GLMatrixUniformBinding*>(uniformVal))->Value());
+					break;
+				case lepus::gfx::UniformType::FLOAT:
+					glUniform1f(location, (reinterpret_cast<lepus::gfx::GLFloatUniformBinding*>(uniformVal))->Value());
 					break;
 			}
 		}

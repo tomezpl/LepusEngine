@@ -7,33 +7,34 @@ namespace lepus
 {
     namespace gfx
     {
-        template<typename TUniformHandle = void*>
+        template<typename TUniformHandle, typename TUniformValue = void*>
         class UniformBinding
         {
             private:
             size_t m_Size = 0;
-            void* m_Value = nullptr;
+            TUniformValue m_Value;
             bool m_Dirty = false;
+            protected:
+            TUniformHandle m_Location;
 
             public:
-            TUniformHandle Location;
 
             UniformBinding(TUniformHandle location)
             {
-                Location = location;
+                memcpy(&m_Location, &location, sizeof(TUniformHandle));
             }
 
-            template<typename TUniformValue>
+            virtual const TUniformHandle& Location() const = 0;
+
             inline void Value(TUniformValue value)
             {
-                m_Value = reinterpret_cast<void*>(value);
+                m_Value = value;
                 m_Dirty = true;
             }
 
-            template<typename TUniformValue>
-            inline TUniformValue Value()
+            inline const TUniformValue& Value() const
             {
-                return reinterpret_cast<TUniformValue>(m_Value);
+                return m_Value;
             }
 
             inline bool IsDirty() { return m_Dirty; }
