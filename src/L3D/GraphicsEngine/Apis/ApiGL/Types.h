@@ -16,12 +16,12 @@ namespace lepus
             GLUniformBinding(size_t location) : UniformBinding<GLint, TUniformValue>(location)
             {
                 // No idea why, but sometimes the location won't assign correctly, so we do this terribleness...
-                m_Location = location;
+                this->m_Location = location;
             }
 
             const GLint& Location() const override
             {
-                return m_Location;
+                return this->m_Location;
             }
         };
     }
