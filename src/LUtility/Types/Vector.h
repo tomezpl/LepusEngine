@@ -185,9 +185,9 @@ namespace lepus
             inline float x() const { return m_Components[0]; }
             inline float y() const { return m_Components[1]; }
             inline float z() const { return m_Components[2]; }
-            inline float x(float newX) { m_Components[0] = newX; }
-            inline float y(float newY) { m_Components[1] = newY; }
-            inline float z(float newZ) { m_Components[2] = newZ; }
+            inline float x(float newX) { return m_Components[0] = newX; }
+            inline float y(float newY) { return m_Components[1] = newY; }
+            inline float z(float newZ) { return m_Components[2] = newZ; }
 
             inline Vector3 operator-(const Vector3& b) { Vector<3>::Subtract(b); return *this; }
             inline Vector3 operator+(const Vector3& b) { Vector<3>::Add(b); return *this; }
@@ -233,10 +233,10 @@ namespace lepus
             inline float y() const { return m_Components[1]; }
             inline float z() const { return m_Components[2]; }
             inline float w() const { return m_Components[3]; }
-            inline float x(float newX) { m_Components[0] = newX; }
-            inline float y(float newY) { m_Components[1] = newY; }
-            inline float z(float newZ) { m_Components[2] = newZ; }
-            inline float w(float newW) { m_Components[3] = newW; }
+            inline float x(float newX) { return m_Components[0] = newX; }
+            inline float y(float newY) { return m_Components[1] = newY; }
+            inline float z(float newZ) { return m_Components[2] = newZ; }
+            inline float w(float newW) { return m_Components[3] = newW; }
 
             inline Vector4 operator-(const Vector4& b) { Vector<4>::Subtract(b); return *this; }
             inline Vector4 operator+(const Vector4& b) { Vector<4>::Add(b); return *this; }
