@@ -75,6 +75,16 @@ namespace lepus
                 return ret;
             }
 
+            lepus::types::Vector4 Multiply(const lepus::types::Vector4& v) const
+            {
+                return lepus::types::Vector4(
+                    get(0, 0) * v.x() + get(0, 1) * v.y() + get(0, 2) * v.z() + get(0, 3) * v.w(),
+                    get(1, 0) * v.x() + get(1, 1) * v.y() + get(1, 2) * v.z() + get(1, 3) * v.w(),
+                    get(2, 0) * v.x() + get(2, 1) * v.y() + get(2, 2) * v.z() + get(2, 3) * v.w(),
+                    get(3, 0) * v.x() + get(3, 1) * v.y() + get(3, 2) * v.z() + get(3, 3) * v.w()
+                );
+            }
+
             inline const float* data() const
             {
                 return m_Elements;

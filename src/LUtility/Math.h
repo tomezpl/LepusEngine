@@ -7,6 +7,7 @@
 
 #include "Types/Vector.h"
 #include "Types/Matrix4x4.h"
+#include "Types/Quaternion.h"
 #include "Types/Transform.h"
 
 #define DEG2RAD PI/180.0

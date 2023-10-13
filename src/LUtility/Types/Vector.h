@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <string>
 #include <memory>
 
 namespace lepus
@@ -57,6 +58,20 @@ namespace lepus
             {
                 for (uint8_t i = 0; i < nbComponents; i++) { m_Components[i] -= b.m_Components[i]; }
             }
+
+            static inline float Dot(const Vector<nbComponents>& a, const Vector<nbComponents>& b)
+            {
+                float sum = 0.f;
+
+                for (uint8_t componentIdx = 0; componentIdx < nbComponents; componentIdx++)
+                {
+                    sum += a.m_Components[componentIdx] * b.m_Components[componentIdx];
+                }
+
+                return sum;
+            }
+
+            static inline Vector<nbComponents> Cross() {}
 
             Vector<nbComponents> operator-(const Vector<nbComponents>& b)
             {
@@ -193,6 +208,19 @@ namespace lepus
             inline Vector3 operator+(const Vector3& b) { Vector<3>::Add(b); return *this; }
             inline Vector3 operator*(const Vector3& b) { Vector<3>::Multiply(b); return *this; }
             inline Vector3 operator*(float scalar) { Vector<3>::Multiply(scalar); return *this; }
+
+            inline std::string ToString()
+            {
+                std::string vectorStr = "X = ";
+
+                vectorStr.append(std::to_string(x()));
+                vectorStr.append(", Y = ");
+                vectorStr.append(std::to_string(y()));
+                vectorStr.append(", Z = ");
+                vectorStr.append(std::to_string(z()));
+
+                return vectorStr;
+            }
         };
 
         class Vector4 : public Vector<4>
@@ -240,7 +268,7 @@ namespace lepus
 
             inline Vector4 operator-(const Vector4& b) { Vector<4>::Subtract(b); return *this; }
             inline Vector4 operator+(const Vector4& b) { Vector<4>::Add(b); return *this; }
-            inline Vector4 operator*(const Vector4& b) { Vector<4>::Multiply(b); return *this; }
+            inline virtual Vector4 operator*(const Vector4& b) { Vector<4>::Multiply(b); return *this; }
             inline Vector4 operator*(float scalar) { Vector<4>::Multiply(scalar); return *this; }
         };
     }

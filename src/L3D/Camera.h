@@ -58,8 +58,6 @@ namespace lepus
 
             lepus::math::Matrix4x4 BuildViewMatrix()
             {
-                lepus::math::Matrix4x4 rot = lepus::math::Matrix4x4::Identity();
-                lepus::math::Matrix4x4 pos = lepus::math::Matrix4x4::Identity();
 
                 /*
     rot[0] = vec4(c+axis.x*axis.x*(1.0 - c), axis.y*axis.x*(1.0 - c)+axis.z*s, axis.z*axis.x*(1.0 - c)-axis.y*s, 0.0);
@@ -69,27 +67,14 @@ namespace lepus
                 */
 
                 lepus::types::Vector4& axisAngle = m_Transform.Rotation();
-                lepus::types::Vector3 axis = lepus::types::Vector3((float*)axisAngle.GetData());
-                axis = axis * (1.f / axis.Magnitude());
 
-                float c = cosf(axisAngle.w());
-                float s = sinf(axisAngle.w());
+                // TODO: shouldn't need the non-const float* cast
+                lepus::math::Matrix4x4 rot = lepus::math::Transform::AxisAngle(lepus::types::Vector3((float*)axisAngle.GetData()), axisAngle.w());
+                lepus::math::Matrix4x4 pos = lepus::math::Matrix4x4::Identity();
 
-                rot.set<0, 0>(c + axis.x() * axis.x() * (1.f - c));
-                rot.set<1, 0>(axis.y() * axis.x() * (1.f - c) + axis.z() * s);
-                rot.set<2, 0>(axis.z() * axis.x() * (1.f - c) - axis.y() * s);
-
-                rot.set<0, 1>(axis.y() * axis.x() * (1.f - c) - axis.z() * s);
-                rot.set<1, 1>(c + axis.y() * axis.y() * (1.f - c));
-                rot.set<2, 1>(axis.z() * axis.y() * (1.f - c) + axis.x() * s);
-
-                rot.set<0, 2>(axis.z() * axis.x() * (1.f - c) + axis.y() * s);
-                rot.set<1, 2>(axis.z() * axis.y() * (1.f - c) - axis.x() * s);
-                rot.set<2, 2>(c + axis.z() * axis.z() * (1.f - c));
-
-                pos.set<0, 3>(m_Transform.Origin().x());
-                pos.set<1, 3>(m_Transform.Origin().y());
-                pos.set<2, 3>(m_Transform.Origin().z());
+                pos.set<0, 3>(-m_Transform.Origin().x());
+                pos.set<1, 3>(-m_Transform.Origin().y());
+                pos.set<2, 3>(-m_Transform.Origin().z());
 
                 return rot.Multiply(pos);
             }
