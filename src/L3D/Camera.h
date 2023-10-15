@@ -66,16 +66,50 @@ namespace lepus
     rot[3] = vec4(0.0, 0.0, 0.0, 1.0);
                 */
 
-                lepus::types::Vector4& axisAngle = m_Transform.Rotation();
+                lepus::types::Vector3 axis = m_Transform.Rotation().Axis();
+
+                auto fwdDot = lepus::types::Vector3::Dot(m_Transform.Forward(), lepus::types::Vector3(0.f, 0.f, -1.f));
+                auto rgtDot = lepus::types::Vector3::Dot(m_Transform.Right(), lepus::types::Vector3(1.f, 0.f, 0.f));
+                auto upDot = lepus::types::Vector3::Dot(m_Transform.Up(), lepus::types::Vector3(0.f, 1.f, 0.f));
+
+                float angle = m_Transform.Rotation().Angle();
+
+
+                /*axis.x(axis.x() * rgtDot);
+                axis.y(axis.y() * upDot);
+                axis.z(axis.z() * fwdDot);*/
 
                 // TODO: shouldn't need the non-const float* cast
-                lepus::math::Matrix4x4 rot = lepus::math::Transform::AxisAngle(lepus::types::Vector3((float*)axisAngle.GetData()), axisAngle.w());
+                lepus::math::Matrix4x4 rot = lepus::math::Transform::AxisAngle(axis, angle);
                 lepus::math::Matrix4x4 pos = lepus::math::Matrix4x4::Identity();
+
+                //LepusEngine::ConsoleLogger::Global().LogInfo("Camera", "BuildViewMatrix", (char*)std::to_string(angle).c_str());
+                //LepusEngine::ConsoleLogger::Global().LogInfo("Camera", "BuildViewMatrix", (char*)std::to_string(fwdDot).c_str());
 
                 pos.set<0, 3>(-m_Transform.Origin().x());
                 pos.set<1, 3>(-m_Transform.Origin().y());
                 pos.set<2, 3>(-m_Transform.Origin().z());
 
+                auto f = m_Transform.Forward() * (1.f / m_Transform.Forward().Magnitude());
+                auto s = m_Transform.Right() * (1.f / m_Transform.Right().Magnitude());
+                auto u = m_Transform.Up() * (1.f / m_Transform.Up().Magnitude());
+
+                LepusEngine::ConsoleLogger::Global().LogInfo("Camera", "BuildViewMatrix", (char*)s.ToString().c_str());
+
+                /*pos.set<0, 0>(s.x());pos.set<0, 1>(u.x());pos.set<0, 2>(f.x());
+                pos.set<1, 0>(s.y());pos.set<1, 1>(u.y());pos.set<1, 2>(f.y());
+                pos.set<2, 0>(s.z());pos.set<2, 1>(u.z());pos.set<2, 2>(f.z());*/
+
+                //return pos;
+
+
+                lepus::math::Matrix4x4 lookAt = lepus::math::Matrix4x4::Identity();
+
+                lookAt.set<0, 0>(s.x());lookAt.set<0, 1>(s.y());lookAt.set<0, 2>(s.z());
+                lookAt.set<1, 0>(u.x());lookAt.set<1, 1>(u.y());lookAt.set<1, 2>(u.z());
+                lookAt.set<2, 0>(f.x());lookAt.set<2, 1>(f.y());lookAt.set<2, 2>(f.z());
+
+                return lookAt.Multiply(pos);
                 return rot.Multiply(pos);
             }
         };

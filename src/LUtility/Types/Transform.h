@@ -2,6 +2,7 @@
 #define LUTILITY_MATH_TRANSFORM
 
 #include "../Math.h"
+#include "../../LEngine/ConsoleLogger.h"
 
 namespace lepus
 {
@@ -36,8 +37,8 @@ namespace lepus
             inline lepus::types::Vector3 Forward() { return lepus::types::Vector3(m_Forward); }
             inline lepus::types::Vector3 Right() { return lepus::types::Vector3(m_Right); }
             inline lepus::types::Vector3 Up() { return lepus::types::Vector3(m_Up); }
-            inline lepus::types::Vector4& Rotation() { return m_Rotation; }
-            inline void Rotation(lepus::types::Vector4& newRotation)
+            inline lepus::types::Quaternion& Rotation() { return m_Rotation; }
+            inline void Rotation(lepus::types::Quaternion& newRotation)
             {
                 m_Rotation.x(newRotation.x());
                 m_Rotation.y(newRotation.y());
@@ -45,27 +46,26 @@ namespace lepus
                 m_Rotation.w(newRotation.w());
             }
 
-            inline void Rotation(float x, float y, float z, float w)
+            inline void Rotate(lepus::types::Quaternion quat)
             {
-                m_Rotation.x(x);
-                m_Rotation.y(y);
-                m_Rotation.z(z);
-                m_Rotation.w(w);
-            }
 
-            inline void Rotate(lepus::types::Vector3& axis, float angle)
-            {
-                lepus::math::Matrix4x4 rotationMatrix = AxisAngle(axis, -angle);
 
-                auto newForward = rotationMatrix.Multiply(lepus::types::Vector4(m_Forward));
-                auto newRight = rotationMatrix.Multiply(lepus::types::Vector4(m_Right));
-                auto newUp = rotationMatrix.Multiply(lepus::types::Vector4(m_Up));
+                auto combined = m_Rotation * quat;
+                auto newAxis = combined.Axis();
+                auto newAngle = combined.Angle();
+                //if (abs(newAngle) > 0.001f)
+                {
+                    m_Rotation = combined;
+                }
+                lepus::math::Matrix4x4 rotationMatrix = AxisAngle(newAxis, -newAngle);
+                auto newForward = rotationMatrix.Multiply(lepus::types::Vector4(0.f, 0.f, -1.f, 1.f));
+                auto newRight = rotationMatrix.Multiply(lepus::types::Vector4(1.f, 0.f, 0.f, 1.f));
+                auto newUp = rotationMatrix.Multiply(lepus::types::Vector4(0.f, 1.f, 0.f, 1.f));
 
                 m_Forward.x(newForward.x());m_Forward.y(newForward.y());m_Forward.z(newForward.z());
                 m_Right.x(newRight.x());m_Right.y(newRight.y());m_Right.z(newRight.z());
                 m_Up.x(newUp.x());m_Up.y(newUp.y());m_Up.z(newUp.z());
 
-                lepus::types::Vector4& currentRot = Rotation();
                 // TODO: Set the rotation to a multiplication of currentRot by the delta quaternion
             }
 

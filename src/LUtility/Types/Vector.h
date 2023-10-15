@@ -71,8 +71,6 @@ namespace lepus
                 return sum;
             }
 
-            static inline Vector<nbComponents> Cross() {}
-
             Vector<nbComponents> operator-(const Vector<nbComponents>& b)
             {
                 Vector<nbComponents> out = Vector<nbComponents>(*this);
@@ -203,6 +201,17 @@ namespace lepus
             inline float x(float newX) { return m_Components[0] = newX; }
             inline float y(float newY) { return m_Components[1] = newY; }
             inline float z(float newZ) { return m_Components[2] = newZ; }
+
+            static inline Vector3 Cross(const Vector3& a, const Vector3& b)
+            {
+                // Find determinant of:
+                // x   y   z
+                // a1  a2  a3
+                // b1  b2  b3
+
+                // det(x) - det(y) + det(z)
+                return Vector3(a.y() * b.z() - a.z() * b.y(), -(a.x() * b.z() - a.z() * b.x()), (a.x() * b.y() - a.y() * b.x()));
+            }
 
             inline Vector3 operator-(const Vector3& b) { Vector<3>::Subtract(b); return *this; }
             inline Vector3 operator+(const Vector3& b) { Vector<3>::Add(b); return *this; }

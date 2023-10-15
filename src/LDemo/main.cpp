@@ -27,7 +27,7 @@ using namespace LepusEngine;
 #endif
 
 float fov = 0.f;
-float angle = 0.f;
+float angleYaw = 0.f, anglePitch = 0.f;
 const float camSpeed = 0.005f;
 double xposLast = -1.0;
 double yposLast = -1.0;
@@ -53,12 +53,33 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 		yposLast = ypos;
 	}
 
-	float deltaX = (xpos - xposLast) / 100.0;
-	float deltaY = (ypos - yposLast) / 100.0;
-	angle += deltaX * 0.3f;
-	camera.Transform().Rotate(lepus::types::Vector3(0.0f, 1.f, 0.f), deltaX * 0.3f);
+	float deltaX = (xpos - xposLast) / 300.0;
+	float deltaY = (ypos - yposLast) / 300.0;
+	angleYaw += deltaX;
+	anglePitch += deltaY;
+	lepus::types::Quaternion rotationYaw = lepus::types::Quaternion(0.f, 1.f, 0.f, deltaX);
+	//camera.Transform().Rotate(lepus::types::Vector3(0.0f, 1.f, 0.f), deltaX);
 
-	LepusEngine::ConsoleLogger::Global().LogInfo("", "mouseCallback", (char*)std::to_string(angle).c_str());
+	//LepusEngine::ConsoleLogger::Global().LogInfo("", "mouseCallback", (char*)axis.ToString().c_str());
+	//ConsoleLogger::Global().LogInfo("", "mouseCallback", (char*)std::to_string(angle).c_str());
+	//if (abs(angle) > 0.001f)
+	{
+		//camera.Transform().Rotate(axis, angle);
+	}
+
+	auto combined = rotationYaw;
+	float angle = combined.Angle();
+	if (abs(angle) > 0.001f)
+	{
+		camera.Transform().Rotate(rotationYaw);
+	}
+	lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(camera.Transform().Right(), deltaY);
+	angle = rotationPitch.Angle();
+	if (abs(angle) > 0.001f)
+	{
+		camera.Transform().Rotate(rotationPitch);
+	}
+
 	xposLast = xpos;
 	yposLast = ypos;
 }
@@ -112,7 +133,8 @@ int main()
 
 	float runningTime = glfwGetTime();
 
-	camera.Transform().Rotation().y(1.f);
+	//camera.Transform().Rotation().y(1.f);
+	//camera.Transform().Rotation().w(0.f);
 	//camera.Transform().Rotation().z(1.f);
 
 	GLFWwindow* window = reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr());
@@ -155,7 +177,7 @@ int main()
 			  camera.Transform().Origin().y(y);
 			  camera.Transform().Origin().z(z);
 	  */
-		camera.Transform().Rotation().w(angle);
+	  //camera.Transform().Rotation().w(angleYaw);
 		viewMatrix = camera.BuildViewMatrix();
 
 		((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>("PROJ"))->Value((float*)projMatrix.data());
@@ -168,7 +190,7 @@ int main()
 		float newRunningTime = glfwGetTime();
 		deltaTime = newRunningTime - runningTime;
 
-		ConsoleLogger::Global().LogInfo("", "main", (char*)camera.Transform().Forward().ToString().c_str());
+		//ConsoleLogger::Global().LogInfo("", "main", (char*)camera.Transform().Forward().ToString().c_str());
 
 		isRunning = windowing->Update();
 	}
