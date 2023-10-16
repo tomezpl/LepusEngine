@@ -154,11 +154,11 @@ int main()
 		lepus::types::Vector3 forwardDelta, rightDelta;
 		if (back == GLFW_PRESS)
 		{
-			forwardDelta = forwardDelta - (camera.Transform().Forward() * deltaTime * camSpeed);
+			forwardDelta = forwardDelta + (camera.Transform().Forward() * deltaTime * camSpeed);
 		}
 		if (forward == GLFW_PRESS)
 		{
-			forwardDelta = forwardDelta + (camera.Transform().Forward() * deltaTime * camSpeed);
+			forwardDelta = forwardDelta - (camera.Transform().Forward() * deltaTime * camSpeed);
 		}
 		if (right == GLFW_PRESS)
 		{

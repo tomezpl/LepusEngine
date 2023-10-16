@@ -57,7 +57,7 @@ namespace lepus
                 {
                     m_Rotation = combined;
                 }
-                lepus::math::Matrix4x4 rotationMatrix = AxisAngle(newAxis, -newAngle);
+                lepus::math::Matrix4x4 rotationMatrix = AxisAngle(newAxis, newAngle);
                 auto newForward = rotationMatrix.Multiply(lepus::types::Vector4(0.f, 0.f, -1.f, 1.f));
                 auto newRight = rotationMatrix.Multiply(lepus::types::Vector4(1.f, 0.f, 0.f, 1.f));
                 auto newUp = rotationMatrix.Multiply(lepus::types::Vector4(0.f, 1.f, 0.f, 1.f));

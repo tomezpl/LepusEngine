@@ -86,15 +86,19 @@ namespace lepus
                 //LepusEngine::ConsoleLogger::Global().LogInfo("Camera", "BuildViewMatrix", (char*)std::to_string(angle).c_str());
                 //LepusEngine::ConsoleLogger::Global().LogInfo("Camera", "BuildViewMatrix", (char*)std::to_string(fwdDot).c_str());
 
-                pos.set<0, 3>(-m_Transform.Origin().x());
-                pos.set<1, 3>(-m_Transform.Origin().y());
-                pos.set<2, 3>(-m_Transform.Origin().z());
+
 
                 auto f = m_Transform.Forward() * (1.f / m_Transform.Forward().Magnitude());
                 auto s = m_Transform.Right() * (1.f / m_Transform.Right().Magnitude());
                 auto u = m_Transform.Up() * (1.f / m_Transform.Up().Magnitude());
 
-                LepusEngine::ConsoleLogger::Global().LogInfo("Camera", "BuildViewMatrix", (char*)s.ToString().c_str());
+                //LepusEngine::ConsoleLogger::Global().LogInfo("Camera", "BuildViewMatrix", (char*)s.ToString().c_str());
+
+                auto e = m_Transform.Origin();
+
+                pos.set<0, 3>(-e.x());
+                pos.set<1, 3>(-e.y());
+                pos.set<2, 3>(-e.z());
 
                 /*pos.set<0, 0>(s.x());pos.set<0, 1>(u.x());pos.set<0, 2>(f.x());
                 pos.set<1, 0>(s.y());pos.set<1, 1>(u.y());pos.set<1, 2>(f.y());
