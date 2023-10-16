@@ -213,10 +213,10 @@ namespace lepus
                 return Vector3(a.y() * b.z() - a.z() * b.y(), -(a.x() * b.z() - a.z() * b.x()), (a.x() * b.y() - a.y() * b.x()));
             }
 
-            inline Vector3 operator-(const Vector3& b) { Vector<3>::Subtract(b); return *this; }
-            inline Vector3 operator+(const Vector3& b) { Vector<3>::Add(b); return *this; }
-            inline Vector3 operator*(const Vector3& b) { Vector<3>::Multiply(b); return *this; }
-            inline Vector3 operator*(float scalar) { Vector<3>::Multiply(scalar); return *this; }
+            inline Vector3 operator-(const Vector3& b) { auto result = *this; result.Subtract(b); return result; }
+            inline Vector3 operator+(const Vector3& b) { auto result = *this; result.Add(b); return result; }
+            inline Vector3 operator*(const Vector3& b) { auto result = *this; result.Multiply(b); return result; }
+            inline Vector3 operator*(float scalar) { auto result = *this; result.Multiply(scalar); return result; }
 
             inline std::string ToString()
             {
