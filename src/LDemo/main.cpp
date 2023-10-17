@@ -190,7 +190,7 @@ int main()
 		float newRunningTime = glfwGetTime();
 		deltaTime = newRunningTime - runningTime;
 
-		//ConsoleLogger::Global().LogInfo("", "main", (char*)camera.Transform().Forward().ToString().c_str());
+		ConsoleLogger::Global().LogInfo("", "main", (char*)camera.Transform().Forward().ToString().c_str());
 
 		isRunning = windowing->Update();
 	}

@@ -2,6 +2,9 @@
 #define LEPUS_UTILITY_TYPES_QUATERNION
 
 #include "Vector.h"
+#include "../../LEngine/ConsoleLogger.h"
+#include <cmath>
+#include "../Math.h"
 
 namespace lepus
 {
@@ -36,10 +39,14 @@ namespace lepus
 
             inline Vector3 Axis()
             {
-                float sqrtInvW = sqrtf(1.f - w() * w());
+                float invW = fmax(0.f, 1.f - w() * w());
+                float sqrtInvW = sqrt(invW);
+                std::string wStr = "invW = " + std::to_string(invW) + ", sqrtInvW = " + std::to_string(sqrtInvW);
+                LepusEngine::ConsoleLogger::Global().LogInfo("Quaternion", "Axis", (char*)wStr.c_str());
                 if (sqrtInvW == 0.f)
                 {
                     // just return Vector3.Up if divide by 0
+                    LepusEngine::ConsoleLogger::Global().LogInfo("Quaternion", "Axis", "Up");
                     return Vector3(0.f, 1.f, 0.f);
                 }
 
@@ -47,9 +54,9 @@ namespace lepus
                 return vec * (1.f / vec.Magnitude());
             }
 
-            inline float Angle()
+            inline float Angle() const
             {
-                return acosf(w()) * 2.f;
+                return acosf(fmax(-1.f, fmin(1.f, w()))) * 2.f;
             }
 
             inline Quaternion operator*(const Quaternion& b)
