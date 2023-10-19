@@ -60,10 +60,13 @@ namespace lepus
                 LepusEngine::ConsoleLogger::Global().LogInfo("Transform", "Rotate", (char*)std::to_string(newAngle).c_str());
                 LepusEngine::ConsoleLogger::Global().LogInfo("Transform", "Rotate", (char*)newAxis.ToString().c_str());
                 lepus::math::Matrix4x4 rotationMatrix = AxisAngle(newAxis, newAngle);
-                auto newForward = rotationMatrix.Multiply(lepus::types::Vector4(0.f, 0.f, -1.f, 1.f));
+                /*auto newForward = rotationMatrix.Multiply(lepus::types::Vector4(0.f, 0.f, -1.f, 1.f));
                 auto newRight = rotationMatrix.Multiply(lepus::types::Vector4(1.f, 0.f, 0.f, 1.f));
-                auto newUp = rotationMatrix.Multiply(lepus::types::Vector4(0.f, 1.f, 0.f, 1.f));
+                auto newUp = rotationMatrix.Multiply(lepus::types::Vector4(0.f, 1.f, 0.f, 1.f));*/
 
+                auto newForward = quat.Rotate(m_Forward);
+                auto newRight = quat.Rotate(m_Right);
+                auto newUp = quat.Rotate(m_Up);
                 m_Forward.x(newForward.x());m_Forward.y(newForward.y());m_Forward.z(newForward.z());
                 m_Right.x(newRight.x());m_Right.y(newRight.y());m_Right.z(newRight.z());
                 m_Up.x(newUp.x());m_Up.y(newUp.y());m_Up.z(newUp.z());

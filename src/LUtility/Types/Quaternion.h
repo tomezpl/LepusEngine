@@ -75,6 +75,20 @@ namespace lepus
 
                 return result;
             }
+
+            inline lepus::types::Vector3 Rotate(const lepus::types::Vector3& v)
+            {
+                Quaternion p = Quaternion();
+                p.w(0.f);
+                p.x(v.x());
+                p.y(v.y());
+                p.z(v.z());
+                Quaternion conjugate = Quaternion(*this);
+                conjugate.x(-conjugate.x());
+                conjugate.y(-conjugate.y());
+                conjugate.z(-conjugate.z());
+                return lepus::types::Vector3((float*)(*this * p * conjugate).GetData());
+            }
         };
     }
 }
