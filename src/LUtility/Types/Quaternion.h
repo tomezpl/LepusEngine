@@ -37,16 +37,14 @@ namespace lepus
 
             Quaternion(const Vector3& axis, float angle) : Quaternion(axis.x(), axis.y(), axis.z(), angle) {}
 
-            inline Vector3 Axis()
+            /// @brief Get the axis of rotation for this Quaternion.
+            /// @return A Vector3 representing the axis of rotation calculated from the Quaternion's imaginary part.
+            inline Vector3 Axis() const
             {
-                float invW = fmax(0.f, 1.f - w() * w());
-                float sqrtInvW = sqrt(invW);
-                std::string wStr = "invW = " + std::to_string(invW) + ", sqrtInvW = " + std::to_string(sqrtInvW);
-                //LepusEngine::ConsoleLogger::Global().LogInfo("Quaternion", "Axis", (char*)wStr.c_str());
+                float sqrtInvW = sqrt(fmax(0.f, 1.f - w() * w()));
                 if (sqrtInvW == 0.f)
                 {
                     // just return Vector3.Up if divide by 0
-                    LepusEngine::ConsoleLogger::Global().LogInfo("Quaternion", "Axis", "Up");
                     return Vector3(0.f, 1.f, 0.f);
                 }
 
@@ -54,14 +52,15 @@ namespace lepus
                 return vec * (1.f / vec.Magnitude());
             }
 
+            /// @brief Get the angle of rotation for this Quaternion.
+            /// @return A scalar describing the angle of rotation calculated from the Quaternion's real part (arccos(w) * 2).
             inline float Angle() const
             {
                 return acosf(fmax(-1.f, fmin(1.f, w()))) * 2.f;
             }
 
-            inline Quaternion operator*(const Quaternion& b)
+            inline Quaternion operator*(const Quaternion& b) const
             {
-                // TODO: use scalar/vector notation for multiplying quaternions
                 Quaternion result = Quaternion();
 
                 lepus::types::Vector3 va = lepus::types::Vector3((float*)GetData());
@@ -76,7 +75,10 @@ namespace lepus
                 return result;
             }
 
-            inline lepus::types::Vector3 Rotate(const lepus::types::Vector3& v)
+            /// @brief Rotates a Vector3 v by the axis and angle described by this Quaternion.
+            /// @param v Vector3 representing a point in 3D space to rotate.
+            /// @return A Vector3 containing the point v rotated around the origin.
+            inline lepus::types::Vector3 Rotate(const lepus::types::Vector3& v) const
             {
                 Quaternion p = Quaternion();
                 p.w(0.f);
@@ -90,7 +92,9 @@ namespace lepus
                 return lepus::types::Vector3((float*)(*this * p * conjugate).GetData());
             }
 
-            std::string ToString()
+            /// @brief Create a text representation of the Quaternion. Useful for debugging.
+            /// @return A string representing the Quaternion formatted as: "X = x, Y = y, Z = z, W = w" 
+            std::string ToString() const
             {
                 return std::string("X = ").append(std::to_string(x())).append(", Y = ").append(std::to_string(y())).append(", Z = ").append(std::to_string(z())).append(", W = ").append(std::to_string(w()));
             }

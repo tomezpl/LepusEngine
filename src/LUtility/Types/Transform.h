@@ -27,18 +27,20 @@ namespace lepus
                 m_Rotation = lepus::types::Quaternion();
             }
 
-            inline lepus::types::Vector3& Origin() { return m_Origin; }
+            inline lepus::types::Vector3 Origin() { return m_Origin; }
             inline void Origin(const lepus::types::Vector3& vec)
             {
                 m_Origin.x(vec.x());
                 m_Origin.y(vec.y());
                 m_Origin.z(vec.z());
             }
+
             inline lepus::types::Vector3 Forward() { return lepus::types::Vector3(m_Forward); }
             inline lepus::types::Vector3 Right() { return lepus::types::Vector3(m_Right); }
             inline lepus::types::Vector3 Up() { return lepus::types::Vector3(m_Up); }
-            inline lepus::types::Quaternion& Rotation() { return m_Rotation; }
-            inline void Rotation(lepus::types::Quaternion& newRotation)
+
+            inline lepus::types::Quaternion Rotation() { return m_Rotation; }
+            inline void Rotation(const lepus::types::Quaternion& newRotation)
             {
                 m_Rotation.x(newRotation.x());
                 m_Rotation.y(newRotation.y());
@@ -46,32 +48,19 @@ namespace lepus
                 m_Rotation.w(newRotation.w());
             }
 
-            inline void Rotate(lepus::types::Quaternion quat)
+            inline void Rotate(const lepus::types::Quaternion& quat)
             {
+                m_Rotation = m_Rotation * quat;
 
-
-                auto combined = m_Rotation * quat;
-                auto newAxis = combined.Axis();
-                auto newAngle = combined.Angle();
-                //if (abs(newAngle) > 0.001f)
-                {
-                    m_Rotation = combined;
-                }
-                //LepusEngine::ConsoleLogger::Global().LogInfo("Transform", "Rotate", (char*)std::to_string(newAngle).c_str());
-                //LepusEngine::ConsoleLogger::Global().LogInfo("Transform", "Rotate", (char*)newAxis.ToString().c_str());
-                lepus::math::Matrix4x4 rotationMatrix = AxisAngle(newAxis, newAngle);
-                /*auto newForward = rotationMatrix.Multiply(lepus::types::Vector4(0.f, 0.f, -1.f, 1.f));
-                auto newRight = rotationMatrix.Multiply(lepus::types::Vector4(1.f, 0.f, 0.f, 1.f));
-                auto newUp = rotationMatrix.Multiply(lepus::types::Vector4(0.f, 1.f, 0.f, 1.f));*/
-
+                // Rotate the basis vectors
                 auto newForward = quat.Rotate(m_Forward);
                 auto newRight = quat.Rotate(m_Right);
                 auto newUp = quat.Rotate(m_Up);
+
+                // Set basis vectors to rotated
                 m_Forward.x(newForward.x());m_Forward.y(newForward.y());m_Forward.z(newForward.z());
                 m_Right.x(newRight.x());m_Right.y(newRight.y());m_Right.z(newRight.z());
                 m_Up.x(newUp.x());m_Up.y(newUp.y());m_Up.z(newUp.z());
-
-                // TODO: Set the rotation to a multiplication of currentRot by the delta quaternion
             }
 
             static inline lepus::math::Matrix4x4 AxisAngle(lepus::types::Vector3& axis, float angle)
