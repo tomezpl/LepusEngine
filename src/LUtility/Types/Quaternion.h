@@ -42,7 +42,7 @@ namespace lepus
                 float invW = fmax(0.f, 1.f - w() * w());
                 float sqrtInvW = sqrt(invW);
                 std::string wStr = "invW = " + std::to_string(invW) + ", sqrtInvW = " + std::to_string(sqrtInvW);
-                LepusEngine::ConsoleLogger::Global().LogInfo("Quaternion", "Axis", (char*)wStr.c_str());
+                //LepusEngine::ConsoleLogger::Global().LogInfo("Quaternion", "Axis", (char*)wStr.c_str());
                 if (sqrtInvW == 0.f)
                 {
                     // just return Vector3.Up if divide by 0
@@ -88,6 +88,11 @@ namespace lepus
                 conjugate.y(-conjugate.y());
                 conjugate.z(-conjugate.z());
                 return lepus::types::Vector3((float*)(*this * p * conjugate).GetData());
+            }
+
+            std::string ToString()
+            {
+                return std::string("X = ").append(std::to_string(x())).append(", Y = ").append(std::to_string(y())).append(", Z = ").append(std::to_string(z())).append(", W = ").append(std::to_string(w()));
             }
         };
     }
