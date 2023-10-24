@@ -28,7 +28,7 @@ namespace lepus
             }
 
             inline lepus::types::Vector3& Origin() { return m_Origin; }
-            inline void Origin(lepus::types::Vector3& vec)
+            inline void Origin(const lepus::types::Vector3& vec)
             {
                 m_Origin.x(vec.x());
                 m_Origin.y(vec.y());
@@ -57,8 +57,8 @@ namespace lepus
                 {
                     m_Rotation = combined;
                 }
-                LepusEngine::ConsoleLogger::Global().LogInfo("Transform", "Rotate", (char*)std::to_string(newAngle).c_str());
-                LepusEngine::ConsoleLogger::Global().LogInfo("Transform", "Rotate", (char*)newAxis.ToString().c_str());
+                //LepusEngine::ConsoleLogger::Global().LogInfo("Transform", "Rotate", (char*)std::to_string(newAngle).c_str());
+                //LepusEngine::ConsoleLogger::Global().LogInfo("Transform", "Rotate", (char*)newAxis.ToString().c_str());
                 lepus::math::Matrix4x4 rotationMatrix = AxisAngle(newAxis, newAngle);
                 /*auto newForward = rotationMatrix.Multiply(lepus::types::Vector4(0.f, 0.f, -1.f, 1.f));
                 auto newRight = rotationMatrix.Multiply(lepus::types::Vector4(1.f, 0.f, 0.f, 1.f));
