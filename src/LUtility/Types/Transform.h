@@ -27,7 +27,7 @@ namespace lepus
                 m_Rotation = lepus::types::Quaternion();
             }
 
-            inline lepus::types::Vector3 Origin() { return m_Origin; }
+            inline lepus::types::Vector3 Origin() const { return m_Origin; }
             inline void Origin(const lepus::types::Vector3& vec)
             {
                 m_Origin.x(vec.x());
@@ -35,11 +35,11 @@ namespace lepus
                 m_Origin.z(vec.z());
             }
 
-            inline lepus::types::Vector3 Forward() { return lepus::types::Vector3(m_Forward); }
-            inline lepus::types::Vector3 Right() { return lepus::types::Vector3(m_Right); }
-            inline lepus::types::Vector3 Up() { return lepus::types::Vector3(m_Up); }
+            inline lepus::types::Vector3 Forward() const { return lepus::types::Vector3(m_Forward); }
+            inline lepus::types::Vector3 Right() const { return lepus::types::Vector3(m_Right); }
+            inline lepus::types::Vector3 Up() const { return lepus::types::Vector3(m_Up); }
 
-            inline lepus::types::Quaternion Rotation() { return m_Rotation; }
+            inline lepus::types::Quaternion Rotation() const { return m_Rotation; }
             inline void Rotation(const lepus::types::Quaternion& newRotation)
             {
                 m_Rotation.x(newRotation.x());

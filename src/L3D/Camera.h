@@ -27,7 +27,7 @@ namespace lepus
                 m_Transform = lepus::math::Transform();
             }
 
-            inline float FOV()
+            inline float FOV() const
             {
                 return m_FOV;
             }
@@ -37,9 +37,13 @@ namespace lepus
                 m_FOV = fov;
             }
 
+            /// @brief Gets the Camera's Transform.
+            /// @return A reference to the Transform used by the Camera.
             inline lepus::math::Transform& Transform() { return m_Transform; }
 
-            lepus::math::Matrix4x4 BuildPerspectiveMatrix()
+            /// @brief Generates a perspective projection matrix using the current FOV angle and near/far clipping planes.
+            /// @return A 4x4 projection matrix that can be used to apply camera perspective to vertices.
+            lepus::math::Matrix4x4 BuildPerspectiveMatrix() const
             {
                 lepus::math::Matrix4x4 projMatrix = lepus::math::Matrix4x4();
 
@@ -56,7 +60,9 @@ namespace lepus
                 return projMatrix;
             }
 
-            lepus::math::Matrix4x4 BuildViewMatrix()
+            /// @brief Generates a look-at view matrix using the Camera's Transform.
+            /// @return A 4x4 view matrix that can be used to rotate and translate vertices according to eye position and camera orientation.
+            lepus::math::Matrix4x4 BuildViewMatrix() const
             {
                 lepus::math::Matrix4x4 pos = lepus::math::Matrix4x4::Identity();
 
