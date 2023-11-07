@@ -27,11 +27,15 @@ namespace lepus
                 m_Transform = lepus::math::Transform();
             }
 
+            /// @brief Gets field of view
+            /// @return Camera's field of view (in degrees)
             inline float FOV() const
             {
                 return m_FOV;
             }
 
+            /// @brief Sets field of view
+            /// @param fov New field of view (in degrees) to be used by this camera
             inline void FOV(float fov)
             {
                 m_FOV = fov;

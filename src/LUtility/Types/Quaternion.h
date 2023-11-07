@@ -29,6 +29,12 @@ namespace lepus
                 init(quatData);
             }
 
+            /// @brief Constructs a Quaternion from Axis-Angle representation.
+            /// @remarks This is not for initialising XYZW directly - use the array initialiser instead.
+            /// @param axisX X component of the axis
+            /// @param axisY Y component of the axis
+            /// @param axisZ Z component of the axis
+            /// @param angle Rotation angle around the axis
             Quaternion(float axisX, float axisY, float axisZ, float angle)
             {
                 // Negating the angle here so that the Quaternion represents a clockwise rotation along an axis as observed looking towards the origin/object.

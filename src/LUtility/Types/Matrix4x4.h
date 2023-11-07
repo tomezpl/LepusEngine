@@ -11,8 +11,7 @@ namespace lepus
         class Matrix4x4
         {
             private:
-            // TODO: use an array instead?
-            // Elements in row-major order.
+            /// @brief Elements in row-major order.
             float m_Elements[4 * 4];
 
             public:

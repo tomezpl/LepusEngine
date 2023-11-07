@@ -47,14 +47,6 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	angleYaw += deltaX;
 	anglePitch += deltaY;
 	lepus::types::Quaternion rotationYaw = lepus::types::Quaternion(0.f, 1.f, 0.f, deltaX);
-	//camera.Transform().Rotate(lepus::types::Vector3(0.0f, 1.f, 0.f), deltaX);
-
-	//LepusEngine::ConsoleLogger::Global().LogInfo("", "mouseCallback", (char*)axis.ToString().c_str());
-	//ConsoleLogger::Global().LogInfo("", "mouseCallback", (char*)std::to_string(angle).c_str());
-	//if (abs(angle) > 0.001f)
-	{
-		//camera.Transform().Rotate(axis, angle);
-	}
 
 	auto combined = rotationYaw;
 	float angle = combined.Angle();
@@ -117,13 +109,8 @@ int main()
 	fov = camera.FOV();
 
 	glfwSetScrollCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), scrollCallback);
-	//glfwSetKeyCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), keyInputCallback);
 
 	float runningTime = glfwGetTime();
-
-	//camera.Transform().Rotation().y(1.f);
-	//camera.Transform().Rotation().w(0.f);
-	//camera.Transform().Rotation().z(1.f);
 
 	GLFWwindow* window = reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr());
 	glfwGetCursorPos(window, &xposLast, &yposLast);
@@ -161,26 +148,16 @@ int main()
 
 		camera.Transform().Origin(camera.Transform().Origin() + forwardDelta + rightDelta);
 
-
-		/*
-			  camera.Transform().Origin().x(x);
-			  camera.Transform().Origin().y(y);
-			  camera.Transform().Origin().z(z);
-	  */
-	  //camera.Transform().Rotation().w(angleYaw);
 		viewMatrix = camera.BuildViewMatrix();
 
 		((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>("PROJ"))->Value((float*)projMatrix.data());
 		((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>("VIEW"))->Value((float*)viewMatrix.data());
-		((lepus::gfx::GLFloatUniformBinding*)api.GetUniform<lepus::gfx::GLFloatUniformBinding>("runningTime"))->Value(runningTime);
 
 		windowing->Update(); // Update window before drawing
 		engine.Render<unsigned char, Lepus3D::GraphicsEngine::PixelFormat::RGBA32>(100, 149, 237);
 
 		float newRunningTime = glfwGetTime();
 		deltaTime = newRunningTime - runningTime;
-
-		ConsoleLogger::Global().LogInfo("", "main", (char*)camera.Transform().Rotation().ToString().c_str());
 
 		isRunning = windowing->Update();
 	}

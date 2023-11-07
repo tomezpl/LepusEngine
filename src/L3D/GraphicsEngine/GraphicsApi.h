@@ -62,6 +62,9 @@ namespace LepusEngine
 				memcpy(m_Options, options, optionsSz);
 			}
 
+			/// @brief Internal API-specific method for retrieving a native handle to a uniform object.
+			/// @param name The name of the uniform to fetch.
+			/// @return API-specific handle for a uniform of a given type.
 			virtual void* GetUniformInternal(char* name) = 0;
 			public:
 			/// @brief Default constructor. Does nothing, so Init(GraphicsApiOptions*) needs to be called manually.
@@ -101,12 +104,20 @@ namespace LepusEngine
 
 			virtual void CreatePipeline() = 0;
 
+			/// @brief Gets a Lepus UniformBinding wrapper for an API-specific uniform with the given name.
+			/// @tparam TUniformHandle API-specific handle type used for this type of uniform.
+			/// @tparam TUniformBinding UniformBinding implementation
+			/// @param name Name of the uniform to fetch.
+			/// @return A UniformBinding wrapper for the named uniform object.
 			template<typename TUniformHandle = void*, class TUniformBinding = lepus::gfx::UniformBinding<TUniformHandle>>
 			inline const TUniformBinding* GetUniform(char* name)
 			{
 				return reinterpret_cast<const TUniformBinding*>(GetUniformInternal(name));
 			}
 
+			/// @brief Applies uniforms in the shader.
+			/// Implementations can fire & forget by issuing this before every draw, but it might be worth having a mechanism to invalidate uniforms
+			/// and only update them once they're marked as dirty.
 			virtual void UpdateUniforms() = 0;
 
 			virtual void Draw() = 0;

@@ -60,16 +60,10 @@ void GraphicsApiGL::SetupUniforms()
 	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(proj));
 	m_Pipeline.uniformMap.insert_or_assign("PROJ", reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(proj));
 
-	// temp
-	auto* runningTime = new lepus::gfx::GLFloatUniformBinding(glGetUniformLocation(m_Programs[0], "runningTime"));
-	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(runningTime));
-	m_Pipeline.uniformMap.insert_or_assign("runningTime", reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(runningTime));
-
 	// View matrix
 	auto* view = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], "VIEW"));
 	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(view));
 	m_Pipeline.uniformMap.insert_or_assign("VIEW", reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(view));
-
 }
 
 void GraphicsApiGL::CreatePipeline()

@@ -7,6 +7,9 @@ namespace lepus
 {
     namespace gfx
     {
+        /// @brief An API-agnostic wrapper around a generic uniform.
+        /// @tparam TUniformHandle API-specific uniform handle type
+        /// @tparam TUniformValue Datatype held by this uniform (usually a POD type).
         template<typename TUniformHandle, typename TUniformValue = void*>
         class UniformBinding
         {
@@ -37,6 +40,8 @@ namespace lepus
                 return m_Value;
             }
 
+            /// @brief Has the uniform been invalidated since it's last been applied?
+            /// @return True if uniform has been invalidated and pending update in shader, false if no changes to data
             inline bool IsDirty() { return m_Dirty; }
 
             virtual UniformType Type() = 0;

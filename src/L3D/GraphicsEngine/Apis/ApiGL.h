@@ -100,7 +100,7 @@ namespace LepusEngine
 			{
 				size_t targetKeyLength = strlen(name);
 
-				// TODO: unordered_map doesn't really work with string keys...
+				// TODO: unordered_map doesn't really work with string keys... add actual hashing!
 				for (auto it = m_Pipeline.uniformMap.begin(); it != m_Pipeline.uniformMap.end(); it++)
 				{
 					size_t keyLength = strlen(it->first);
@@ -111,17 +111,6 @@ namespace LepusEngine
 				}
 
 				return nullptr;
-
-				/*if (!strcmp("PROJ", name))
-				{
-					return *(++m_Pipeline.uniforms.begin());
-				}
-				else if (!strcmp("runningTime", name))
-				{
-					return *(m_Pipeline.uniforms.begin());
-				}
-
-				return nullptr;*/
 			}
 
 			public:
