@@ -15,13 +15,55 @@
 
 #include <LSystem/IO.h>
 
+#include <L3D/Camera.h>
+
 #include <thread>
+#include <string>
 
 using namespace LepusEngine;
 
 #ifndef _DEBUG
 #define NDEBUG
 #endif
+
+float fov = 0.f;
+float angleYaw = 0.f, anglePitch = 0.f;
+const float camSpeed = 0.005f;
+double xposLast = -1.0;
+double yposLast = -1.0;
+float deltaTime = 0.f;
+lepus::gfx::Camera camera;
+
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	fov = fmax(1.f, fmin(179.f, fov + (float)yoffset));
+	LepusEngine::ConsoleLogger::Global().LogInfo("", "scrollCallback", "yoffset", (char*)std::to_string(xoffset).append(", ").append(std::to_string(yoffset)).append("FOV: ").append(std::to_string(fov)).c_str());
+}
+
+void mouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	float deltaX = (xpos - xposLast) / 300.0;
+	float deltaY = (ypos - yposLast) / 300.0;
+	angleYaw += deltaX;
+	anglePitch += deltaY;
+	lepus::types::Quaternion rotationYaw = lepus::types::Quaternion(0.f, 1.f, 0.f, deltaX);
+
+	auto combined = rotationYaw;
+	float angle = combined.Angle();
+	if (abs(angle) > 0.001f)
+	{
+		camera.Transform().Rotate(rotationYaw);
+	}
+	lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(camera.Transform().Right(), deltaY);
+	angle = rotationPitch.Angle();
+	if (abs(angle) > 0.001f)
+	{
+		camera.Transform().Rotate(rotationPitch);
+	}
+
+	xposLast = xpos;
+	yposLast = ypos;
+}
 
 int main()
 {
@@ -51,15 +93,71 @@ int main()
 		fragShader = Lepus3D::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc.c_str(), fragShaderSrc.length(), Lepus3D::FragmentShader);
 
 	// Register shader with the API.
-	engine.GetApi<Lepus3D::GraphicsApiGL>().GetOptions<Lepus3D::GraphicsApiGLOptions>().RegisterShader(&vertShader, &fragShader);
+	auto& api = engine.GetApi<Lepus3D::GraphicsApiGL>();
+	api.GetOptions<Lepus3D::GraphicsApiGLOptions>().RegisterShader(&vertShader, &fragShader);
 
 	// Set up engine for drawing.
 	engine.Setup();
 
+	camera = lepus::gfx::Camera();
+	lepus::math::Matrix4x4 projMatrix = camera.BuildPerspectiveMatrix();
+	((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>("PROJ"))->Value((float*)projMatrix.data());
+
+	lepus::math::Matrix4x4 viewMatrix = camera.BuildViewMatrix();
+	((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>("VIEW"))->Value((float*)viewMatrix.data());
+
+	fov = camera.FOV();
+
+	glfwSetScrollCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), scrollCallback);
+
+	float runningTime = glfwGetTime();
+
+	GLFWwindow* window = reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr());
+	glfwGetCursorPos(window, &xposLast, &yposLast);
+	glfwSetCursorPosCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), mouseCallback);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, 1);
+
 	while (isRunning)
 	{
+		camera.FOV(fov);
+		projMatrix = camera.BuildPerspectiveMatrix();
+
+		int left = glfwGetKey(window, GLFW_KEY_A);
+		int right = glfwGetKey(window, GLFW_KEY_D);
+		int forward = glfwGetKey(window, GLFW_KEY_W);
+		int back = glfwGetKey(window, GLFW_KEY_S);
+		lepus::types::Vector3 forwardDelta, rightDelta;
+		if (back == GLFW_PRESS)
+		{
+			forwardDelta = forwardDelta - (camera.Transform().Forward() * deltaTime * camSpeed);
+		}
+		if (forward == GLFW_PRESS)
+		{
+			forwardDelta = forwardDelta + (camera.Transform().Forward() * deltaTime * camSpeed);
+		}
+		if (right == GLFW_PRESS)
+		{
+			rightDelta = rightDelta + (camera.Transform().Right() * deltaTime * camSpeed);
+		}
+		if (left == GLFW_PRESS)
+		{
+			rightDelta = rightDelta - (camera.Transform().Right() * deltaTime * camSpeed);
+		}
+
+		camera.Transform().Origin(camera.Transform().Origin() + forwardDelta + rightDelta);
+
+		viewMatrix = camera.BuildViewMatrix();
+
+		((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>("PROJ"))->Value((float*)projMatrix.data());
+		((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>("VIEW"))->Value((float*)viewMatrix.data());
+
 		windowing->Update(); // Update window before drawing
 		engine.Render<unsigned char, Lepus3D::GraphicsEngine::PixelFormat::RGBA32>(100, 149, 237);
+
+		float newRunningTime = glfwGetTime();
+		deltaTime = newRunningTime - runningTime;
 
 		isRunning = windowing->Update();
 	}

@@ -6,11 +6,17 @@
 
 class GraphicsApiStub : public LepusEngine::Lepus3D::GraphicsApi
 {
-private:
+	private:
 	/// @brief Pointer to a bool that will be set to true upon Shutdown being called.
 	bool* m_ShutdownReceiver = nullptr;
 
-public:
+	private:
+	inline void* GetUniformInternal(char*) override
+	{
+		return (void*)nullptr;
+	}
+
+	public:
 	GraphicsApiStub(GraphicsApiStubOptions* options, bool* shutdownReceiver = nullptr)
 	{
 		Init(options);
@@ -29,6 +35,11 @@ public:
 	}
 
 	void Draw() override
+	{
+
+	}
+
+	void UpdateUniforms() override
 	{
 
 	}
@@ -65,5 +76,8 @@ public:
 		// Do nothing.
 	}
 };
+
+
+template const lepus::gfx::UniformBinding<void*>* LepusEngine::Lepus3D::GraphicsApi::GetUniform<lepus::gfx::UniformBinding<void*>*>(char* name);
 
 #endif

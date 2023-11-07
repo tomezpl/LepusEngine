@@ -5,8 +5,10 @@
 #include "../ShaderCompilers/ShaderCompilerGLSL.h"
 #include "../../GraphicsEngine.h"
 #include <LUtility/Primitives.h>
+#include <forward_list>
+#include <unordered_map>
 
-typedef unsigned int GLuint;
+#include "ApiGL/Bindings.h"
 
 namespace LepusEngine
 {
@@ -72,15 +74,45 @@ namespace LepusEngine
 
 				/// @brief Handle to the global IBO.
 				GLuint ibo;
+
+				/// @brief List with all uniforms used by the API.
+				// TODO: Change to array - might get better cache/locality to improve access times.
+				std::forward_list<lepus::gfx::GLUniformBinding<void*>*> uniforms;
+
+				/// @brief Uniform map to update the values.
+				// TODO: Move to a Material class?
+				std::unordered_map<const char*, lepus::gfx::GLUniformBinding<void*>*> uniformMap;
 			} m_Pipeline;
 
 			GLuint m_Programs[GraphicsApiGLOptions::ProgramCount];
 
+			// TODO: separate
 			LepusUtility::Primitive m_CubeGeometry = LepusUtility::Primitives::Cube();
+
 			private:
 			void SetupVertexArrays();
 			void SetupBuffers();
 			void SetupShaders();
+			void SetupUniforms();
+
+			private:
+			inline void* GetUniformInternal(char* name) override
+			{
+				size_t targetKeyLength = strlen(name);
+
+				// TODO: unordered_map doesn't really work with string keys... add actual hashing!
+				for (auto it = m_Pipeline.uniformMap.begin(); it != m_Pipeline.uniformMap.end(); it++)
+				{
+					size_t keyLength = strlen(it->first);
+					if (targetKeyLength == keyLength && !strcmp(name, it->first))
+					{
+						return it->second;
+					}
+				}
+
+				return nullptr;
+			}
+
 			public:
 			GraphicsApiGL(GraphicsApiGLOptions options)
 			{
@@ -91,6 +123,8 @@ namespace LepusEngine
 
 			void CreatePipeline() override;
 
+			void UpdateUniforms() override;
+
 			void Draw() override;
 
 			void ClearFrameBuffer(float r, float g, float b) override;
@@ -100,6 +134,8 @@ namespace LepusEngine
 
 			void Shutdown() override;
 		};
+
+		template const lepus::gfx::GLUniformBinding<void*>* GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(char* name);
 
 		template GraphicsApiGL& GraphicsEngine::GetApi<GraphicsApiGL>();
 	}

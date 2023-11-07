@@ -190,6 +190,7 @@ add_executable(LepusSystem_Tests
 add_executable(LepusUtility_Tests
 	tests/LUtility/MathTests/MatrixTests.cpp
 	tests/LUtility/MathTests/VectorTests.cpp
+	tests/LUtility/MathTests/TransformTests.cpp
 )
 
 add_custom_command(TARGET LepusSystem_Tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/tests/Content" ${CMAKE_BINARY_DIR}/tests/Content)

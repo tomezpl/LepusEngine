@@ -113,6 +113,21 @@ TYPED_TEST_P(MathVectorOperationsTests, VectorsAreMultipliedCorrectly)
     ASSERT_EQ(out, testData.multiply.expected);
 }
 
+TEST(MathVectorOperationsTests, Vector3CrossIsCorrect)
+{
+    Vector3 forward = Vector3(0.0f, 0.0f, -1.f), right = Vector3(1.f, 0.0f, 0.0f), up = Vector3(0.0f, 1.0f, 0.0f);
+
+    Vector3 cross = Vector3::Cross(right, forward);
+    std::cout << cross.ToString().c_str() << "\n";
+    ASSERT_EQ(cross, up);
+    cross = Vector3::Cross(forward, up);
+    std::cout << cross.ToString().c_str() << "\n";
+    ASSERT_EQ(cross, right);
+    cross = Vector3::Cross(up, right);
+    std::cout << cross.ToString().c_str() << "\n";
+    ASSERT_EQ(cross, forward);
+}
+
 REGISTER_TYPED_TEST_SUITE_P(MathVectorOperationsTests, VectorsAreAddedCorrectly, VectorsAreSubtractedCorrectly, VectorsAreMultipliedCorrectly);
 
 using VectorTypes = testing::Types<Vector2, Vector3, Vector4>;

@@ -5,6 +5,7 @@
 #include <memory>
 #include <cstring>
 #include <cassert>
+#include "GraphicsApi/BaseBindings.h"
 
 namespace LepusEngine
 {
@@ -29,7 +30,7 @@ namespace LepusEngine
 
 		class GraphicsApiOptions
 		{
-		public:
+			public:
 			/// @brief Indicates what API type this options object is used for.
 			/// @return The GraphicsApiType enum value for this GraphicsApiOptions.
 			virtual GraphicsApiType GetType() { return GraphicsApiUnknown; }
@@ -44,11 +45,11 @@ namespace LepusEngine
 		/// not a variety of D3D/GL/VK methods.
 		class GraphicsApi
 		{
-		private:
+			private:
 			bool m_ShutdownCalled;
-		protected:
+			protected:
 			GraphicsApiOptions* m_Options;
-		protected:
+			protected:
 			/// @brief Performs internal, boilerplate setup for all API wrappers.
 			/// @tparam TGraphicsApiOptions An options type derived from GraphicsApiOptions for a specific graphics API.
 			/// @param options Pointer to an options object (using the type matching the requested graphics API).
@@ -60,7 +61,12 @@ namespace LepusEngine
 				m_Options = new TGraphicsApiOptions();
 				memcpy(m_Options, options, optionsSz);
 			}
-		public:
+
+			/// @brief Internal API-specific method for retrieving a native handle to a uniform object.
+			/// @param name The name of the uniform to fetch.
+			/// @return API-specific handle for a uniform of a given type.
+			virtual void* GetUniformInternal(char* name) = 0;
+			public:
 			/// @brief Default constructor. Does nothing, so Init(GraphicsApiOptions*) needs to be called manually.
 			GraphicsApi()
 			{
@@ -98,6 +104,22 @@ namespace LepusEngine
 
 			virtual void CreatePipeline() = 0;
 
+			/// @brief Gets a Lepus UniformBinding wrapper for an API-specific uniform with the given name.
+			/// @tparam TUniformHandle API-specific handle type used for this type of uniform.
+			/// @tparam TUniformBinding UniformBinding implementation
+			/// @param name Name of the uniform to fetch.
+			/// @return A UniformBinding wrapper for the named uniform object.
+			template<typename TUniformHandle = void*, class TUniformBinding = lepus::gfx::UniformBinding<TUniformHandle>>
+			inline const TUniformBinding* GetUniform(char* name)
+			{
+				return reinterpret_cast<const TUniformBinding*>(GetUniformInternal(name));
+			}
+
+			/// @brief Applies uniforms in the shader.
+			/// Implementations can fire & forget by issuing this before every draw, but it might be worth having a mechanism to invalidate uniforms
+			/// and only update them once they're marked as dirty.
+			virtual void UpdateUniforms() = 0;
+
 			virtual void Draw() = 0;
 
 			virtual void ClearFrameBuffer(float r, float g, float b) = 0;
@@ -108,15 +130,15 @@ namespace LepusEngine
 			/// but it does not need to be used or implemented.
 			virtual void SwapBuffers() {}
 
-			virtual void Shutdown() 
+			virtual void Shutdown()
 			{
 				m_ShutdownCalled = true;
 			}
-			
-			~GraphicsApi() 
-			{ 
+
+			~GraphicsApi()
+			{
 				assert(m_ShutdownCalled == true);
-				Shutdown(); 
+				Shutdown();
 			}
 		};
 	}

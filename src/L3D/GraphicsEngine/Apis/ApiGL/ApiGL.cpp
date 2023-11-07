@@ -53,11 +53,54 @@ void GraphicsApiGL::SetupShaders()
 	}
 }
 
+void GraphicsApiGL::SetupUniforms()
+{
+	// Proj matrix
+	auto* proj = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], "PROJ"));
+	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(proj));
+	m_Pipeline.uniformMap.insert_or_assign("PROJ", reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(proj));
+
+	// View matrix
+	auto* view = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], "VIEW"));
+	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(view));
+	m_Pipeline.uniformMap.insert_or_assign("VIEW", reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(view));
+}
+
 void GraphicsApiGL::CreatePipeline()
 {
 	SetupVertexArrays();
 	SetupBuffers();
 	SetupShaders();
+	SetupUniforms();
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+}
+
+void GraphicsApiGL::UpdateUniforms()
+{
+	for (auto uniform = m_Pipeline.uniforms.begin(); uniform != m_Pipeline.uniforms.end(); uniform++)
+	{
+		auto uniformVal = *uniform;
+		if (uniformVal->IsDirty())
+		{
+			const GLint& location = uniformVal->Location();
+			switch (uniformVal->Type())
+			{
+				// TODO: with more shaders, we'll want to wrap the uniform objects in "instances" that specify a program handle and hold a reference to the uniform data
+				// However, it'll work for now given there is only ever one GL program in use.
+				case lepus::gfx::UniformType::MATRIX4:
+					glUniformMatrix4fv(location, 1, true, (reinterpret_cast<lepus::gfx::GLMatrixUniformBinding*>(uniformVal))->Value());
+					break;
+				case lepus::gfx::UniformType::FLOAT:
+					glUniform1f(location, (reinterpret_cast<lepus::gfx::GLFloatUniformBinding*>(uniformVal))->Value());
+					break;
+			}
+		}
+	}
 }
 
 void GraphicsApiGL::Draw()
@@ -68,13 +111,13 @@ void GraphicsApiGL::Draw()
 	glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo);
 
-	glDrawElements(GL_TRIANGLE_STRIP, m_CubeGeometry.IndexCount(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_CubeGeometry.IndexCount(), GL_UNSIGNED_INT, 0);
 }
 
 void GraphicsApiGL::ClearFrameBuffer(float r, float g, float b)
 {
 	glClearColor(r, g, b, 1.f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GraphicsApiGL::Shutdown()

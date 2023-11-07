@@ -16,7 +16,7 @@ std::string FileSystem::Read(const char* path)
 	while (reader.good())
 	{
 		reader.read(buffer, bufSz);
-		
+
 		if (reader.gcount() <= 0)
 		{
 			break;
@@ -25,6 +25,8 @@ std::string FileSystem::Read(const char* path)
 		{
 			contents.append(buffer);
 		}
+
+		memset(buffer, 0, bufSz + 1);
 	}
 
 	reader.close();

@@ -40,6 +40,7 @@ void GraphicsEngine::Render(float r, float g, float b)
 {
 	m_Api->ClearFrameBuffer(r, g, b);
 
+	m_Api->UpdateUniforms();
 	m_Api->Draw();
 
 	m_Api->SwapBuffers();

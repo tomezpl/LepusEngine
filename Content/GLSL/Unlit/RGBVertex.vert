@@ -2,11 +2,14 @@
 
 layout (location = 0) in vec3 position;
 
+uniform mat4 PROJ;
+uniform mat4 VIEW;
+
 out vec3 vertColor;
 
 void main()
 {
-	gl_Position = vec4(position, 1.0f);
+	gl_Position = PROJ * VIEW * vec4(position, 1.0);
 
 	float normalisedIndex = mod(float(gl_VertexID), 3.0f);
 	float r = step(normalisedIndex, 0.0f);
