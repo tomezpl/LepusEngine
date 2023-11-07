@@ -15,7 +15,7 @@ namespace lepus
             public:
             GLUniformBinding(size_t location) : UniformBinding<GLint, TUniformValue>(location)
             {
-                // No idea why, but sometimes the location won't assign correctly, so we do this terribleness...
+                // TODO: No idea why, but sometimes the location won't assign correctly, so we do this terribleness...
                 this->m_Location = location;
             }
 
