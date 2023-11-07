@@ -31,6 +31,8 @@ namespace lepus
 
             Quaternion(float axisX, float axisY, float axisZ, float angle)
             {
+                // Negating the angle here so that the Quaternion represents a clockwise rotation along an axis as observed looking towards the origin/object.
+                angle *= -1.f;
                 float const q[] = { axisX * sinf(angle / 2.f), axisY * sinf(angle / 2.f), axisZ * sinf(angle / 2.f), cos(angle / 2.f) };
                 init((float*)q);
             }

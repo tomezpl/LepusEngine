@@ -66,7 +66,7 @@ namespace lepus
             {
                 lepus::math::Matrix4x4 pos = lepus::math::Matrix4x4::Identity();
 
-                auto f = m_Transform.Forward() * (1.f / m_Transform.Forward().Magnitude());
+                auto f = m_Transform.Forward() * (-1.f / m_Transform.Forward().Magnitude());
                 auto s = m_Transform.Right() * (1.f / m_Transform.Right().Magnitude());
                 auto u = m_Transform.Up() * (1.f / m_Transform.Up().Magnitude());
 

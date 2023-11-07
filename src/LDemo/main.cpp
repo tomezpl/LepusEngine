@@ -46,7 +46,7 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	float deltaY = (ypos - yposLast) / 300.0;
 	angleYaw += deltaX;
 	anglePitch += deltaY;
-	lepus::types::Quaternion rotationYaw = lepus::types::Quaternion(0.f, 1.f, 0.f, -deltaX);
+	lepus::types::Quaternion rotationYaw = lepus::types::Quaternion(0.f, 1.f, 0.f, deltaX);
 	//camera.Transform().Rotate(lepus::types::Vector3(0.0f, 1.f, 0.f), deltaX);
 
 	//LepusEngine::ConsoleLogger::Global().LogInfo("", "mouseCallback", (char*)axis.ToString().c_str());
@@ -62,7 +62,7 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	{
 		camera.Transform().Rotate(rotationYaw);
 	}
-	lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(camera.Transform().Right(), -deltaY);
+	lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(camera.Transform().Right(), deltaY);
 	angle = rotationPitch.Angle();
 	if (abs(angle) > 0.001f)
 	{
@@ -144,11 +144,11 @@ int main()
 		lepus::types::Vector3 forwardDelta, rightDelta;
 		if (back == GLFW_PRESS)
 		{
-			forwardDelta = forwardDelta + (camera.Transform().Forward() * deltaTime * camSpeed);
+			forwardDelta = forwardDelta - (camera.Transform().Forward() * deltaTime * camSpeed);
 		}
 		if (forward == GLFW_PRESS)
 		{
-			forwardDelta = forwardDelta - (camera.Transform().Forward() * deltaTime * camSpeed);
+			forwardDelta = forwardDelta + (camera.Transform().Forward() * deltaTime * camSpeed);
 		}
 		if (right == GLFW_PRESS)
 		{

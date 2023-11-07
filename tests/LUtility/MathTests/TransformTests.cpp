@@ -13,8 +13,7 @@ TEST(MathTransformTests, TransformIsInitialisedCorrectly)
 
     ASSERT_FLOAT_EQ(transform.Forward().x(), 0.f);
     ASSERT_FLOAT_EQ(transform.Forward().y(), 0.f);
-    // LepusEngine uses a right-hand coordinate system so negative Z is forward.
-    ASSERT_FLOAT_EQ(transform.Forward().z(), -1.f);
+    ASSERT_FLOAT_EQ(transform.Forward().z(), 1.f);
 
     ASSERT_FLOAT_EQ(transform.Up().x(), 0.f);
     ASSERT_FLOAT_EQ(transform.Up().y(), 1.f);

@@ -20,7 +20,7 @@ namespace lepus
             {
                 m_Origin = lepus::types::Vector3();
 
-                m_Forward = lepus::types::Vector3(0.f, 0.f, -1.f);
+                m_Forward = lepus::types::Vector3(0.f, 0.f, 1.f);
                 m_Right = lepus::types::Vector3(1.f, 0.f, 0.f);
                 m_Up = lepus::types::Vector3(0.f, 1.f, 0.f);
 
