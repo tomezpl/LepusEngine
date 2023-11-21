@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <LUtility/Math.h>
+#include <lepus/utility/Math.h>
 #include <iostream>
 #include <cmath>
 
