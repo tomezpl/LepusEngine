@@ -13,6 +13,9 @@ namespace lepus
 			virtual void LogError(char* className, char* funcName, char* message, char* funcParams = "") = 0;
 			virtual void LogInfo(char* className, char* funcName, char* message, char* funcParams = "") = 0;
 			virtual void LogWarning(char* className, char* funcName, char* message, char* funcParams = "") = 0;
+
+			/// @brief Dummy virtual destructor. Unlikely it'll ever be needed but the compiler wants one anyway.
+			virtual ~ILogger() {}
 		};
 	}
 }

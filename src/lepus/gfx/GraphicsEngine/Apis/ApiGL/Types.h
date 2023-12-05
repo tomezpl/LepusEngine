@@ -13,7 +13,7 @@ namespace lepus
         template<typename TUniformValue> class GLUniformBinding : public lepus::gfx::UniformBinding<GLint, TUniformValue>
         {
             public:
-            GLUniformBinding(size_t location) : UniformBinding<GLint, TUniformValue>(location)
+            GLUniformBinding(GLint location) : UniformBinding<GLint, TUniformValue>(location)
             {
                 // TODO: No idea why, but sometimes the location won't assign correctly, so we do this terribleness...
                 this->m_Location = location;

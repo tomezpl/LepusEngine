@@ -56,7 +56,7 @@ m_OutputInfo = {}; \
 			/// @param options API options used to initialise and create the API library wrapper. These are copied, so it is recommended to create options in stack.
 			void InitApi(GraphicsApiOptions* options);
 
-#undef INIT_DEFAULT()
+#undef INIT_DEFAULT
 
 			enum PixelFormat
 			{
