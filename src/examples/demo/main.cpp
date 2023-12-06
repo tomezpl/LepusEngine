@@ -37,7 +37,7 @@ lepus::gfx::Camera camera;
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	fov = fmax(1.f, fmin(179.f, fov + (float)yoffset));
-	engine::ConsoleLogger::Global().LogInfo("", "scrollCallback", "yoffset", (char*)std::to_string(xoffset).append(", ").append(std::to_string(yoffset)).append("FOV: ").append(std::to_string(fov)).c_str());
+	engine::ConsoleLogger::Global().LogInfo("", "scrollCallback", "yoffset", std::to_string(xoffset).append(", ").append(std::to_string(yoffset)).append("FOV: ").append(std::to_string(fov)).c_str());
 }
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)

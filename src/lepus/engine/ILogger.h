@@ -9,10 +9,10 @@ namespace lepus
 			public:
 			enum LogEventTypes { LEPUS_ERROR, LEPUS_INFO, LEPUS_WARNING };
 
-			virtual void Log(char* className, char* funcName, int eventType, char* message, char* funcParams) = 0;
-			virtual void LogError(char* className, char* funcName, char* message, char* funcParams = "") = 0;
-			virtual void LogInfo(char* className, char* funcName, char* message, char* funcParams = "") = 0;
-			virtual void LogWarning(char* className, char* funcName, char* message, char* funcParams = "") = 0;
+			virtual void Log(const char* className, const char* funcName, LogEventTypes eventType, const char* message, const char* funcParams) = 0;
+			virtual void LogError(const char* className, const char* funcName, const char* message, const char* funcParams = "") = 0;
+			virtual void LogInfo(const char* className, const char* funcName, const char* message, const char* funcParams = "") = 0;
+			virtual void LogWarning(const char* className, const char* funcName, const char* message, const char* funcParams = "") = 0;
 
 			/// @brief Dummy virtual destructor. Unlikely it'll ever be needed but the compiler wants one anyway.
 			virtual ~ILogger() {}

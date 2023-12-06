@@ -10,7 +10,7 @@ namespace lepus
 	{
 		ILogger* ConsoleLogger::m_Instance = nullptr;
 
-		void ConsoleLogger::LogInternal(char* cN, char* fN, int eT, char* msg, char* fP)
+		void ConsoleLogger::LogInternal(const char* cN, const char* fN, LogEventTypes eT, const char* msg, const char* fP)
 		{
 			if (Enabled)
 			{

@@ -12,7 +12,7 @@ namespace lepus
 		class ConsoleLogger : ILogger
 		{
 			private:
-			void LogInternal(char* className, char* funcName, int eventType, char* message, char* funcParams);
+			void LogInternal(const char* className, const char* funcName, LogEventTypes eventType, const char* message, const char* funcParams);
 			static ILogger* m_Instance;
 
 			public:
@@ -33,16 +33,16 @@ namespace lepus
 				return *reinterpret_cast<ConsoleLogger*>(m_Instance);
 			}
 
-			inline void Log(char* className, char* funcName, int eventType, char* message, char* funcParams)
+			inline void Log(const char* className, const char* funcName, LogEventTypes eventType, const char* message, const char* funcParams)
 			{
 #ifdef LEPUS_ALLOW_STDOUT
 				LogInternal(className, funcName, eventType, message, funcParams);
 #endif
 			}
 
-			void LogError(char* className, char* funcName, char* message, char* funcParams = "") { Log(className, funcName, LogEventTypes::LEPUS_ERROR, message, funcParams); }
-			void LogInfo(char* className, char* funcName, char* message, char* funcParams = "") { Log(className, funcName, LogEventTypes::LEPUS_INFO, message, funcParams); }
-			void LogWarning(char* className, char* funcName, char* message, char* funcParams = "") { Log(className, funcName, LogEventTypes::LEPUS_WARNING, message, funcParams); }
+			void LogError(const char* className, const char* funcName, const char* message, const char* funcParams = "") { Log(className, funcName, LogEventTypes::LEPUS_ERROR, message, funcParams); }
+			void LogInfo(const char* className, const char* funcName, const char* message, const char* funcParams = "") { Log(className, funcName, LogEventTypes::LEPUS_INFO, message, funcParams); }
+			void LogWarning(const char* className, const char* funcName, const char* message, const char* funcParams = "") { Log(className, funcName, LogEventTypes::LEPUS_WARNING, message, funcParams); }
 
 			static void Shutdown()
 			{
