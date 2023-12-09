@@ -10,7 +10,7 @@ namespace lepus
 {
     namespace types
     {
-        class Quaternion : public Vector4
+        class Quaternion : public Vector<4>
         {
             public:
             Quaternion()
@@ -66,6 +66,15 @@ namespace lepus
             {
                 return acosf(fmax(-1.f, fmin(1.f, w()))) * 2.f;
             }
+
+            inline float x() const { return m_Components[0]; }
+            inline float y() const { return m_Components[1]; }
+            inline float z() const { return m_Components[2]; }
+            inline float w() const { return m_Components[3]; }
+            inline float x(float newX) { return m_Components[0] = newX; }
+            inline float y(float newY) { return m_Components[1] = newY; }
+            inline float z(float newZ) { return m_Components[2] = newZ; }
+            inline float w(float newW) { return m_Components[3] = newW; }
 
             inline Quaternion operator*(const Quaternion& b) const
             {

@@ -133,6 +133,11 @@ namespace lepus
             {
                 return m_Components;
             }
+
+            virtual ~Vector<nbComponents>()
+            {
+
+            }
         };
 
         class Vector2 : public Vector<2>

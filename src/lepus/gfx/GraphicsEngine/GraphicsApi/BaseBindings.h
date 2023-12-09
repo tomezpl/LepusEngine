@@ -50,6 +50,11 @@ namespace lepus
             {
 
             }
+
+            virtual ~UniformBinding()
+            {
+                Release();
+            }
         };
     }
 }

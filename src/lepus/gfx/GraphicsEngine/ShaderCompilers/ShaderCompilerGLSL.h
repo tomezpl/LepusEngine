@@ -44,7 +44,7 @@ namespace lepus
 			{
 				assert(shaderSrcLength <= MAXINT);
 
-				GLenum shaderType = -1;
+				GLenum shaderType = 0;
 
 				switch (type)
 				{

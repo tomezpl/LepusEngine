@@ -30,6 +30,11 @@ namespace lepus
 
 			/// @brief Performs back/front buffer swap. This usually needs to be called after rendering a frame.
 			virtual void SwapBuffers() = 0;
+
+			virtual ~Windowing()
+			{
+
+			}
 		};
 	}
 }

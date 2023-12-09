@@ -35,6 +35,11 @@ namespace lepus
 			public:
 			virtual void Init() = 0;
 			virtual ShaderCompiledResult<TShaderHandle> CompileShader(const char* shaderSource, size_t shaderSourceLength, ShaderType type) = 0;
+
+			virtual ~ShaderCompiler()
+			{
+
+			}
 		};
 	}
 }

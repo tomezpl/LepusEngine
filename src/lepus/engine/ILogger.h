@@ -4,10 +4,10 @@ namespace lepus
 {
 	namespace engine
 	{
+		enum LogEventTypes { LEPUS_ERROR, LEPUS_INFO, LEPUS_WARNING };
 		class ILogger
 		{
 			public:
-			enum LogEventTypes { LEPUS_ERROR, LEPUS_INFO, LEPUS_WARNING };
 
 			virtual void Log(const char* className, const char* funcName, LogEventTypes eventType, const char* message, const char* funcParams) = 0;
 			virtual void LogError(const char* className, const char* funcName, const char* message, const char* funcParams = "") = 0;

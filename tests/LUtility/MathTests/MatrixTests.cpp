@@ -17,7 +17,7 @@ TEST(MathMatrixTests, MatrixMultipliedByMatrixCorrectly)
         13  14  15  16
 
     */
-    for (uint8_t i = 0; i < 16; i++) { matA.set((i - (i % 4)) / 4, i % 4, float(i + 1)); }
+    for (uint8_t i = 0; i < 16; i++) { matA.set((i - (i % 4U)) / 4U, i % 4U, float(i + 1U)); }
 
     /* Matrix B looks like this:
 
@@ -26,7 +26,7 @@ TEST(MathMatrixTests, MatrixMultipliedByMatrixCorrectly)
         10  11  12  13
         14  15  16  17
     */
-    for (uint8_t i = 0; i < 16; i++) { matB.set((i - (i % 4)) / 4, i % 4, float(i + 2)); }
+    for (uint8_t i = 0; i < 16; i++) { matB.set((i - (i % 4U)) / 4U, i % 4U, float(i + 2U)); }
 
     /* Expected results:
         100 110 120 130
@@ -44,8 +44,8 @@ TEST(MathMatrixTests, MatrixMultipliedByMatrixCorrectly)
     lepus::math::Matrix4x4 actual = matA.Multiply(matB);
 
     // Make sure the original matrices are still correct - they should not be affected by the multiplication, as it's not in-place.
-    for (uint8_t i = 0; i < 16; i++) { ASSERT_FLOAT_EQ(matA.get((i - (i % 4)) / 4, i % 4), (float)(i + 1)); }
-    for (uint8_t i = 0; i < 16; i++) { ASSERT_FLOAT_EQ(matB.get((i - (i % 4)) / 4, i % 4), (float)(i + 2)); }
+    for (uint8_t i = 0; i < 16; i++) { ASSERT_FLOAT_EQ(matA.get((i - (i % 4U)) / 4U, i % 4U), (float)(i + 1U)); }
+    for (uint8_t i = 0; i < 16; i++) { ASSERT_FLOAT_EQ(matB.get((i - (i % 4U)) / 4U, i % 4U), (float)(i + 2U)); }
 
     // Check that the multiplied result is correct.
     for (uint8_t r = 0; r < 4; r++)

@@ -5,7 +5,7 @@ using namespace lepus::gfx;
 
 void GraphicsApiGL::Init(GraphicsApiOptions* options)
 {
-	InitInternal<GraphicsApiGLOptions>(reinterpret_cast<GraphicsApiGLOptions*>(options));
+	InitInternal<GraphicsApiGLOptions>((GraphicsApiGLOptions*)options);
 }
 
 void GraphicsApiGL::SetupVertexArrays()
@@ -25,13 +25,13 @@ void GraphicsApiGL::SetupBuffers()
 	glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, 0);
-	glBufferData(GL_ARRAY_BUFFER, m_CubeGeometry.VertexBufferSize(), m_CubeGeometry.GetVertices(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)m_CubeGeometry.VertexBufferSize(), m_CubeGeometry.GetVertices(), GL_STATIC_DRAW);
 
 	// Create a global IBO and upload triangle index data to it.
 	glCreateBuffers(1, &m_Pipeline.ibo);
 	//const GLuint indices[] = { 0, 1, 2 };
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_CubeGeometry.IndexBufferSize(), m_CubeGeometry.GetIndices(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)m_CubeGeometry.IndexBufferSize(), m_CubeGeometry.GetIndices(), GL_STATIC_DRAW);
 }
 
 void GraphicsApiGL::SetupShaders()

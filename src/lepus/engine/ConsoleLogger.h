@@ -30,7 +30,7 @@ namespace lepus
 					m_Instance = new ConsoleLogger();
 				}
 
-				return *reinterpret_cast<ConsoleLogger*>(m_Instance);
+				return *(ConsoleLogger*)m_Instance;
 			}
 
 			inline void Log(const char* className, const char* funcName, LogEventTypes eventType, const char* message, const char* funcParams)

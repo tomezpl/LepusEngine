@@ -206,18 +206,28 @@ gtest_discover_tests(LepusSystem_Tests)
 gtest_discover_tests(LepusUtility_Tests)
 
 # Warnings
+set(LepusTargets LepusEngine LepusSystem LepusGfx LepusSystem_Tests LepusGfx_Tests LepusUtility_Tests)
 if(MSVC)
-	target_compile_options(LepusEngine PRIVATE /W3 /WX)
-	target_compile_options(LepusSystem PRIVATE /W3 /WX)
-	target_compile_options(LepusGfx PRIVATE /W3 /WX)
-	target_compile_options(LepusSystem_Tests PRIVATE /W3 /WX)
-	target_compile_options(LepusGfx_Tests PRIVATE /W3 /WX)
-	target_compile_options(LepusUtility_Tests PRIVATE /W3 /WX)
+	# Ignore warnings:
+	# 4100: unreferenced param, 
+	# 4514: unreferenced inline function removed,
+	# 4464: parent relative include,
+	# 4820: struct padding,
+	# 4263: member not overriding base class virtual
+	# 4265-5027: copy ctor, move ctor, assignment, move assignment implicitly deleted (this messes up gtest projects)
+	# 5045: "compiler will insert Spectre mitigation for memory load"
+	set(MSVCDisabledWarnings 4100 4514 4464 4820 4263 4625 5026 4626 5027 5045)
+
+	set(MSVCDisabledWarningsFormatted "")
+	foreach(Warning IN LISTS MSVCDisabledWarnings)
+		set(MSVCDisabledWarningsFormatted ${MSVCDisabledWarningsFormatted} /wd${Warning})
+	endforeach()
+
+	foreach(Target IN LISTS LepusTargets)
+		target_compile_options(${Target} PRIVATE /Wall ${MSVCDisabledWarningsFormatted} /WX /external:W3)
+	endforeach()
 else()
-	target_compile_options(LepusEngine PRIVATE -Wall -Wextra -Wpedantic)
-	target_compile_options(LepusSystem PRIVATE -Wall -Wextra -Wpedantic)
-	target_compile_options(LepusGfx PRIVATE -Wall -Wextra -Wpedantic)
-	target_compile_options(LepusSystem_Tests PRIVATE -Wall -Wextra -Wpedantic)
-	target_compile_options(LepusGfx_Tests PRIVATE -Wall -Wextra -Wpedantic)
-	target_compile_options(LepusUtility_Tests PRIVATE -Wall -Wextra -Wpedantic)
+	foreach(Target IN LISTS LepusTargets)
+		target_compile_options(${Target} PRIVATE -Wall -Wextra -Wpedantic)
+	endforeach()
 endif()

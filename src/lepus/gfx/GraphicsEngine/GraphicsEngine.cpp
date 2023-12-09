@@ -22,8 +22,13 @@ void GraphicsEngine::InitApi(GraphicsApiOptions* options)
 	switch (options->GetType())
 	{
 		case GraphicsApiType::GraphicsApiOpenGL:
-			m_Api = new GraphicsApiGL(*reinterpret_cast<GraphicsApiGLOptions*>(options));
+			m_Api = new GraphicsApiGL(*(GraphicsApiGLOptions*)options);
 			break;
+		case GraphicsApiType::GraphicsApiVulkan:
+			// TODO
+		case GraphicsApiType::GraphicsApiTest:
+			// Ignore test/mock APIs.
+		case GraphicsApiType::GraphicsApiUnknown:
 		default:
 			// Assert if the API type is not part of the enum.
 			assert(false);

@@ -37,6 +37,11 @@ namespace lepus
 
 			/// @brief Main viewport used by the application.
 			lepus::types::Viewport mainViewport = {};
+
+			virtual ~GraphicsApiOptions()
+			{
+
+			}
 		};
 
 		/// @brief API wrapper to be used by GraphicsEngine.
@@ -99,7 +104,7 @@ namespace lepus
 				// The internal options object NEEDS to have been allocated.
 				assert(m_Options != nullptr);
 
-				return *reinterpret_cast<TGraphicsApiOptions*>(m_Options);
+				return *(TGraphicsApiOptions*)m_Options;
 			}
 
 			virtual void CreatePipeline() = 0;
@@ -135,7 +140,7 @@ namespace lepus
 				m_ShutdownCalled = true;
 			}
 
-			~GraphicsApi()
+			virtual ~GraphicsApi()
 			{
 				assert(m_ShutdownCalled == true);
 				Shutdown();

@@ -26,7 +26,7 @@ class GraphicsApiStub : public lepus::gfx::GraphicsApi
 
 	void Init(lepus::gfx::GraphicsApiOptions* options) override
 	{
-		InitInternal<GraphicsApiStubOptions>(reinterpret_cast<GraphicsApiStubOptions*>(options));
+		InitInternal<GraphicsApiStubOptions>((GraphicsApiStubOptions*)options);
 	}
 
 	void CreatePipeline() override
@@ -66,7 +66,7 @@ class GraphicsApiStub : public lepus::gfx::GraphicsApi
 			}
 
 			// TODO: is this cast needed?
-			delete reinterpret_cast<GraphicsApiStubOptions*>(m_Options);
+			delete (GraphicsApiStubOptions*)m_Options;
 			m_Options = nullptr;
 		}
 	}
