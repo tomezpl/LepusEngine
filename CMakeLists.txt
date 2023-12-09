@@ -50,6 +50,9 @@ cmake_print_variables(VCPKG_INCLUDE_PATH)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 
+# Engine source root
+set(LEPUS_SRC_DIR ${CMAKE_SOURCE_DIR}/src/lepus)
+
 # Engine-wide include directories
 include_directories(${CMAKE_SOURCE_DIR}/include src ${CMAKE_SOURCE_DIR}/3rdparty)
 include_directories(${VCPKG_INCLUDE_PATH})
@@ -64,56 +67,54 @@ add_library(DearImgui ${IMGUI_SRC})
 include_directories(${CMAKE_SOURCE_DIR}/3rdparty/imgui)
 
 # Demo executable
-add_executable(LepusDemo src/LDemo/main.cpp)
+add_executable(LepusDemo src/examples/demo/main.cpp)
 
 # LepusUtility
-file(GLOB_RECURSE LEPUSUTILITY_HEADERS ${CMAKE_SOURCE_DIR}/src/LUtility/*.h ${CMAKE_SOURCE_DIR}/src/LUtility/**/*.h)
+file(GLOB_RECURSE LEPUSUTILITY_HEADERS ${LEPUS_SRC_DIR}/utility/*.h ${LEPUS_SRC_DIR}/utility/**/*.h)
 add_custom_target(LepusUtility SOURCES ${LEPUSUTILITY_HEADERS})
-source_group(TREE ${CMAKE_SOURCE_DIR}/src/LUtility FILES ${LEPUSUTILITY_HEADERS})
+source_group(TREE ${LEPUS_SRC_DIR}/utility FILES ${LEPUSUTILITY_HEADERS})
 
-# Lepus3D shaders
+# LepusGfx shaders
 file(GLOB LEPUS3D_SHADERS_SRC ${CMAKE_SOURCE_DIR}/Content/GLSL/*.frag ${CMAKE_SOURCE_DIR}/Content/GLSL/*.vert)
-add_custom_target(Lepus3D_Shaders SOURCES ${LEPUS3D_SHADERS_SRC})
+add_custom_target(LepusGfx_Shaders SOURCES ${LEPUS3D_SHADERS_SRC})
 
-# Lepus3D sources
-file(GLOB_RECURSE Lepus3D_SRC src/L3D/*.h src/L3D/*.cpp src/L3D/**/*.h src/L3D/**/*.cpp)
-list(FILTER Lepus3D_SRC EXCLUDE REGEX ".*(3rdparty)+.*")
+# LepusGfx sources
+file(GLOB_RECURSE LepusGfx_SRC ${LEPUS_SRC_DIR}/gfx/*.h ${LEPUS_SRC_DIR}/gfx/*.cpp ${LEPUS_SRC_DIR}/gfx/**/*.h ${LEPUS_SRC_DIR}/gfx/**/*.cpp)
+list(FILTER LepusGfx_SRC EXCLUDE REGEX ".*(3rdparty)+.*")
 
-add_library(Lepus3D ${Lepus3D_SRC})
-source_group(TREE ${CMAKE_SOURCE_DIR}/src/L3D FILES ${Lepus3D_SRC})
+add_library(LepusGfx ${LepusGfx_SRC})
+source_group(TREE ${LEPUS_SRC_DIR}/gfx FILES ${LepusGfx_SRC})
 
 # LepusEngine sources
-file(GLOB_RECURSE LepusEngine_SRC src/LEngine/*.h src/LEngine/*.cpp src/LEngine/**/*.h src/LEngine/**/*.cpp)
+file(GLOB_RECURSE LepusEngine_SRC ${LEPUS_SRC_DIR}/engine/*.h ${LEPUS_SRC_DIR}/engine/*.cpp ${LEPUS_SRC_DIR}/engine/**/*.h ${LEPUS_SRC_DIR}/engine/**/*.cpp)
 add_library(LepusEngine ${LepusEngine_SRC})
-source_group(TREE ${CMAKE_SOURCE_DIR}/src/LEngine FILES ${LepusEngine_SRC})
+source_group(TREE ${LEPUS_SRC_DIR}/engine FILES ${LepusEngine_SRC})
 
 # LepusSystem sources
-file(GLOB_RECURSE LepusSystem_SRC src/LSystem/*.h src/LSystem/*.cpp src/LSystem/**/*.h src/LSystem/**/*.cpp)
+file(GLOB_RECURSE LepusSystem_SRC ${LEPUS_SRC_DIR}/system/*.h ${LEPUS_SRC_DIR}/system/*.cpp ${LEPUS_SRC_DIR}/system/**/*.h ${LEPUS_SRC_DIR}/system/**/*.cpp)
 add_library(LepusSystem ${LepusSystem_SRC})
-source_group(TREE ${CMAKE_SOURCE_DIR}/src/LSystem FILES ${LepusSystem_SRC})
+source_group(TREE ${LEPUS_SRC_DIR}/system FILES ${LepusSystem_SRC})
 
 # Unit test example files
 file(GLOB_RECURSE LEPUS_TESTS_CONTENT_SRC ${CMAKE_SOURCE_DIR}/tests/Content/*.* ${CMAKE_SOURCE_DIR}/tests/Content/**.*)
 add_custom_target(Lepus_Tests_Content SOURCES ${LEPUS_TESTS_CONTENT_SRC})
 
-#add_dependencies(Lepus3D)
-# TODO: Get LepusEngine to build add_dependencies(Lepus3D LepusEngine LepusUtility)
-add_dependencies(LepusDemo Lepus3D)
+add_dependencies(LepusDemo LepusGfx)
 
 # Dependency libraries
-## Lepus3D: GL3W (core profile loading)
+## LepusGfx: GL3W (core profile loading)
 add_library(GL3W
 	3rdparty/gl3w/src/gl3w.c
 )
 include_directories(3rdparty/gl3w/include)
-## Lepus3D: GLFW libraries
+## LepusGfx: GLFW libraries
 find_package(glfw3 CONFIG REQUIRED)
 
-## Lepus3D: GLEW includes
-include_directories(Lepus3D ${GLEW_INCLUDES})
+## LepusGfx: GLEW includes
+include_directories(LepusGfx ${GLEW_INCLUDES})
 
-## Lepus3D: GLFW includes
-include_directories(Lepus3D ${GLFW_INCLUDES})
+## LepusGfx: GLFW includes
+include_directories(LepusGfx ${GLFW_INCLUDES})
 
 # LepusEngine sources
 ## LepusEngine: PhysX includes
@@ -154,8 +155,8 @@ if(OpenGL::GL)
 elseif(OpenGL::OpenGL)
 	set(GL_LIBRARY OpenGL::OpenGL)
 endif(OpenGL::GL)
-target_link_libraries(Lepus3D PRIVATE GL3W glfw ${GL_LIBRARY} DearImgui LepusEngine LepusSystem)
-target_link_libraries(LepusDemo PRIVATE DearImgui Lepus3D LepusEngine)
+target_link_libraries(LepusGfx PRIVATE GL3W glfw ${GL_LIBRARY} DearImgui LepusEngine LepusSystem)
+target_link_libraries(LepusDemo PRIVATE DearImgui LepusGfx LepusEngine)
 
 # Copy content (models, GLSL, etc.)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Content)
@@ -175,7 +176,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 # Unit test projects for each library
-add_executable(Lepus3D_Tests
+add_executable(LepusGfx_Tests
 	tests/L3D/GraphicsEngine/GraphicsApiTests.h
 		tests/L3D/GraphicsEngine/GraphicsApiTests.cpp
 	tests/L3D/GraphicsEngine/GraphicsApiOptionsTests.h
@@ -195,11 +196,38 @@ add_executable(LepusUtility_Tests
 
 add_custom_command(TARGET LepusSystem_Tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/tests/Content" ${CMAKE_BINARY_DIR}/tests/Content)
 
-target_link_libraries(Lepus3D_Tests GTest::gtest_main Lepus3D)
+target_link_libraries(LepusGfx_Tests GTest::gtest_main LepusGfx)
 target_link_libraries(LepusSystem_Tests GTest::gtest_main LepusSystem)
 target_link_libraries(LepusUtility_Tests GTest::gtest_main)
 
 include(GoogleTest)
-gtest_discover_tests(Lepus3D_Tests)
+gtest_discover_tests(LepusGfx_Tests)
 gtest_discover_tests(LepusSystem_Tests)
 gtest_discover_tests(LepusUtility_Tests)
+
+# Warnings
+set(LepusTargets LepusEngine LepusSystem LepusGfx LepusSystem_Tests LepusGfx_Tests LepusUtility_Tests)
+if(MSVC)
+	# Ignore warnings:
+	# 4100: unreferenced param, 
+	# 4514: unreferenced inline function removed,
+	# 4464: parent relative include,
+	# 4820: struct padding,
+	# 4263: member not overriding base class virtual
+	# 4265-5027: copy ctor, move ctor, assignment, move assignment implicitly deleted (this messes up gtest projects)
+	# 5045: "compiler will insert Spectre mitigation for memory load"
+	set(MSVCDisabledWarnings 4100 4514 4464 4820 4263 4625 5026 4626 5027 5045)
+
+	set(MSVCDisabledWarningsFormatted "")
+	foreach(Warning IN LISTS MSVCDisabledWarnings)
+		set(MSVCDisabledWarningsFormatted ${MSVCDisabledWarningsFormatted} /wd${Warning})
+	endforeach()
+
+	foreach(Target IN LISTS LepusTargets)
+		target_compile_options(${Target} PRIVATE /Wall ${MSVCDisabledWarningsFormatted} /WX /external:W3)
+	endforeach()
+else()
+	foreach(Target IN LISTS LepusTargets)
+		target_compile_options(${Target} PRIVATE -Wall -Wextra -Wpedantic)
+	endforeach()
+endif()

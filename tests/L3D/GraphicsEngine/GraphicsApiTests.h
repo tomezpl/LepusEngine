@@ -1,10 +1,10 @@
 #ifndef LTESTS_L3D_GRAPHICSENGINE_GRAPHICSAPI
 #define LTESTS_L3D_GRAPHICSENGINE_GRAPHICSAPI
 
-#include <L3D/GraphicsEngine/GraphicsApi.h>
+#include <lepus/gfx/GraphicsEngine/GraphicsApi.h>
 #include "GraphicsApiOptionsTests.h"
 
-class GraphicsApiStub : public LepusEngine::Lepus3D::GraphicsApi
+class GraphicsApiStub : public lepus::gfx::GraphicsApi
 {
 	private:
 	/// @brief Pointer to a bool that will be set to true upon Shutdown being called.
@@ -24,9 +24,9 @@ class GraphicsApiStub : public LepusEngine::Lepus3D::GraphicsApi
 		m_ShutdownReceiver = shutdownReceiver;
 	}
 
-	void Init(LepusEngine::Lepus3D::GraphicsApiOptions* options) override
+	void Init(lepus::gfx::GraphicsApiOptions* options) override
 	{
-		InitInternal<GraphicsApiStubOptions>(reinterpret_cast<GraphicsApiStubOptions*>(options));
+		InitInternal<GraphicsApiStubOptions>((GraphicsApiStubOptions*)options);
 	}
 
 	void CreatePipeline() override
@@ -66,7 +66,7 @@ class GraphicsApiStub : public LepusEngine::Lepus3D::GraphicsApi
 			}
 
 			// TODO: is this cast needed?
-			delete reinterpret_cast<GraphicsApiStubOptions*>(m_Options);
+			delete (GraphicsApiStubOptions*)m_Options;
 			m_Options = nullptr;
 		}
 	}
@@ -78,6 +78,6 @@ class GraphicsApiStub : public LepusEngine::Lepus3D::GraphicsApi
 };
 
 
-template const lepus::gfx::UniformBinding<void*>* LepusEngine::Lepus3D::GraphicsApi::GetUniform<lepus::gfx::UniformBinding<void*>*>(char* name);
+template const lepus::gfx::UniformBinding<void*>* lepus::gfx::GraphicsApi::GetUniform<lepus::gfx::UniformBinding<void*>*>(char* name);
 
 #endif

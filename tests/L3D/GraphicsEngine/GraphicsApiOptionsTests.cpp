@@ -26,9 +26,9 @@ std::array<GraphicsApiStubOptions, 3> getTestOptions()
 
 TEST(GraphicsApiOptionsTest, TypeMatchesApi)
 {
-	LepusEngine::Lepus3D::GraphicsApiOptions* options = new GraphicsApiStubOptions();
+	lepus::gfx::GraphicsApiOptions* options = new GraphicsApiStubOptions();
 
-	ASSERT_EQ(options->GetType(), LepusEngine::Lepus3D::GraphicsApiType::GraphicsApiTest);
+	ASSERT_EQ(options->GetType(), lepus::gfx::GraphicsApiType::GraphicsApiTest);
 
 	delete options;
 }

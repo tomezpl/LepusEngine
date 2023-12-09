@@ -12,7 +12,7 @@ TEST(GraphicsApiTest, ShutdownGetsCalled)
 	GraphicsApiStubOptions options = GraphicsApiStubOptions();
 	bool shutdownWasCalled = false;
 
-	LepusEngine::Lepus3D::GraphicsApi* api = new GraphicsApiStub(&options, &shutdownWasCalled);
+	lepus::gfx::GraphicsApi* api = new GraphicsApiStub(&options, &shutdownWasCalled);
 
 	api->Shutdown();
 

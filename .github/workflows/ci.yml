@@ -28,4 +28,4 @@ jobs:
                     cd build
                     ./bin/LepusUtility_Tests
                     ./bin/LepusSystem_Tests
-                    ./bin/Lepus3D_Tests
+                    ./bin/LepusGfx_Tests
