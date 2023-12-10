@@ -29,6 +29,9 @@ namespace lepus
 
             virtual const TUniformHandle& Location() const = 0;
 
+            /// @brief Sets the value of the uniform.
+            /// @remarks Careful when passing data by reference/pointer - e.g. arrays. This class does NOT copy the data, and if the passed array has gone out of scope, the data will not be uploaded to the GPU!
+            /// @param value 
             inline void Value(TUniformValue value)
             {
                 m_Value = value;
