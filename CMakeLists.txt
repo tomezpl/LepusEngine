@@ -67,7 +67,7 @@ add_library(DearImgui ${IMGUI_SRC})
 include_directories(${CMAKE_SOURCE_DIR}/3rdparty/imgui)
 
 # Demo executable
-add_executable(LepusDemo src/examples/demo/main.cpp)
+add_executable(LepusDemo src/examples/demo/DemoApp.h src/examples/demo/main.cpp)
 
 # LepusUtility
 file(GLOB_RECURSE LEPUSUTILITY_HEADERS ${LEPUS_SRC_DIR}/utility/*.h ${LEPUS_SRC_DIR}/utility/**/*.h)
