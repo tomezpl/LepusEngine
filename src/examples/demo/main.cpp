@@ -6,11 +6,6 @@
 
 using namespace lepus;
 
-#ifndef _DEBUG
-#define NDEBUG
-#endif
-
-
 int main()
 {
 	DemoApp app;

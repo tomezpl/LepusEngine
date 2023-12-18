@@ -23,6 +23,7 @@ using namespace lepus;
 
 class DemoApp;
 
+/// @brief Wrapper for binding GLFW input events to DemoApp event handler methods.
 namespace DemoAppGLFWCallbacks
 {
     DemoApp* _demoApp = 0;
@@ -36,7 +37,6 @@ class DemoApp : public system::BaseApp
 {
     private:
     float m_FOV;
-    float angleYaw, anglePitch;
 
     const float _camSpeed = 5.f;
 
@@ -63,8 +63,6 @@ class DemoApp : public system::BaseApp
     DemoApp()
     {
         m_FOV = 0.f;
-        angleYaw = 0.f;
-        anglePitch = 0.f;
 
         m_MouseState =
         {
@@ -78,12 +76,10 @@ class DemoApp : public system::BaseApp
 
     inline void Init()
     {
-        // TODO: assert?
-        if (m_Initialised)
-        {
-            // Enable logging
-            engine::ConsoleLogger::Global().Enabled = true;
-        }
+        assert(!m_Initialised);
+
+        // Enable logging
+        engine::ConsoleLogger::Global().Enabled = true;
 
         m_Initialised = true;
 
@@ -223,7 +219,6 @@ class DemoApp : public system::BaseApp
         lepus::types::Vector3 forwardDelta, rightDelta;
         if (keys.s)
         {
-            engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", "Moving back!");
             forwardDelta = forwardDelta - (m_Camera.Transform().Forward() * deltaTime * _camSpeed);
         }
         if (keys.w)
