@@ -2,7 +2,7 @@
 #define LEPUS_GFX_GL_MESH
 
 #include <lepus/engine/Objects/Mesh.h>
-#include <gl/GL3w.h>
+#include <GL/gl3w.h>
 
 namespace lepus
 {
