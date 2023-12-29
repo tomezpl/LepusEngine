@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <memory>
+#include <cstring>
 
 namespace lepus
 {
