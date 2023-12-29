@@ -70,9 +70,9 @@ include_directories(${CMAKE_SOURCE_DIR}/3rdparty/imgui)
 add_executable(LepusDemo src/examples/demo/DemoApp.h src/examples/demo/main.cpp)
 
 # LepusUtility
-file(GLOB_RECURSE LEPUSUTILITY_HEADERS ${LEPUS_SRC_DIR}/utility/*.h ${LEPUS_SRC_DIR}/utility/**/*.h)
-add_custom_target(LepusUtility SOURCES ${LEPUSUTILITY_HEADERS})
-source_group(TREE ${LEPUS_SRC_DIR}/utility FILES ${LEPUSUTILITY_HEADERS})
+# file(GLOB_RECURSE LEPUSUTILITY_HEADERS ${LEPUS_SRC_DIR}/utility/*.h ${LEPUS_SRC_DIR}/utility/**/*.h)
+# add_custom_target(LepusUtility SOURCES ${LEPUSUTILITY_HEADERS})
+# source_group(TREE ${LEPUS_SRC_DIR}/utility FILES ${LEPUSUTILITY_HEADERS})
 
 # LepusGfx shaders
 file(GLOB LEPUS3D_SHADERS_SRC ${CMAKE_SOURCE_DIR}/Content/GLSL/*.frag ${CMAKE_SOURCE_DIR}/Content/GLSL/*.vert)
@@ -90,7 +90,12 @@ file(GLOB_RECURSE LepusEngine_SRC ${LEPUS_SRC_DIR}/engine/*.h ${LEPUS_SRC_DIR}/e
 add_library(LepusEngine ${LepusEngine_SRC})
 source_group(TREE ${LEPUS_SRC_DIR}/engine FILES ${LepusEngine_SRC})
 
-# LepusSystem sources
+# LepusUtility sources
+file(GLOB_RECURSE LepusUtility_SRC ${LEPUS_SRC_DIR}/utility/*.h ${LEPUS_SRC_DIR}/utility/*.cpp ${LEPUS_SRC_DIR}/utility/**/*.h ${LEPUS_SRC_DIR}/utility/**/*.cpp)
+add_library(LepusUtility ${LepusUtility_SRC})
+source_group(TREE ${LEPUS_SRC_DIR}/utility FILES ${LepusUtility_SRC})
+
+# LepusUtility sources
 file(GLOB_RECURSE LepusSystem_SRC ${LEPUS_SRC_DIR}/system/*.h ${LEPUS_SRC_DIR}/system/*.cpp ${LEPUS_SRC_DIR}/system/**/*.h ${LEPUS_SRC_DIR}/system/**/*.cpp)
 add_library(LepusSystem ${LepusSystem_SRC})
 source_group(TREE ${LEPUS_SRC_DIR}/system FILES ${LepusSystem_SRC})
@@ -155,8 +160,8 @@ if(OpenGL::GL)
 elseif(OpenGL::OpenGL)
 	set(GL_LIBRARY OpenGL::OpenGL)
 endif(OpenGL::GL)
-target_link_libraries(LepusGfx PRIVATE GL3W glfw ${GL_LIBRARY} DearImgui LepusEngine LepusSystem)
-target_link_libraries(LepusDemo PRIVATE DearImgui LepusGfx LepusEngine)
+target_link_libraries(LepusGfx PRIVATE GL3W glfw ${GL_LIBRARY} DearImgui LepusEngine LepusUtility LepusSystem)
+target_link_libraries(LepusDemo PRIVATE DearImgui LepusGfx LepusUtility LepusEngine)
 
 # Copy content (models, GLSL, etc.)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Content)
