@@ -86,9 +86,6 @@ namespace lepus
 
 			GLuint m_Programs[GraphicsApiGLOptions::ProgramCount];
 
-			// TODO: separate
-			const lepus::utility::Primitive& m_CubeGeometry = lepus::utility::Primitives::Cube();
-
 			private:
 			void SetupVertexArrays();
 			void SetupBuffers();

@@ -1,4 +1,5 @@
 #include "../ApiGL.h"
+#include "Types/GLMesh.h"
 #include <GL/gl3w.h>
 
 using namespace lepus::gfx;
@@ -19,19 +20,9 @@ void GraphicsApiGL::SetupBuffers()
 {
 	glBindVertexArray(m_Pipeline.vao);
 
-	// Create a global VBO and upload triangle data to it.
-	glCreateBuffers(1, &m_Pipeline.vbo);
-	//const GLfloat vertices[] = { -0.5f, -0.5f, 0.f, 0.5f, -0.5f, 0.f, 0.f, 0.5f, 0.f };
-	glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, 0);
-	glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)m_CubeGeometry.VertexBufferSize(), m_CubeGeometry.GetVertices(), GL_STATIC_DRAW);
-
-	// Create a global IBO and upload triangle index data to it.
-	glCreateBuffers(1, &m_Pipeline.ibo);
-	//const GLuint indices[] = { 0, 1, 2 };
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)m_CubeGeometry.IndexBufferSize(), m_CubeGeometry.GetIndices(), GL_STATIC_DRAW);
+	GLMesh cubeMesh = GLMesh(lepus::utility::Primitives::Cube());
+	m_Pipeline.vbo = cubeMesh.GetVBO();
+	m_Pipeline.ibo = cubeMesh.GetIBO();
 }
 
 void GraphicsApiGL::SetupShaders()
@@ -111,7 +102,7 @@ void GraphicsApiGL::Draw()
 	glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo);
 
-	glDrawElements(GL_TRIANGLES, (GLsizei)m_CubeGeometry.IndexCount(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, (GLsizei)lepus::utility::Primitives::Cube().IndexCount(), GL_UNSIGNED_INT, 0);
 }
 
 void GraphicsApiGL::ClearFrameBuffer(float r, float g, float b)

@@ -42,7 +42,7 @@ namespace lepus
                 public:
 #define LEPUS_MESH_CONSTRUCTOR(MeshClass) \
                 inline MeshClass(lepus::engine::MeshVertexFormat format = lepus::engine::MeshVertexFormat::VVV) {Init(format);} \
-                inline MeshClass(lepus::utility::Primitive& primitive, bool copy = false) {Init((void*)primitive.GetVertices(), primitive.VertexBufferSize(), lepus::engine::MeshVertexFormat::VVV, (uint32_t*)primitive.GetIndices(), primitive.IndexCount(), copy);} \
+                inline MeshClass(const lepus::utility::Primitive& primitive, bool copy = false) {Init((void*)primitive.GetVertices(), primitive.VertexBufferSize(), lepus::engine::MeshVertexFormat::VVV, (uint32_t*)primitive.GetIndices(), primitive.IndexCount(), copy);} \
                 inline MeshClass(void* vertices, size_t szVertices, lepus::engine::MeshVertexFormat format = lepus::engine::MeshVertexFormat::VVV, uint32_t* indices = nullptr, size_t indexCount = 0, bool copy = false) {Init(vertices, szVertices, format, indices, indexCount, copy);} \
                 inline virtual ~MeshClass() {Dispose();}
 
@@ -56,7 +56,7 @@ namespace lepus
                     InitInternal();
                 }
 
-                inline void Init(lepus::utility::Primitive& primitive, bool copy = false)
+                inline void Init(const lepus::utility::Primitive& primitive, bool copy = false)
                 {
                     Init((void*)primitive.GetVertices(), primitive.VertexBufferSize(), MeshVertexFormat::VVV, (uint32_t*)primitive.GetIndices(), primitive.IndexCount(), copy);
                 }

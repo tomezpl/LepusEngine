@@ -26,6 +26,9 @@ namespace lepus
 
             public:
             LEPUS_MESH_CONSTRUCTOR(GLMesh);
+
+            inline GLuint GetVBO() const { return m_VBO; }
+            inline GLuint GetIBO() const { return m_IBO; }
         };
     }
 }
