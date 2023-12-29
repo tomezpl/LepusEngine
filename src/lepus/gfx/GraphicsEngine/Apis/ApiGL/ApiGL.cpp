@@ -1,6 +1,5 @@
 #include "../ApiGL.h"
 #include "Types/GLMesh.h"
-#include <GL/gl3w.h>
 
 using namespace lepus::gfx;
 
