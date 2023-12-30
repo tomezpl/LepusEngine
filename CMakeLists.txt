@@ -95,7 +95,7 @@ file(GLOB_RECURSE LepusUtility_SRC ${LEPUS_SRC_DIR}/utility/*.h ${LEPUS_SRC_DIR}
 add_library(LepusUtility ${LepusUtility_SRC})
 source_group(TREE ${LEPUS_SRC_DIR}/utility FILES ${LepusUtility_SRC})
 
-# LepusUtility sources
+# LepusSystem sources
 file(GLOB_RECURSE LepusSystem_SRC ${LEPUS_SRC_DIR}/system/*.h ${LEPUS_SRC_DIR}/system/*.cpp ${LEPUS_SRC_DIR}/system/**/*.h ${LEPUS_SRC_DIR}/system/**/*.cpp)
 add_library(LepusSystem ${LepusSystem_SRC})
 source_group(TREE ${LEPUS_SRC_DIR}/system FILES ${LepusSystem_SRC})
