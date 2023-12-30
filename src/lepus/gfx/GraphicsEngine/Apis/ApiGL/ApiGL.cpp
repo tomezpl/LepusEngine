@@ -1,5 +1,4 @@
 #include "../ApiGL.h"
-#include "Types/GLMesh.h"
 
 using namespace lepus::gfx;
 
@@ -19,9 +18,13 @@ void GraphicsApiGL::SetupBuffers()
 {
 	glBindVertexArray(m_Pipeline.vao);
 
-	GLMesh cubeMesh = GLMesh(lepus::utility::Primitives::Cube());
-	m_Pipeline.vbo = cubeMesh.GetVBO();
-	m_Pipeline.ibo = cubeMesh.GetIBO();
+	m_Meshes[0] = GLMesh(lepus::utility::Primitives::Cube());
+	m_Pipeline.vbo[0] = m_Meshes[0].GetVBO();
+	m_Pipeline.ibo[0] = m_Meshes[0].GetIBO();
+
+	m_Meshes[1] = GLMesh(m_Meshes[0]);
+	m_Pipeline.vbo[1] = m_Meshes[1].GetVBO();
+	m_Pipeline.ibo[1] = m_Meshes[1].GetIBO();
 }
 
 void GraphicsApiGL::SetupShaders()
@@ -98,10 +101,13 @@ void GraphicsApiGL::Draw()
 	glUseProgram(m_Programs[0]);
 
 	glBindVertexArray(m_Pipeline.vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo);
+	for (uint8_t meshIndex = 0; meshIndex < _meshCount; meshIndex++)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo[meshIndex]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo[meshIndex]);
 
-	glDrawElements(GL_TRIANGLES, (GLsizei)lepus::utility::Primitives::Cube().IndexCount(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, (GLsizei)lepus::utility::Primitives::Cube().IndexCount(), GL_UNSIGNED_INT, 0);
+	}
 }
 
 void GraphicsApiGL::ClearFrameBuffer(float r, float g, float b)

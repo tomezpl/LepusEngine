@@ -34,6 +34,20 @@ namespace lepus
                 bool m_IsIndexed = false;
 
                 protected:
+                inline void CopyInternal(const Mesh& other)
+                {
+                    m_Format = other.m_Format;
+                    m_Vertices = other.m_Vertices;
+                    m_szVertices = other.m_szVertices;
+                    m_IndexCount = other.m_IndexCount;
+                    m_Indices = other.m_Indices;
+                    m_IsIndexed = other.m_IsIndexed;
+
+                    // We're not making a copy of the data, so we don't own it.
+                    // TODO: Add some kind of reference counting via a resource manager, so if we copy an existing mesh, its data doesn't get disposed until its copies are.
+                    m_OwnData = false;
+                }
+
                 inline virtual void InitInternal()
                 {
 
@@ -48,7 +62,25 @@ namespace lepus
 
                 LEPUS_MESH_CONSTRUCTOR(Mesh);
 
-                Mesh(Mesh& other)
+                /// @brief Copy constructor
+                /// @param other Mesh object to copy
+                Mesh(const Mesh& other)
+                {
+                    CopyInternal(other);
+                }
+
+                /// @brief Copy assignment
+                /// @param other Mesh object to copy
+                /// @return
+                Mesh& operator=(const Mesh& other)
+                {
+                    CopyInternal(other);
+                    return *this;
+                }
+
+                /// @brief Move constructor
+                /// @param other Rvalue to initialise the Mesh object with.
+                Mesh(Mesh&& other)
                 {
                     m_Format = MeshVertexFormat::Invalid;
                     m_Vertices = nullptr;
@@ -61,6 +93,9 @@ namespace lepus
                     *this = std::move(other);
                 }
 
+                /// @brief Move assignment
+                /// @param other Rvalue to assign
+                /// @return The current object with vertices, indices and any metadata from the rvalue. 
                 Mesh& operator=(Mesh&& other)
                 {
                     if (this != &other)
@@ -183,7 +218,7 @@ namespace lepus
                     return m_IndexCount;
                 }
 
-                inline void Dispose()
+                inline virtual void Dispose()
                 {
                     if (m_OwnData)
                     {
