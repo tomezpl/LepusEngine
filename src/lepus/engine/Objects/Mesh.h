@@ -48,6 +48,48 @@ namespace lepus
 
                 LEPUS_MESH_CONSTRUCTOR(Mesh);
 
+                Mesh(Mesh& other)
+                {
+                    m_Format = MeshVertexFormat::Invalid;
+                    m_Vertices = nullptr;
+                    m_szVertices = 0;
+                    m_OwnData = false;
+                    m_Indices = nullptr;
+                    m_IndexCount = 0;
+                    m_IsIndexed = false;
+
+                    *this = std::move(other);
+                }
+
+                Mesh& operator=(Mesh&& other)
+                {
+                    if (this != &other)
+                    {
+                        Dispose();
+
+                        m_Format = other.m_Format;
+
+                        m_Vertices = other.m_Vertices;
+                        m_szVertices = other.m_szVertices;
+
+                        m_Indices = other.m_Indices;
+                        m_IndexCount = other.m_IndexCount;
+
+                        m_IsIndexed = other.m_IsIndexed;
+                        m_OwnData = other.m_OwnData;
+
+                        other.m_Format = MeshVertexFormat::Invalid;
+                        other.m_IndexCount = 0;
+                        other.m_szVertices = 0;
+                        other.m_Indices = nullptr;
+                        other.m_Vertices = nullptr;
+                        other.m_OwnData = false;
+                        other.m_IsIndexed = false;
+                    }
+
+                    return *this;
+                }
+
                 inline void Init(MeshVertexFormat format = MeshVertexFormat::VVV)
                 {
                     m_Format = format;
@@ -99,17 +141,17 @@ namespace lepus
 
                 inline MeshVertexFormat GetFormat() const { return m_Format; }
 
-                const void* GetVertices()
+                const void* GetVertices() const
                 {
                     return m_Vertices;
                 }
 
-                const uint32_t* GetIndices()
+                const uint32_t* GetIndices() const
                 {
                     return m_Indices;
                 }
 
-                const uint8_t GetSingleVertexSize()
+                uint8_t GetSingleVertexSize() const
                 {
                     switch (m_Format)
                     {
@@ -121,22 +163,22 @@ namespace lepus
                     }
                 }
 
-                const size_t inline VertexCount()
+                size_t inline VertexCount() const
                 {
                     return m_szVertices / GetSingleVertexSize();
                 }
 
-                constexpr size_t const inline VertexBufferSize()
+                size_t inline VertexBufferSize() const
                 {
                     return m_szVertices;
                 }
 
-                constexpr size_t const inline IndexBufferSize()
+                size_t inline IndexBufferSize() const
                 {
                     return m_IndexCount * sizeof(uint32_t);
                 }
 
-                const size_t inline IndexCount()
+                size_t inline IndexCount() const
                 {
                     return m_IndexCount;
                 }
@@ -148,11 +190,15 @@ namespace lepus
                         if (m_Vertices)
                         {
                             free(m_Vertices);
+                            m_Vertices = nullptr;
+                            m_szVertices = 0;
                         }
 
                         if (m_Indices)
                         {
                             delete[] m_Indices;
+                            m_Indices = nullptr;
+                            m_IndexCount = 0;
                         }
                     }
                 }

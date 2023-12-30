@@ -46,14 +46,14 @@ void GraphicsApiGL::SetupShaders()
 void GraphicsApiGL::SetupUniforms()
 {
 	// Proj matrix
-	auto* proj = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], "PROJ"));
+	auto* proj = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX));
 	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(proj));
-	m_Pipeline.uniformMap.insert_or_assign("PROJ", reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(proj));
+	m_Pipeline.uniformMap.insert_or_assign(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX, reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(proj));
 
 	// View matrix
-	auto* view = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], "VIEW"));
+	auto* view = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX));
 	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(view));
-	m_Pipeline.uniformMap.insert_or_assign("VIEW", reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(view));
+	m_Pipeline.uniformMap.insert_or_assign(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX, reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(view));
 }
 
 void GraphicsApiGL::CreatePipeline()

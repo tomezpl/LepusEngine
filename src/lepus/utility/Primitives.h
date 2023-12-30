@@ -106,22 +106,22 @@ namespace lepus
                 return m_Indices;
             }
 
-            const size_t inline VertexCount() const
+            size_t inline VertexCount() const
             {
                 return m_VertCount;
             }
 
-            constexpr size_t const inline VertexBufferSize() const
+            size_t inline VertexBufferSize() const
             {
                 return m_VertCount * sizeof(float) * NbComponents;
             }
 
-            constexpr size_t const inline IndexBufferSize() const
+            size_t inline IndexBufferSize() const
             {
                 return m_IndexCount * sizeof(uint32_t);
             }
 
-            const size_t inline IndexCount() const
+            size_t inline IndexCount() const
             {
                 return m_IndexCount;
             }
