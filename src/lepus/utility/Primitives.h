@@ -132,6 +132,9 @@ namespace lepus
             private:
             static Primitives _shared;
             public:
+
+            /// @brief Gets the global Primitives instance.
+            /// @return A reference to the global Primitives object containing shared instances of Primitive objects.
             static Primitives& Shared() { return _shared; };
 
 #define LEPUS_UTILITY_PRIMITIVE_SHARED(PrimitiveName) \

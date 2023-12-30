@@ -18,10 +18,13 @@ void GraphicsApiGL::SetupBuffers()
 {
 	glBindVertexArray(m_Pipeline.vao);
 
+	// Creating a mesh from built-in primitive geometry.
 	m_Meshes[0] = GLMesh(lepus::utility::Primitives::Cube());
 	m_Pipeline.vbo[0] = m_Meshes[0].GetVBO();
 	m_Pipeline.ibo[0] = m_Meshes[0].GetIBO();
 
+	// Creating a mesh by copying the first mesh.
+	// Vertex & index data is shared with the first mesh, but uploaded to a separate pair of OpenGL buffers.
 	m_Meshes[1] = GLMesh(m_Meshes[0]);
 	m_Pipeline.vbo[1] = m_Meshes[1].GetVBO();
 	m_Pipeline.ibo[1] = m_Meshes[1].GetIBO();

@@ -8,6 +8,7 @@ namespace lepus
 {
     namespace gfx
     {
+        /// @brief A Mesh specialisation to create and manage OpenGL resources for mesh data as needed.
         class GLMesh : protected lepus::engine::objects::Mesh
         {
             private:
@@ -17,7 +18,9 @@ namespace lepus
             bool m_HasVBO;
             bool m_HasIBO;
 
+            /// @brief Creates a Vertex Buffer Object for the mesh data.
             void _CreateVBO();
+            /// @brief Creates an Index Buffer Object for the mesh data.
             void _CreateIBO();
 
             protected:
@@ -29,7 +32,7 @@ namespace lepus
                 m_HasVBO = false;
 
                 // Avoid creating a VBO or IBO if the size is 0 - this is likely because the mesh is being created on the stack
-                // before a VAO was bound. This will only result in a crash.
+                // with the default constructor before a VAO was bound. This will only result in a crash.
                 if (VertexBufferSize() > 0)
                 {
                     _CreateVBO();
@@ -50,22 +53,33 @@ namespace lepus
             public:
             LEPUS_MESH_CONSTRUCTOR(GLMesh);
 
+            /// @brief Copy constructor
+            /// @param other GLMesh object to copy.
             GLMesh(const GLMesh& other)
             {
                 CopyInternal(other);
             }
 
+            /// @brief Move constructor. Moves all base Mesh data (including vertices and indices) as well as OpenGL buffer names.
+            /// @param other GLMesh rvalue to move data from.
             GLMesh(GLMesh&& other)
             {
+                // Calls the move-assignment operator as the logic is the same.
                 *this = std::move(other);
             }
 
+            /// @brief Copy-assignment operator
+            /// @param other GLMesh object to copy.
+            /// @return A reference to a GLMesh object with data internally copied from the assigned object.
             GLMesh& operator=(const GLMesh& other)
             {
                 CopyInternal(other);
                 return *this;
             }
 
+            /// @brief Move-assignment operator
+            /// @param other GLMesh rvalue to move data from.
+            /// @return A reference to a GLMesh object with vertex & index data as well as OpenGL buffers moved from the assigned object.
             GLMesh& operator=(GLMesh&& other)
             {
                 *((Mesh*)this) = (Mesh)other;
@@ -78,9 +92,15 @@ namespace lepus
                 return *this;
             }
 
+            /// @brief Gets the Vertex Buffer Object used for this Mesh.
+            /// @return An OpenGL Vertex Buffer Object name that can be used with glBindBuffer.
             inline GLuint GetVBO() const { return m_VBO; }
+
+            /// @brief Gets the Index Buffer Object used for this Mesh.
+            /// @return An OpenGL Index Buffer Object name that can be used with glBindBuffer.
             inline GLuint GetIBO() const { return m_IBO; }
 
+            /// @brief Specialised Dispose() that, in addition to calling base Dispose(), releases OpenGL Vertex and Index Buffer Objects as needed.
             inline void Dispose() override
             {
                 Mesh::Dispose();
