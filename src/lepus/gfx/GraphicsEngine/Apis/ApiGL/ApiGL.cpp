@@ -1,5 +1,4 @@
 #include "../ApiGL.h"
-#include <GL/gl3w.h>
 
 using namespace lepus::gfx;
 
@@ -19,19 +18,16 @@ void GraphicsApiGL::SetupBuffers()
 {
 	glBindVertexArray(m_Pipeline.vao);
 
-	// Create a global VBO and upload triangle data to it.
-	glCreateBuffers(1, &m_Pipeline.vbo);
-	//const GLfloat vertices[] = { -0.5f, -0.5f, 0.f, 0.5f, -0.5f, 0.f, 0.f, 0.5f, 0.f };
-	glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, 0);
-	glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)m_CubeGeometry.VertexBufferSize(), m_CubeGeometry.GetVertices(), GL_STATIC_DRAW);
+	// Creating a mesh from built-in primitive geometry.
+	m_Meshes[0] = GLMesh(lepus::utility::Primitives::Cube());
+	m_Pipeline.vbo[0] = m_Meshes[0].GetVBO();
+	m_Pipeline.ibo[0] = m_Meshes[0].GetIBO();
 
-	// Create a global IBO and upload triangle index data to it.
-	glCreateBuffers(1, &m_Pipeline.ibo);
-	//const GLuint indices[] = { 0, 1, 2 };
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)m_CubeGeometry.IndexBufferSize(), m_CubeGeometry.GetIndices(), GL_STATIC_DRAW);
+	// Creating a mesh by copying the first mesh.
+	// Vertex & index data is shared with the first mesh, but uploaded to a separate pair of OpenGL buffers.
+	m_Meshes[1] = GLMesh(m_Meshes[0]);
+	m_Pipeline.vbo[1] = m_Meshes[1].GetVBO();
+	m_Pipeline.ibo[1] = m_Meshes[1].GetIBO();
 }
 
 void GraphicsApiGL::SetupShaders()
@@ -56,14 +52,14 @@ void GraphicsApiGL::SetupShaders()
 void GraphicsApiGL::SetupUniforms()
 {
 	// Proj matrix
-	auto* proj = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], "PROJ"));
+	auto* proj = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX));
 	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(proj));
-	m_Pipeline.uniformMap.insert_or_assign("PROJ", reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(proj));
+	m_Pipeline.uniformMap.insert_or_assign(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX, reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(proj));
 
 	// View matrix
-	auto* view = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], "VIEW"));
+	auto* view = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX));
 	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(view));
-	m_Pipeline.uniformMap.insert_or_assign("VIEW", reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(view));
+	m_Pipeline.uniformMap.insert_or_assign(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX, reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(view));
 }
 
 void GraphicsApiGL::CreatePipeline()
@@ -108,10 +104,13 @@ void GraphicsApiGL::Draw()
 	glUseProgram(m_Programs[0]);
 
 	glBindVertexArray(m_Pipeline.vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo);
+	for (uint8_t meshIndex = 0; meshIndex < _meshCount; meshIndex++)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo[meshIndex]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo[meshIndex]);
 
-	glDrawElements(GL_TRIANGLES, (GLsizei)m_CubeGeometry.IndexCount(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, (GLsizei)m_Meshes[meshIndex].IndexCount(), GL_UNSIGNED_INT, 0);
+	}
 }
 
 void GraphicsApiGL::ClearFrameBuffer(float r, float g, float b)

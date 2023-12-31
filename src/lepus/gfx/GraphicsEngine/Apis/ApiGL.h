@@ -9,6 +9,7 @@
 #include <unordered_map>
 
 #include "ApiGL/Bindings.h"
+#include "ApiGL/Types/GLMesh.h"
 
 namespace lepus
 {
@@ -64,16 +65,17 @@ namespace lepus
 		{
 			friend class GraphicsApiGLOptions;
 			private:
+			static const uint8_t _meshCount = 2;
 			struct
 			{
 				/// @brief Handle to the vertex array objects.
 				GLuint vao;
 
 				/// @brief Handle to the global VBO.
-				GLuint vbo;
+				GLuint vbo[_meshCount] = { 0, 0 };
 
 				/// @brief Handle to the global IBO.
-				GLuint ibo;
+				GLuint ibo[_meshCount] = { 0, 0 };
 
 				/// @brief List with all uniforms used by the API.
 				// TODO: Change to array - might get better cache/locality to improve access times.
@@ -86,8 +88,7 @@ namespace lepus
 
 			GLuint m_Programs[GraphicsApiGLOptions::ProgramCount];
 
-			// TODO: separate
-			LepusUtility::Primitive m_CubeGeometry = LepusUtility::Primitives::Cube();
+			GLMesh m_Meshes[_meshCount];
 
 			private:
 			void SetupVertexArrays();
