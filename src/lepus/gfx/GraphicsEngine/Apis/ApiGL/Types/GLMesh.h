@@ -9,7 +9,7 @@ namespace lepus
     namespace gfx
     {
         /// @brief A Mesh specialisation to create and manage OpenGL resources for mesh data as needed.
-        class GLMesh : protected lepus::engine::objects::Mesh
+        class GLMesh : public lepus::engine::objects::Mesh
         {
             private:
             GLuint m_VBO;

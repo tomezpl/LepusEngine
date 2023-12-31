@@ -109,7 +109,7 @@ void GraphicsApiGL::Draw()
 		glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo[meshIndex]);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo[meshIndex]);
 
-		glDrawElements(GL_TRIANGLES, (GLsizei)lepus::utility::Primitives::Cube().IndexCount(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, (GLsizei)m_Meshes[meshIndex].IndexCount(), GL_UNSIGNED_INT, 0);
 	}
 }
 
