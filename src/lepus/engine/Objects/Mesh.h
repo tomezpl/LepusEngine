@@ -38,6 +38,8 @@ namespace lepus
 
                 /// @brief Does this Mesh own the vertex/index data? If true, this Mesh will delete the data when Dispose is called.
                 bool m_OwnData = false;
+
+                /// @brief Is the Mesh indexed?
                 bool m_IsIndexed = false;
 
                 protected:
