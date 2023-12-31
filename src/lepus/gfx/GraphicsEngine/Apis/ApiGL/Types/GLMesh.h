@@ -82,12 +82,23 @@ namespace lepus
             /// @return A reference to a GLMesh object with vertex & index data as well as OpenGL buffers moved from the assigned object.
             GLMesh& operator=(GLMesh&& other)
             {
-                *((Mesh*)this) = (Mesh)other;
+                if (this != &other)
+                {
+                    Dispose();
 
-                m_IBO = other.m_IBO;
-                m_VBO = other.m_VBO;
-                other.m_HasIBO = false;
-                other.m_HasVBO = false;
+                    MoveInternal(other);
+
+                    m_IBO = other.m_IBO;
+                    m_VBO = other.m_VBO;
+                    m_HasIBO = other.m_HasIBO;
+                    m_HasVBO = other.m_HasVBO;
+
+                    other.m_HasIBO = false;
+                    other.m_HasVBO = false;
+                    other.m_IBO = 0;
+                    other.m_VBO = 0;
+                }
+
 
                 return *this;
             }

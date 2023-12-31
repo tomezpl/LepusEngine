@@ -63,6 +63,28 @@ namespace lepus
 
                 }
 
+                inline void MoveInternal(Mesh& other)
+                {
+                    m_Format = other.m_Format;
+
+                    m_Vertices = other.m_Vertices;
+                    m_szVertices = other.m_szVertices;
+
+                    m_Indices = other.m_Indices;
+                    m_IndexCount = other.m_IndexCount;
+
+                    m_IsIndexed = other.m_IsIndexed;
+                    m_OwnData = other.m_OwnData;
+
+                    other.m_Format = MeshVertexFormat::Invalid;
+                    other.m_IndexCount = 0;
+                    other.m_szVertices = 0;
+                    other.m_Indices = nullptr;
+                    other.m_Vertices = nullptr;
+                    other.m_OwnData = false;
+                    other.m_IsIndexed = false;
+                }
+
 #define LEPUS_MESH_CONSTRUCTOR(MeshClass) \
                 public:\
                 inline MeshClass(lepus::engine::MeshVertexFormat format = lepus::engine::MeshVertexFormat::VVV) {Init(format);} \
@@ -116,24 +138,7 @@ namespace lepus
                         // Make sure our data is disposed first if necessary so memory doesn't leak.
                         Dispose();
 
-                        m_Format = other.m_Format;
-
-                        m_Vertices = other.m_Vertices;
-                        m_szVertices = other.m_szVertices;
-
-                        m_Indices = other.m_Indices;
-                        m_IndexCount = other.m_IndexCount;
-
-                        m_IsIndexed = other.m_IsIndexed;
-                        m_OwnData = other.m_OwnData;
-
-                        other.m_Format = MeshVertexFormat::Invalid;
-                        other.m_IndexCount = 0;
-                        other.m_szVertices = 0;
-                        other.m_Indices = nullptr;
-                        other.m_Vertices = nullptr;
-                        other.m_OwnData = false;
-                        other.m_IsIndexed = false;
+                        MoveInternal(other);
                     }
 
                     return *this;
