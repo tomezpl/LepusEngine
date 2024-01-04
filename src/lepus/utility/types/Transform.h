@@ -27,6 +27,35 @@ namespace lepus
                 m_Rotation = lepus::types::Quaternion();
             }
 
+            Transform(Transform&& transform)
+            {
+                m_Origin = transform.Origin();
+                m_Forward = transform.Forward();
+                m_Up = transform.Up();
+                m_Right = transform.Right();
+                m_Rotation = transform.Rotation();
+            }
+
+            Transform(const Transform& transform)
+            {
+                m_Origin = transform.Origin();
+                m_Forward = transform.Forward();
+                m_Up = transform.Up();
+                m_Right = transform.Right();
+                m_Rotation = transform.Rotation();
+            }
+
+            Transform& operator=(const Transform& transform)
+            {
+                m_Origin = transform.Origin();
+                m_Forward = transform.Forward();
+                m_Up = transform.Up();
+                m_Right = transform.Right();
+                m_Rotation = transform.Rotation();
+
+                return *this;
+            }
+
             inline lepus::types::Vector3 Origin() const { return m_Origin; }
             inline void Origin(const lepus::types::Vector3& vec)
             {

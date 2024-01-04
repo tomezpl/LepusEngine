@@ -147,6 +147,11 @@ class DemoApp : public system::BaseApp
         engine.Setup();
         m_Camera.Transform().Origin(m_Camera.Transform().Forward() * -2.f);
 
+        auto cubeMesh = lepus::gfx::GLMesh(lepus::utility::Primitives::Cube());
+        auto cube = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+        auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+        api.GetSceneGraph().AddChild(&cube);
+        api.GetSceneGraph().AddChild(&cube2);
 
         m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
         ((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX))->Value((float*)m_UniformState.projMatrix.data());

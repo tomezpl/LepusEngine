@@ -52,8 +52,10 @@ namespace lepus
 		{
 			private:
 			bool m_ShutdownCalled;
+
 			protected:
 			GraphicsApiOptions* m_Options;
+
 			protected:
 			/// @brief Performs internal, boilerplate setup for all API wrappers.
 			/// @tparam TGraphicsApiOptions An options type derived from GraphicsApiOptions for a specific graphics API.
@@ -71,6 +73,7 @@ namespace lepus
 			/// @param name The name of the uniform to fetch.
 			/// @return API-specific handle for a uniform of a given type.
 			virtual void* GetUniformInternal(char* name) = 0;
+
 			public:
 			/// @brief Default constructor. Does nothing, so Init(GraphicsApiOptions*) needs to be called manually.
 			GraphicsApi()

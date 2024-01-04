@@ -10,6 +10,7 @@
 
 #include "ApiGL/Bindings.h"
 #include "ApiGL/Types/GLMesh.h"
+#include <lepus/gfx/SceneGraph.h>
 
 namespace lepus
 {
@@ -59,6 +60,8 @@ namespace lepus
 			}
 		};
 
+		typedef lepus::gfx::SceneGraph<GLMesh, lepus::gfx::Renderable<GLMesh>> GLSceneGraph;
+
 		template GraphicsApiGLOptions& GraphicsApi::GetOptions<GraphicsApiGLOptions>();
 
 		class GraphicsApiGL : public GraphicsApi
@@ -71,12 +74,6 @@ namespace lepus
 				/// @brief Handle to the vertex array objects.
 				GLuint vao;
 
-				/// @brief Handle to the global VBO.
-				GLuint vbo[_meshCount] = { 0, 0 };
-
-				/// @brief Handle to the global IBO.
-				GLuint ibo[_meshCount] = { 0, 0 };
-
 				/// @brief List with all uniforms used by the API.
 				// TODO: Change to array - might get better cache/locality to improve access times.
 				std::forward_list<lepus::gfx::GLUniformBinding<void*>*> uniforms;
@@ -88,7 +85,7 @@ namespace lepus
 
 			GLuint m_Programs[GraphicsApiGLOptions::ProgramCount];
 
-			GLMesh m_Meshes[_meshCount];
+			GLSceneGraph m_Scene;
 
 			private:
 			void SetupVertexArrays();
@@ -125,6 +122,11 @@ namespace lepus
 			void CreatePipeline() override;
 
 			void UpdateUniforms() override;
+
+			inline GLSceneGraph& GetSceneGraph()
+			{
+				return m_Scene;
+			}
 
 			void Draw() override;
 

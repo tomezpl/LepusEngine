@@ -5,6 +5,8 @@ using namespace lepus::gfx;
 void GraphicsApiGL::Init(GraphicsApiOptions* options)
 {
 	InitInternal<GraphicsApiGLOptions>((GraphicsApiGLOptions*)options);
+
+	m_Scene = GLSceneGraph();
 }
 
 void GraphicsApiGL::SetupVertexArrays()
@@ -14,20 +16,10 @@ void GraphicsApiGL::SetupVertexArrays()
 	glBindVertexArray(m_Pipeline.vao);
 }
 
+// TODO: rename this, or move to SetupVertexArrays?
 void GraphicsApiGL::SetupBuffers()
 {
 	glBindVertexArray(m_Pipeline.vao);
-
-	// Creating a mesh from built-in primitive geometry.
-	m_Meshes[0] = GLMesh(lepus::utility::Primitives::Cube());
-	m_Pipeline.vbo[0] = m_Meshes[0].GetVBO();
-	m_Pipeline.ibo[0] = m_Meshes[0].GetIBO();
-
-	// Creating a mesh by copying the first mesh.
-	// Vertex & index data is shared with the first mesh, but uploaded to a separate pair of OpenGL buffers.
-	m_Meshes[1] = GLMesh(m_Meshes[0]);
-	m_Pipeline.vbo[1] = m_Meshes[1].GetVBO();
-	m_Pipeline.ibo[1] = m_Meshes[1].GetIBO();
 }
 
 void GraphicsApiGL::SetupShaders()
@@ -104,13 +96,49 @@ void GraphicsApiGL::Draw()
 	glUseProgram(m_Programs[0]);
 
 	glBindVertexArray(m_Pipeline.vao);
-	for (uint8_t meshIndex = 0; meshIndex < _meshCount; meshIndex++)
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo[meshIndex]);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo[meshIndex]);
 
-		glDrawElements(GL_TRIANGLES, (GLsizei)m_Meshes[meshIndex].IndexCount(), GL_UNSIGNED_INT, 0);
+	const GLSceneGraph::Node* currentNode = m_Scene.Root();
+
+	bool branchComplete = false;
+
+	while (currentNode)
+	{
+		if (!branchComplete && !currentNode->IsRoot())
+		{
+			typedef lepus::gfx::Renderable<GLMesh> GLRenderable;
+			const GLRenderable* renderable = currentNode->GetRenderable();
+			if (renderable)
+			{
+				glBindBuffer(GL_ARRAY_BUFFER, renderable->GetMesh()->GetVBO());
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderable->GetMesh()->GetIBO());
+
+				glDrawElements(GL_TRIANGLES, (GLsizei)renderable->GetMesh()->IndexCount(), GL_UNSIGNED_INT, 0);
+			}
+		}
+
+		if (!branchComplete && currentNode->FirstChild())
+		{
+			currentNode = currentNode->FirstChild();
+		}
+		else if (currentNode->NextSibling())
+		{
+			currentNode = currentNode->NextSibling();
+			branchComplete = false;
+		}
+		else
+		{
+			branchComplete = true;
+			currentNode = currentNode->Parent();
+		}
 	}
+
+	// for (uint8_t meshIndex = 0; meshIndex < _meshCount; meshIndex++)
+	// {
+	// 	glBindBuffer(GL_ARRAY_BUFFER, m_Pipeline.vbo[meshIndex]);
+	// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Pipeline.ibo[meshIndex]);
+
+	// 	glDrawElements(GL_TRIANGLES, (GLsizei)m_Meshes[meshIndex].IndexCount(), GL_UNSIGNED_INT, 0);
+	// }
 }
 
 void GraphicsApiGL::ClearFrameBuffer(float r, float g, float b)
