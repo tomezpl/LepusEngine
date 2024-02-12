@@ -186,6 +186,8 @@ add_executable(LepusGfx_Tests
 		tests/L3D/GraphicsEngine/GraphicsApiTests.cpp
 	tests/L3D/GraphicsEngine/GraphicsApiOptionsTests.h
 		tests/L3D/GraphicsEngine/GraphicsApiOptionsTests.cpp
+	tests/L3D/SceneGraph/SceneGraphTests.h
+		tests/L3D/SceneGraph/SceneGraphTests.cpp
 )
 
 add_executable(LepusSystem_Tests
