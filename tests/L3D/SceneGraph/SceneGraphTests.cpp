@@ -29,6 +29,4 @@ TEST(SceneGraphTest, SceneGraphChildIsAddedCorrectly)
     ASSERT_EQ(sceneGraph.Root()->NextSibling(), nullptr);
     ASSERT_EQ(sceneGraph.Root()->FirstChild()->FirstChild(), nullptr);
     ASSERT_EQ(sceneGraph.Root()->FirstChild()->NextSibling(), nullptr);
-
-    std::cout << "test" << std::endl;
 }

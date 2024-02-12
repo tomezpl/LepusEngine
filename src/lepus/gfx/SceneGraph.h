@@ -96,26 +96,17 @@ namespace lepus
                 // Delete all children
                 while (currentNode)
                 {
-                    std::cout << "current node is " << std::hex << currentNode << std::endl;
-                    std::cout << "parent is " << std::hex << parent;
-                    if (parent == currentNode)
-                    {
-                        std::cout << "(we're root)";
-                    }
-                    std::cout << std::endl;
-
                     if (currentNode->m_Child)
                     {
-                        std::cout << "moving to child" << std::endl;
                         parent = currentNode;
                         currentNode = currentNode->m_Child;
                     }
                     else
                     {
-                        std::cout << "deleting current node " << std::hex << currentNode << std::endl;
+                        bool wasRoot = currentNode->IsRoot();
                         parent->m_Child = currentNode->m_Sibling;
                         delete currentNode;
-                        currentNode = parent;
+                        currentNode = wasRoot ? nullptr : parent;
                     }
                 }
             }
