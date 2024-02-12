@@ -223,7 +223,8 @@ if(MSVC)
 	# 4263: member not overriding base class virtual
 	# 4265-5027: copy ctor, move ctor, assignment, move assignment implicitly deleted (this messes up gtest projects)
 	# 5045: "compiler will insert Spectre mitigation for memory load"
-	set(MSVCDisabledWarnings 4100 4514 4464 4820 4263 4625 5026 4626 5027 5045)
+	# 5262: implicit switch fallback
+	set(MSVCDisabledWarnings 4100 4514 4464 4820 4263 4625 5026 4626 5027 5045 5262)
 
 	set(MSVCDisabledWarningsFormatted "")
 	foreach(Warning IN LISTS MSVCDisabledWarnings)
