@@ -115,6 +115,27 @@ namespace lepus
 
                 return ret;
             }
+
+            inline void SetPosition(float x, float y, float z)
+            {
+                m_Origin.x(x);
+                m_Origin.y(y);
+                m_Origin.z(z);
+            }
+
+            inline lepus::math::Matrix4x4 BuildMatrix() const
+            {
+                lepus::math::Matrix4x4 model = lepus::math::Matrix4x4::Identity();
+
+                // Translation
+                model.set<0, 3>(m_Origin.x());
+                model.set<1, 3>(m_Origin.y());
+                model.set<2, 3>(m_Origin.z());
+
+                // TODO: add scaling and rotation
+
+                return model;
+            }
         };
     }
 }

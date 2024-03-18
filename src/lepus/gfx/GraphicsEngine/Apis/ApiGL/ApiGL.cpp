@@ -52,6 +52,11 @@ void GraphicsApiGL::SetupUniforms()
 	auto* view = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX));
 	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(view));
 	m_Pipeline.uniformMap.insert_or_assign(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX, reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(view));
+
+	// Model matrix
+	auto* model = new lepus::gfx::GLMatrixUniformBinding(glGetUniformLocation(m_Programs[0], LEPUS_GFX_UNIFORMS_GLOBAL_MODEL_MATRIX));
+	m_Pipeline.uniforms.push_front((lepus::gfx::GLUniformBinding<void*>*)(model));
+	m_Pipeline.uniformMap.insert_or_assign(LEPUS_GFX_UNIFORMS_GLOBAL_MODEL_MATRIX, reinterpret_cast<lepus::gfx::GLUniformBinding<void*>*>(model));
 }
 
 void GraphicsApiGL::CreatePipeline()
@@ -109,6 +114,11 @@ void GraphicsApiGL::Draw()
 			const GLRenderable* renderable = currentNode->GetRenderable();
 			if (renderable)
 			{
+				lepus::math::Matrix4x4 modelMat = renderable->GetTransform().BuildMatrix();
+				auto modelMatUniformLoation = GetUniform<GLuint, GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_MODEL_MATRIX);
+				// TODO: integrate this with UpdateUniforms somehow, the model matrix uniform needs to be different for each renderable!
+				glUniformMatrix4fv(modelMatUniformLoation->Location(), 1, true, modelMat.data());
+
 				glBindBuffer(GL_ARRAY_BUFFER, renderable->GetMesh()->GetVBO());
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderable->GetMesh()->GetIBO());
 

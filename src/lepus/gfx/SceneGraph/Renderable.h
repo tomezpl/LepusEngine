@@ -49,9 +49,9 @@ namespace lepus
                 return m_Mesh;
             }
 
-            const lepus::math::Transform& GetTransform() const
+            lepus::math::Transform& GetTransform() const
             {
-                return *m_Transform;
+                return (lepus::math::Transform&)(*reinterpret_cast<const lepus::math::Transform*>(m_Transform));
             }
         };
     }

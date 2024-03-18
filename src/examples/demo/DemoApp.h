@@ -147,37 +147,41 @@ class DemoApp : public system::BaseApp
         engine.Setup();
         m_Camera.Transform().Origin(m_Camera.Transform().Forward() * -2.f);
 
+        // Instantiate two Renderables in the scene graph, each with its own transform, using the same cube mesh data.
         auto cubeMesh = lepus::gfx::GLMesh(lepus::utility::Primitives::Cube());
         auto cube = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
         auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
         api.GetSceneGraph().AddChild(&cube);
         api.GetSceneGraph().AddChild(&cube2);
 
+        // Update projection and view matrices with data from the camera object.
         m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
         ((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX))->Value((float*)m_UniformState.projMatrix.data());
-
         m_UniformState.viewMatrix = m_Camera.BuildViewMatrix();
         ((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX))->Value((float*)m_UniformState.viewMatrix.data());
 
+        // Initialise the FOV variable and set up a callback so we can let the user adjust it with the mouse scroll wheel.
         m_FOV = m_Camera.FOV();
-
         glfwSetScrollCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), DemoAppGLFWCallbacks::scroll);
 
         float runningTime = glfwGetTime();
 
         GLFWwindow* window = reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr());
+
+        // Set up mouse input for camera freelook.
         glfwGetCursorPos(window, &m_MouseState.lastX, &m_MouseState.lastY);
         glfwSetCursorPosCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), DemoAppGLFWCallbacks::cursorPos);
-
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, 1);
 
+        // Initialise all keys as released.
         KeyboardState keys = { false, false, false, false };
 
         float deltaTime = 0.f;
 
         while (isRunning)
         {
+            cube2.GetTransform().SetPosition(1.f * sinf(runningTime), 1.f * cosf(runningTime), -1.f);
             windowing->Update(); // Update window before drawing
 
             UpdateInput(keys, windowing);
@@ -222,6 +226,8 @@ class DemoApp : public system::BaseApp
         m_Camera.FOV(m_FOV);
 
         lepus::types::Vector3 forwardDelta, rightDelta;
+
+        // Process camera movement input based on keyboard state.
         if (keys.s)
         {
             forwardDelta = forwardDelta - (m_Camera.Transform().Forward() * deltaTime * _camSpeed);
