@@ -53,6 +53,7 @@ namespace lepus
                 if (sqrtInvW == 0.f)
                 {
                     // just return Vector3.Up if divide by 0
+                    // sqrtInvW = 1.f;
                     return Vector3(0.f, 1.f, 0.f);
                 }
 
@@ -64,43 +65,18 @@ namespace lepus
             /// @return A scalar describing the angle of rotation calculated from the Quaternion's real part (arccos(w) * 2).
             inline float Angle() const
             {
-                float wrappedW = w();
-                // if (wrappedW > 1.f)
-                // {
-                //     wrappedW = -1.f + (wrappedW - 1.f);
-                // }
-                // else if (wrappedW < -1.f)
-                // {
-                //     wrappedW = 1.f + (wrappedW + 1.f);
-                // }
-                return acosf(fmin(1.f, fmax(-1.f, wrappedW))) * 2.f;
+                return acosf(w()) * 2.f;
             }
 
             inline float x() const { return m_Components[0]; }
             inline float y() const { return m_Components[1]; }
             inline float z() const { return m_Components[2]; }
-            inline float w() const
-            {
-                float w = m_Components[3];
-                return w;
-            }
+            inline float w() const { return m_Components[3]; }
+
             inline float x(float newX) { return m_Components[0] = newX; }
             inline float y(float newY) { return m_Components[1] = newY; }
             inline float z(float newZ) { return m_Components[2] = newZ; }
-            inline float w(float newW)
-            {
-                // Wrap the angle component as going outside of [-1, 1] would cause the Quaternion to rotate in the opposite direction
-                // if (newW > 1.f)
-                // {
-                //     newW = -1.f + (newW - 1.f);
-                // }
-                // else if (newW < -1.f)
-                // {
-                //     newW = 1.f + (newW + 1.f);
-                // }
-
-                return m_Components[3] = newW;
-            }
+            inline float w(float newW) { return m_Components[3] = newW; }
 
             inline Quaternion operator*(const Quaternion& b) const
             {
@@ -120,6 +96,24 @@ namespace lepus
                 result.z(vc.z());
 
                 // lepus::engine::ConsoleLogger::Global().LogInfo("Quaternion", "operator*", result.Axis().ToString().c_str(), "const Quaternion& b");
+
+                return result;
+            }
+
+            /// @brief Computes a unit quaternion from this quaternion.
+            /// @return A copy of this quaternion divided by its magnitude.
+            inline Quaternion Normalised() const
+            {
+                Quaternion result = Quaternion();
+
+                float x = this->x(), y = this->y(), z = this->z(), w = this->w();
+
+                float mag = sqrtf(w * w + x * x + y * y + z * z);
+
+                result.x(x / mag);
+                result.y(y / mag);
+                result.z(z / mag);
+                result.w(w / mag);
 
                 return result;
             }

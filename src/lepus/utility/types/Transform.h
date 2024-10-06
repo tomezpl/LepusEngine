@@ -133,34 +133,23 @@ namespace lepus
                 model.set<2, 3>(m_Origin.z());
 
                 // TODO: add scaling and rotation
-                lepus::types::Vector3 axis = m_Rotation.Axis();
+                lepus::types::Quaternion normRot = m_Rotation.Normalised();
+                lepus::types::Vector3 axis = normRot.Axis();
                 //axis = axis * (1.f / axis.Magnitude());
-                float angle = m_Rotation.Angle();
+                float angle = normRot.Angle();
 
-                // model.set<0, 0>(sinf(angle) * axis.z());
-
-                // model.set<0, 1>(cosf(angle) * axis.z());
-                // model.set<1, 0>(cosf(angle) * axis.z());
-                // model.set<1, 1>(sinf(angle) * axis.z());
-
-                // float theta = (float)PI * 0.25f;
-                // float theta = fmod(angle, (float)PI);
-                // model.set<0, 1>(cosf(theta));
-                // model.set<1, 0>(-sinf(theta));
-                // model.set<1, 1>(-cosf(angle * 2.f));
-                // model.set<0, 1>(2.f * sinf(angle) * axis.z());
-                // model.set<1, 0>(2.f * -cosf(angle) * axis.z());
-
-                // model.set<0, 0>(sinf(angle) * axis.z() + cosf(angle) * axis.y());
-                // model.set<1, 1>(cosf(angle) * axis.z() + sinf(angle) * axis.x());
-                // model.set<2, 2>(cosf(angle) * axis.x() + sinf(angle) * axis.y());
-
-                float sign = axis.z();
-                angle *= sign;
-                model.set<0, 0>(cosf(angle));
-                model.set<0, 1>(sinf(angle));
-                model.set<1, 1>(cosf(angle));
-                model.set<1, 0>(-sinf(angle));
+                float cosTheta = cosf(angle);
+                float invCosTheta = 1.f - cosTheta;
+                float sinTheta = sinf(angle);
+                model.set<0, 0>(axis.x() * axis.x() * invCosTheta + cosTheta);
+                model.set<0, 1>(axis.x() * axis.y() * invCosTheta + axis.z() * sinTheta);
+                model.set<1, 1>(axis.y() * axis.y() * invCosTheta + cosTheta);
+                model.set<1, 0>(axis.y() * axis.x() * invCosTheta - axis.z() * sinTheta);
+                model.set<2, 0>(axis.z() * axis.x() * invCosTheta + axis.y() * sinTheta);
+                model.set<2, 1>(axis.z() * axis.y() * invCosTheta - axis.x() * sinTheta);
+                model.set<0, 2>(axis.x() * axis.z() * invCosTheta - axis.y() * sinTheta);
+                model.set<1, 2>(axis.y() * axis.z() * invCosTheta + axis.x() * sinTheta);
+                model.set<2, 2>(axis.z() * axis.z() * invCosTheta + cosTheta);
 
                 return model;
             }

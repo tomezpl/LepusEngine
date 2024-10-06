@@ -151,8 +151,18 @@ class DemoApp : public system::BaseApp
         auto cubeMesh = lepus::gfx::GLMesh(lepus::utility::Primitives::Cube());
         auto cube = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
         auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+        auto cubeX = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+        auto cubeY = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+        auto cubeZ = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
         api.GetSceneGraph().AddChild(&cube);
         api.GetSceneGraph().AddChild(&cube2);
+        api.GetSceneGraph().AddChild(&cubeX);
+        api.GetSceneGraph().AddChild(&cubeY);
+        api.GetSceneGraph().AddChild(&cubeZ);
+
+        cubeX.GetTransform().SetPosition(-1.5f, 2.f, 0.f);
+        cubeY.GetTransform().SetPosition(0.f, 2.f, 0.f);
+        cubeZ.GetTransform().SetPosition(1.5f, 2.f, 0.f);
 
         // Update projection and view matrices with data from the camera object.
         m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
@@ -189,10 +199,16 @@ class DemoApp : public system::BaseApp
 
             bool eKeyPressedLastFrame = keys.e;
             UpdateInput(keys, windowing);
-            cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), deltaTime));
+            // cube.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime));
+            lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(cube2.GetTransform().Rotation().w()).c_str());
+            // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(cube2.GetTransform().Rotation().Angle()).c_str());
+            cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 1.f, 1.f), deltaTime));
+            cubeX.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 0.f, 0.f), deltaTime));
+            cubeY.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime));
+            cubeZ.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), deltaTime));
             if (!eKeyPressedLastFrame && keys.e)
             {
-                cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), PI / 4.f));
+                // cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), PI / 4.f));
                 lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", std::to_string(cube2.GetTransform().Rotation().Angle() * (1.f / PI) * 180.f).c_str());
             }
             Tick(deltaTime, keys);
@@ -256,8 +272,8 @@ class DemoApp : public system::BaseApp
             rightDelta = rightDelta - (m_Camera.Transform().Right() * deltaTime * _camSpeed);
         }
 
-        lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", m_Camera.Transform().Rotation().Axis().ToString().c_str());
-        lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(m_Camera.Transform().Rotation().Angle() * (1.f / PI) * 180.f).c_str());
+        // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", m_Camera.Transform().Rotation().Axis().ToString().c_str());
+        // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(m_Camera.Transform().Rotation().Angle() * (1.f / PI) * 180.f).c_str());
 
         m_Camera.Transform().Origin(m_Camera.Transform().Origin() + forwardDelta + rightDelta);
     }
