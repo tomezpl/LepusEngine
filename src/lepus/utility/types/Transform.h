@@ -133,6 +133,34 @@ namespace lepus
                 model.set<2, 3>(m_Origin.z());
 
                 // TODO: add scaling and rotation
+                lepus::types::Vector3 axis = m_Rotation.Axis();
+                //axis = axis * (1.f / axis.Magnitude());
+                float angle = m_Rotation.Angle();
+
+                // model.set<0, 0>(sinf(angle) * axis.z());
+
+                // model.set<0, 1>(cosf(angle) * axis.z());
+                // model.set<1, 0>(cosf(angle) * axis.z());
+                // model.set<1, 1>(sinf(angle) * axis.z());
+
+                // float theta = (float)PI * 0.25f;
+                // float theta = fmod(angle, (float)PI);
+                // model.set<0, 1>(cosf(theta));
+                // model.set<1, 0>(-sinf(theta));
+                // model.set<1, 1>(-cosf(angle * 2.f));
+                // model.set<0, 1>(2.f * sinf(angle) * axis.z());
+                // model.set<1, 0>(2.f * -cosf(angle) * axis.z());
+
+                // model.set<0, 0>(sinf(angle) * axis.z() + cosf(angle) * axis.y());
+                // model.set<1, 1>(cosf(angle) * axis.z() + sinf(angle) * axis.x());
+                // model.set<2, 2>(cosf(angle) * axis.x() + sinf(angle) * axis.y());
+
+                float sign = axis.z();
+                angle *= sign;
+                model.set<0, 0>(cosf(angle));
+                model.set<0, 1>(sinf(angle));
+                model.set<1, 1>(cosf(angle));
+                model.set<1, 0>(-sinf(angle));
 
                 return model;
             }

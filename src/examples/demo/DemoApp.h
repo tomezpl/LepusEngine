@@ -51,7 +51,7 @@ class DemoApp : public system::BaseApp
 
     struct KeyboardState
     {
-        bool w = false, a = false, s = false, d = false;
+        bool w = false, a = false, s = false, d = false, e = false;
     };
 
     struct
@@ -90,7 +90,7 @@ class DemoApp : public system::BaseApp
     {
         float deltaX = (xpos - m_MouseState.lastX) / 300.0;
         float deltaY = (ypos - m_MouseState.lastY) / 300.0;
-        lepus::types::Quaternion rotationYaw = lepus::types::Quaternion(0.f, 1.f, 0.f, deltaX);
+        lepus::types::Quaternion rotationYaw = lepus::types::Quaternion(0.f, 1.f, 0.f, -deltaX);
 
         auto combined = rotationYaw;
         float angle = combined.Angle();
@@ -98,7 +98,7 @@ class DemoApp : public system::BaseApp
         {
             m_Camera.Transform().Rotate(rotationYaw);
         }
-        lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(m_Camera.Transform().Right(), deltaY);
+        lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(m_Camera.Transform().Right(), -deltaY);
         angle = rotationPitch.Angle();
         if (abs(angle) > 0.001f)
         {
@@ -175,16 +175,26 @@ class DemoApp : public system::BaseApp
         glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, 1);
 
         // Initialise all keys as released.
-        KeyboardState keys = { false, false, false, false };
+        KeyboardState keys = { false, false, false, false, false };
 
         float deltaTime = 0.f;
+        // cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), PI * 0.25f));
 
         while (isRunning)
         {
+            // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", std::to_string(cube2.GetTransform().Rotation().w()).c_str());
+            // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", cube2.GetTransform().Rotation().Axis().ToString().c_str());
             cube2.GetTransform().SetPosition(1.f * sinf(runningTime), 1.f * cosf(runningTime), -1.f);
             windowing->Update(); // Update window before drawing
 
+            bool eKeyPressedLastFrame = keys.e;
             UpdateInput(keys, windowing);
+            cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), deltaTime));
+            if (!eKeyPressedLastFrame && keys.e)
+            {
+                cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), PI / 4.f));
+                lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", std::to_string(cube2.GetTransform().Rotation().Angle() * (1.f / PI) * 180.f).c_str());
+            }
             Tick(deltaTime, keys);
             UpdateUniforms(&api);
 
@@ -210,6 +220,7 @@ class DemoApp : public system::BaseApp
         keys.a = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
         keys.s = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
         keys.d = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
+        keys.e = glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE;
     }
 
     inline void UpdateUniforms(gfx::GraphicsApi* api)
@@ -244,6 +255,9 @@ class DemoApp : public system::BaseApp
         {
             rightDelta = rightDelta - (m_Camera.Transform().Right() * deltaTime * _camSpeed);
         }
+
+        lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", m_Camera.Transform().Rotation().Axis().ToString().c_str());
+        lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(m_Camera.Transform().Rotation().Angle() * (1.f / PI) * 180.f).c_str());
 
         m_Camera.Transform().Origin(m_Camera.Transform().Origin() + forwardDelta + rightDelta);
     }

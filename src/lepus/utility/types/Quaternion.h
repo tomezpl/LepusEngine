@@ -64,30 +64,62 @@ namespace lepus
             /// @return A scalar describing the angle of rotation calculated from the Quaternion's real part (arccos(w) * 2).
             inline float Angle() const
             {
-                return acosf(fmax(-1.f, fmin(1.f, w()))) * 2.f;
+                float wrappedW = w();
+                // if (wrappedW > 1.f)
+                // {
+                //     wrappedW = -1.f + (wrappedW - 1.f);
+                // }
+                // else if (wrappedW < -1.f)
+                // {
+                //     wrappedW = 1.f + (wrappedW + 1.f);
+                // }
+                return acosf(fmin(1.f, fmax(-1.f, wrappedW))) * 2.f;
             }
 
             inline float x() const { return m_Components[0]; }
             inline float y() const { return m_Components[1]; }
             inline float z() const { return m_Components[2]; }
-            inline float w() const { return m_Components[3]; }
+            inline float w() const
+            {
+                float w = m_Components[3];
+                return w;
+            }
             inline float x(float newX) { return m_Components[0] = newX; }
             inline float y(float newY) { return m_Components[1] = newY; }
             inline float z(float newZ) { return m_Components[2] = newZ; }
-            inline float w(float newW) { return m_Components[3] = newW; }
+            inline float w(float newW)
+            {
+                // Wrap the angle component as going outside of [-1, 1] would cause the Quaternion to rotate in the opposite direction
+                // if (newW > 1.f)
+                // {
+                //     newW = -1.f + (newW - 1.f);
+                // }
+                // else if (newW < -1.f)
+                // {
+                //     newW = 1.f + (newW + 1.f);
+                // }
+
+                return m_Components[3] = newW;
+            }
 
             inline Quaternion operator*(const Quaternion& b) const
             {
                 Quaternion result = Quaternion();
 
+                // lepus::engine::ConsoleLogger::Global().LogInfo("Quaternion", "operator*", std::to_string(w()).c_str(), "const Quaternion& b");
+
+                // result.w(fmin(1.f, fmax(-1.f, w())));
+
                 lepus::types::Vector3 va = lepus::types::Vector3((float*)GetData());
                 lepus::types::Vector3 vb = lepus::types::Vector3((float*)b.GetData());
                 result.w((w() * b.w()) - lepus::types::Vector3::Dot(va, vb));
 
-                lepus::types::Vector3 vc = lepus::types::Vector3::Cross(vb, va) + (vb * w()) + (va * b.w());
+                lepus::types::Vector3 vc = lepus::types::Vector3::Cross(va, vb) + (vb * w()) + (va * b.w());
                 result.x(vc.x());
                 result.y(vc.y());
                 result.z(vc.z());
+
+                // lepus::engine::ConsoleLogger::Global().LogInfo("Quaternion", "operator*", result.Axis().ToString().c_str(), "const Quaternion& b");
 
                 return result;
             }
