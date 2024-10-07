@@ -31,7 +31,7 @@ namespace DemoAppGLFWCallbacks
     void cursorPos(GLFWwindow* window, double xpos, double ypos);
 
     void scroll(GLFWwindow* window, double xoffset, double yoffset);
-}
+} // namespace DemoAppGLFWCallbacks
 
 class DemoApp : public system::BaseApp
 {
@@ -42,254 +42,263 @@ class DemoApp : public system::BaseApp
 
     struct
     {
-        double lastX, lastY;
+	double lastX, lastY;
     } m_MouseState;
 
     lepus::gfx::Camera m_Camera;
 
-    virtual void Init(void callback()) {};
+    virtual void Init(void callback()){};
 
     struct KeyboardState
     {
-        bool w = false, a = false, s = false, d = false, e = false;
+	bool w = false, a = false, s = false, d = false, e = false;
     };
 
     struct
     {
-        lepus::math::Matrix4x4 projMatrix, viewMatrix;
+	lepus::math::Matrix4x4 projMatrix, viewMatrix;
     } m_UniformState;
 
     public:
     DemoApp()
     {
-        m_FOV = 0.f;
+	m_FOV = 0.f;
 
-        m_MouseState =
-        {
-            -1.0, -1.0
-        };
+	m_MouseState =
+	    {
+	        -1.0, -1.0};
 
-        m_Camera = lepus::gfx::Camera();
+	m_Camera = lepus::gfx::Camera();
 
-        Init();
+	Init();
     }
 
     inline void Init()
     {
-        assert(!m_Initialised);
+	assert(!m_Initialised);
 
-        // Enable logging
-        engine::ConsoleLogger::Global().Enabled = true;
+	// Enable logging
+	engine::ConsoleLogger::Global().Enabled = true;
 
-        m_Initialised = true;
+	m_Initialised = true;
 
-        DemoAppGLFWCallbacks::_demoApp = this;
+	DemoAppGLFWCallbacks::_demoApp = this;
     }
 
     inline void OnMouseMove(double xpos, double ypos)
     {
-        float deltaX = (xpos - m_MouseState.lastX) / 300.0;
-        float deltaY = (ypos - m_MouseState.lastY) / 300.0;
-        lepus::types::Quaternion rotationYaw = lepus::types::Quaternion(0.f, 1.f, 0.f, -deltaX);
+	float deltaX = (xpos - m_MouseState.lastX) / 300.0;
+	float deltaY = (ypos - m_MouseState.lastY) / 300.0;
+	lepus::types::Quaternion rotationYaw = lepus::types::Quaternion(0.f, 1.f, 0.f, -deltaX);
 
-        auto combined = rotationYaw;
-        float angle = combined.Angle();
-        if (abs(angle) > 0.001f)
-        {
-            m_Camera.Transform().Rotate(rotationYaw);
-        }
-        lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(m_Camera.Transform().Right(), -deltaY);
-        angle = rotationPitch.Angle();
-        if (abs(angle) > 0.001f)
-        {
-            m_Camera.Transform().Rotate(rotationPitch);
-        }
+	auto combined = rotationYaw;
+	float angle = combined.Angle();
+	if (abs(angle) > 0.001f)
+	{
+	    m_Camera.Transform().Rotate(rotationYaw);
+	}
+	lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(m_Camera.Transform().Right(), -deltaY);
+	angle = rotationPitch.Angle();
+	if (abs(angle) > 0.001f)
+	{
+	    m_Camera.Transform().Rotate(rotationPitch);
+	}
 
-        m_MouseState.lastX = xpos;
-        m_MouseState.lastY = ypos;
+	m_MouseState.lastX = xpos;
+	m_MouseState.lastY = ypos;
     }
 
     inline void OnScroll(double xoffset, float yoffset)
     {
-        m_FOV = fmax(1.f, fmin(179.f, m_FOV + (float)yoffset));
-        engine::ConsoleLogger::Global().LogInfo("", "scrollCallback", "yoffset", std::to_string(xoffset).append(", ").append(std::to_string(yoffset)).append("FOV: ").append(std::to_string(m_FOV)).c_str());
+	m_FOV = fmax(1.f, fmin(179.f, m_FOV + (float)yoffset));
+	engine::ConsoleLogger::Global().LogInfo("", "scrollCallback", "yoffset", std::to_string(xoffset).append(", ").append(std::to_string(yoffset)).append("FOV: ").append(std::to_string(m_FOV)).c_str());
     }
 
     inline int Run() override
     {
-        std::shared_ptr<system::WindowingGLFW> windowing = std::make_shared<system::WindowingGLFW>(800, 600);
+	std::shared_ptr<system::WindowingGLFW> windowing = std::make_shared<system::WindowingGLFW>(800, 600);
 
-        // Create new graphics engine instance
-        gfx::GraphicsApiGLOptions options = {};
-        options.mainViewport = { 800, 600 };
-        gfx::GraphicsEngine engine(&options, windowing);
+	// Create new graphics engine instance
+	gfx::GraphicsApiGLOptions options = {};
+	options.mainViewport = {800, 600};
+	gfx::GraphicsEngine engine(&options, windowing);
 
-        // Termination condition for main loop
-        bool isRunning = true;
+	// Termination condition for main loop
+	bool isRunning = true;
 
-        // Set the window as the current OpenGL context.
-        windowing->SetAsCurrentContext();
+	// Set the window as the current OpenGL context.
+	windowing->SetAsCurrentContext();
 
-        // Output start message to console
-        engine::ConsoleLogger::Global().LogInfo("", "main", "Demo starting!");
+	// Output start message to console
+	engine::ConsoleLogger::Global().LogInfo("", "main", "Demo starting!");
 
-        // Load & compile shaders.
-        std::string vertShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.vert"), fragShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.frag");
-        gfx::ShaderCompiledResult
-            vertShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(vertShaderSrc.c_str(), vertShaderSrc.length(), gfx::VertexShader),
-            fragShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc.c_str(), fragShaderSrc.length(), gfx::FragmentShader);
+	// Load & compile shaders.
+	std::string vertShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.vert"), fragShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.frag");
+	gfx::ShaderCompiledResult
+	    vertShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(vertShaderSrc.c_str(), vertShaderSrc.length(), gfx::VertexShader),
+	    fragShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc.c_str(), fragShaderSrc.length(), gfx::FragmentShader);
 
-        // Register shader with the API.
-        auto& api = engine.GetApi<gfx::GraphicsApiGL>();
-        api.GetOptions<gfx::GraphicsApiGLOptions>().RegisterShader(&vertShader, &fragShader);
+	// Register shader with the API.
+	auto& api = engine.GetApi<gfx::GraphicsApiGL>();
+	api.GetOptions<gfx::GraphicsApiGLOptions>().RegisterShader(&vertShader, &fragShader);
 
-        // Set up engine for drawing.
-        engine.Setup();
-        m_Camera.Transform().Origin(m_Camera.Transform().Forward() * -2.f);
+	// Set up engine for drawing.
+	engine.Setup();
+	m_Camera.Transform().Origin(m_Camera.Transform().Forward() * -2.f);
 
-        // Instantiate two Renderables in the scene graph, each with its own transform, using the same cube mesh data.
-        auto cubeMesh = lepus::gfx::GLMesh(lepus::utility::Primitives::Cube());
-        auto cube = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
-        auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
-        auto cubeX = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
-        auto cubeY = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
-        auto cubeZ = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
-        api.GetSceneGraph().AddChild(&cube);
-        api.GetSceneGraph().AddChild(&cube2);
-        api.GetSceneGraph().AddChild(&cubeX);
-        api.GetSceneGraph().AddChild(&cubeY);
-        api.GetSceneGraph().AddChild(&cubeZ);
+	// Instantiate two Renderables in the scene graph, each with its own transform, using the same cube mesh data.
+	auto cubeMesh = lepus::gfx::GLMesh(lepus::utility::Primitives::Cube());
+	auto cube = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+	auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
 
-        cubeX.GetTransform().SetPosition(-1.5f, 2.f, 0.f);
-        cubeY.GetTransform().SetPosition(0.f, 2.f, 0.f);
-        cubeZ.GetTransform().SetPosition(1.5f, 2.f, 0.f);
+	// Also a cube to test each X-axis (pitch), Y-axis (yaw) and Z-axis (roll) rotation.
+	auto cubeX = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+	auto cubeY = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+	auto cubeZ = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+	// api.GetSceneGraph().AddChild(&cube);
+	api.GetSceneGraph().AddChild(&cube2);
+	api.GetSceneGraph().AddChild(&cubeX);
+	api.GetSceneGraph().AddChild(&cubeY);
+	api.GetSceneGraph().AddChild(&cubeZ);
 
-        // Update projection and view matrices with data from the camera object.
-        m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
-        ((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX))->Value((float*)m_UniformState.projMatrix.data());
-        m_UniformState.viewMatrix = m_Camera.BuildViewMatrix();
-        ((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX))->Value((float*)m_UniformState.viewMatrix.data());
+	cubeX.GetTransform().SetPosition(-1.5f, 2.f, 0.f);
+	cubeY.GetTransform().SetPosition(0.f, 2.f, 0.f);
+	cubeZ.GetTransform().SetPosition(1.5f, 2.f, 0.f);
 
-        // Initialise the FOV variable and set up a callback so we can let the user adjust it with the mouse scroll wheel.
-        m_FOV = m_Camera.FOV();
-        glfwSetScrollCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), DemoAppGLFWCallbacks::scroll);
+	// Update projection and view matrices with data from the camera object.
+	m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
+	((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX))->Value((float*)m_UniformState.projMatrix.data());
+	m_UniformState.viewMatrix = m_Camera.BuildViewMatrix();
+	((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX))->Value((float*)m_UniformState.viewMatrix.data());
 
-        float runningTime = glfwGetTime();
+	// Initialise the FOV variable and set up a callback so we can let the user adjust it with the mouse scroll wheel.
+	m_FOV = m_Camera.FOV();
+	glfwSetScrollCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), DemoAppGLFWCallbacks::scroll);
 
-        GLFWwindow* window = reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr());
+	float runningTime = glfwGetTime();
 
-        // Set up mouse input for camera freelook.
-        glfwGetCursorPos(window, &m_MouseState.lastX, &m_MouseState.lastY);
-        glfwSetCursorPosCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), DemoAppGLFWCallbacks::cursorPos);
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, 1);
+	GLFWwindow* window = reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr());
 
-        // Initialise all keys as released.
-        KeyboardState keys = { false, false, false, false, false };
+	// Set up mouse input for camera freelook.
+	glfwGetCursorPos(window, &m_MouseState.lastX, &m_MouseState.lastY);
+	glfwSetCursorPosCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), DemoAppGLFWCallbacks::cursorPos);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, 1);
 
-        float deltaTime = 0.f;
-        // cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), PI * 0.25f));
+	// Initialise all keys as released.
+	KeyboardState keys = {false, false, false, false, false};
 
-        while (isRunning)
-        {
-            // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", std::to_string(cube2.GetTransform().Rotation().w()).c_str());
-            // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", cube2.GetTransform().Rotation().Axis().ToString().c_str());
-            cube2.GetTransform().SetPosition(1.f * sinf(runningTime), 1.f * cosf(runningTime), -1.f);
-            windowing->Update(); // Update window before drawing
+	float deltaTime = 0.f;
+	// cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), PI * 0.25f));
 
-            bool eKeyPressedLastFrame = keys.e;
-            UpdateInput(keys, windowing);
-            // cube.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime));
-            lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(cube2.GetTransform().Rotation().w()).c_str());
-            // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(cube2.GetTransform().Rotation().Angle()).c_str());
-            cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 1.f, 1.f), deltaTime));
-            cubeX.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 0.f, 0.f), deltaTime));
-            cubeY.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime));
-            cubeZ.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), deltaTime));
-            if (!eKeyPressedLastFrame && keys.e)
-            {
-                // cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), PI / 4.f));
-                lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", std::to_string(cube2.GetTransform().Rotation().Angle() * (1.f / PI) * 180.f).c_str());
-            }
-            Tick(deltaTime, keys);
-            UpdateUniforms(&api);
+	while (isRunning)
+	{
+	    // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", std::to_string(cube2.GetTransform().Rotation().w()).c_str());
+	    // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", cube2.GetTransform().Rotation().Axis().ToString().c_str());
+	    cube2.GetTransform().SetPosition(1.f * sinf(runningTime), 1.f * cosf(runningTime), -1.f);
+	    windowing->Update(); // Update window before drawing
 
-            engine.Render<unsigned char, gfx::GraphicsEngine::PixelFormat::RGBA32>(100, 149, 237);
+	    bool eKeyPressedLastFrame = keys.e;
+	    UpdateInput(keys, windowing);
+	    // cube.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime));
+	    lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(cube2.GetTransform().Rotation().w()).c_str());
+	    // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(cube2.GetTransform().Rotation().Angle()).c_str());
+	    // cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 1.f, 1.f), deltaTime));
+	    cubeX.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 0.f, 0.f), deltaTime));
+	    cubeY.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime));
+	    cubeZ.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), deltaTime));
 
-            float newRunningTime = glfwGetTime();
-            deltaTime = newRunningTime - runningTime;
-            runningTime = newRunningTime;
+	    cube2.GetTransform().SetScale(fabs(cosf(runningTime)));
+	    // cube.GetTransform().SetScale(fabs(cosf(runningTime)));
 
-            isRunning = windowing->Update();
-        }
+	    // cubeX.GetTransform().SetScale(fabs(cosf(runningTime)));
+	    // cubeY.GetTransform().SetScale(fabs(cosf(runningTime)));
+	    // cubeZ.GetTransform().SetScale(fabs(cosf(runningTime)));
 
-        Shutdown(windowing);
+	    if (!eKeyPressedLastFrame && keys.e)
+	    {
+		// cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), PI / 4.f));
+		lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", std::to_string(cube2.GetTransform().Rotation().Angle() * (1.f / PI) * 180.f).c_str());
+	    }
+	    Tick(deltaTime, keys);
+	    UpdateUniforms(&api);
 
-        return 0;
+	    engine.Render<unsigned char, gfx::GraphicsEngine::PixelFormat::RGBA32>(100, 149, 237);
+
+	    float newRunningTime = glfwGetTime();
+	    deltaTime = newRunningTime - runningTime;
+	    runningTime = newRunningTime;
+
+	    isRunning = windowing->Update();
+	}
+
+	Shutdown(windowing);
+
+	return 0;
     }
 
     inline void UpdateInput(KeyboardState& keys, std::shared_ptr<system::WindowingGLFW> windowing)
     {
-        GLFWwindow* window = (GLFWwindow*)windowing->GetWindowPtr();
+	GLFWwindow* window = (GLFWwindow*)windowing->GetWindowPtr();
 
-        keys.w = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
-        keys.a = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
-        keys.s = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
-        keys.d = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
-        keys.e = glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE;
+	keys.w = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
+	keys.a = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+	keys.s = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
+	keys.d = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
+	keys.e = glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE;
     }
 
     inline void UpdateUniforms(gfx::GraphicsApi* api)
     {
-        m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
-        m_UniformState.viewMatrix = m_Camera.BuildViewMatrix();
+	m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
+	m_UniformState.viewMatrix = m_Camera.BuildViewMatrix();
 
-        ((lepus::gfx::GLMatrixUniformBinding*)api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX))->Value((float*)m_UniformState.projMatrix.data());
-        ((lepus::gfx::GLMatrixUniformBinding*)api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX))->Value((float*)m_UniformState.viewMatrix.data());
+	((lepus::gfx::GLMatrixUniformBinding*)api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX))->Value((float*)m_UniformState.projMatrix.data());
+	((lepus::gfx::GLMatrixUniformBinding*)api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX))->Value((float*)m_UniformState.viewMatrix.data());
     }
 
     inline void Tick(float deltaTime, const KeyboardState& keys)
     {
-        m_Camera.FOV(m_FOV);
+	m_Camera.FOV(m_FOV);
 
-        lepus::types::Vector3 forwardDelta, rightDelta;
+	lepus::types::Vector3 forwardDelta, rightDelta;
 
-        // Process camera movement input based on keyboard state.
-        if (keys.s)
-        {
-            forwardDelta = forwardDelta - (m_Camera.Transform().Forward() * deltaTime * _camSpeed);
-        }
-        if (keys.w)
-        {
-            forwardDelta = forwardDelta + (m_Camera.Transform().Forward() * deltaTime * _camSpeed);
-        }
-        if (keys.d)
-        {
-            rightDelta = rightDelta + (m_Camera.Transform().Right() * deltaTime * _camSpeed);
-        }
-        if (keys.a)
-        {
-            rightDelta = rightDelta - (m_Camera.Transform().Right() * deltaTime * _camSpeed);
-        }
+	// Process camera movement input based on keyboard state.
+	if (keys.s)
+	{
+	    forwardDelta = forwardDelta - (m_Camera.Transform().Forward() * deltaTime * _camSpeed);
+	}
+	if (keys.w)
+	{
+	    forwardDelta = forwardDelta + (m_Camera.Transform().Forward() * deltaTime * _camSpeed);
+	}
+	if (keys.d)
+	{
+	    rightDelta = rightDelta + (m_Camera.Transform().Right() * deltaTime * _camSpeed);
+	}
+	if (keys.a)
+	{
+	    rightDelta = rightDelta - (m_Camera.Transform().Right() * deltaTime * _camSpeed);
+	}
 
-        // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", m_Camera.Transform().Rotation().Axis().ToString().c_str());
-        // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(m_Camera.Transform().Rotation().Angle() * (1.f / PI) * 180.f).c_str());
+	// lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", m_Camera.Transform().Rotation().Axis().ToString().c_str());
+	// lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(m_Camera.Transform().Rotation().Angle() * (1.f / PI) * 180.f).c_str());
 
-        m_Camera.Transform().Origin(m_Camera.Transform().Origin() + forwardDelta + rightDelta);
+	m_Camera.Transform().Origin(m_Camera.Transform().Origin() + forwardDelta + rightDelta);
     }
 
     inline void Shutdown(std::shared_ptr<system::WindowingGLFW> windowing)
     {
-        // Output shutdown message to console
-        engine::ConsoleLogger::Global().LogInfo("", "main", "Demo shutting down!");
+	// Output shutdown message to console
+	engine::ConsoleLogger::Global().LogInfo("", "main", "Demo shutting down!");
 
-        windowing->Shutdown();
+	windowing->Shutdown();
 
-        system::WindowingGLFW::Terminate();
+	system::WindowingGLFW::Terminate();
 
-        engine::ConsoleLogger::Shutdown();
+	engine::ConsoleLogger::Shutdown();
 
-        m_Initialised = false;
+	m_Initialised = false;
     }
 };
 

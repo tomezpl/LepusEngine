@@ -14,134 +14,143 @@
 
 namespace lepus
 {
-	namespace gfx
+    namespace gfx
+    {
+	class GraphicsApiGLOptions : public GraphicsApiOptions
 	{
-		class GraphicsApiGLOptions : public GraphicsApiOptions
+	    public:
+	    static const size_t ProgramCount = 8;
+
+	    private:
+	    GLuint m_FragmentShaders[ProgramCount];
+	    GLuint m_VertexShaders[ProgramCount];
+	    size_t m_ShaderCount = 0;
+
+	    public:
+	    GraphicsApiType GetType() override { return GraphicsApiOpenGL; }
+
+	    GraphicsApiGLOptions()
+	        : GraphicsApiOptions()
+	    {
+		// Zero the shader arrays.
+		memset(m_FragmentShaders, 0, ProgramCount * sizeof(GLuint));
+		memset(m_VertexShaders, 0, ProgramCount * sizeof(GLuint));
+	    }
+
+	    inline GLuint const GetFragmentShader(size_t index) { return m_FragmentShaders[index]; }
+	    inline GLuint const GetVertexShader(size_t index) { return m_VertexShaders[index]; }
+
+	    const size_t RegisterShader(GLShaderCompiledResult const* vertexShader = nullptr, GLShaderCompiledResult const* fragShader = nullptr, GLShaderCompiledResult const* geomShader = nullptr)
+	    {
+		assert(m_ShaderCount < ProgramCount);
+
+		if (vertexShader)
 		{
-			public:
-			static const size_t ProgramCount = 8;
-			private:
-			GLuint m_FragmentShaders[ProgramCount];
-			GLuint m_VertexShaders[ProgramCount];
-			size_t m_ShaderCount = 0;
-			public:
-			GraphicsApiType GetType() override { return GraphicsApiOpenGL; }
+		    m_VertexShaders[m_ShaderCount] = vertexShader->ShaderHandle;
+		}
 
-			GraphicsApiGLOptions() : GraphicsApiOptions()
-			{
-				// Zero the shader arrays.
-				memset(m_FragmentShaders, 0, ProgramCount * sizeof(GLuint));
-				memset(m_VertexShaders, 0, ProgramCount * sizeof(GLuint));
-			}
-
-			inline GLuint const GetFragmentShader(size_t index) { return m_FragmentShaders[index]; }
-			inline GLuint const GetVertexShader(size_t index) { return m_VertexShaders[index]; }
-
-			const size_t RegisterShader(GLShaderCompiledResult const* vertexShader = nullptr, GLShaderCompiledResult const* fragShader = nullptr, GLShaderCompiledResult const* geomShader = nullptr)
-			{
-				assert(m_ShaderCount < ProgramCount);
-
-				if (vertexShader)
-				{
-					m_VertexShaders[m_ShaderCount] = vertexShader->ShaderHandle;
-				}
-
-				if (fragShader)
-				{
-					m_FragmentShaders[m_ShaderCount] = fragShader->ShaderHandle;
-				}
-
-				if (geomShader)
-				{
-					// TODO
-				}
-
-				return m_ShaderCount++;
-			}
-		};
-
-		typedef lepus::gfx::SceneGraph<GLMesh, lepus::gfx::Renderable<GLMesh>> GLSceneGraph;
-
-		template GraphicsApiGLOptions& GraphicsApi::GetOptions<GraphicsApiGLOptions>();
-
-		class GraphicsApiGL : public GraphicsApi
+		if (fragShader)
 		{
-			friend class GraphicsApiGLOptions;
-			private:
-			static const uint8_t _meshCount = 2;
-			struct
-			{
-				/// @brief Handle to the vertex array objects.
-				GLuint vao;
+		    m_FragmentShaders[m_ShaderCount] = fragShader->ShaderHandle;
+		}
 
-				/// @brief List with all uniforms used by the API.
-				// TODO: Change to array - might get better cache/locality to improve access times.
-				std::forward_list<lepus::gfx::GLUniformBinding<void*>*> uniforms;
+		if (geomShader)
+		{
+		    // TODO
+		}
 
-				/// @brief Uniform map to update the values.
-				// TODO: Move to a Material class?
-				std::unordered_map<const char*, lepus::gfx::GLUniformBinding<void*>*> uniformMap;
-			} m_Pipeline;
+		return m_ShaderCount++;
+	    }
+	};
 
-			GLuint m_Programs[GraphicsApiGLOptions::ProgramCount];
+	typedef lepus::gfx::SceneGraph<GLMesh, lepus::gfx::Renderable<GLMesh>> GLSceneGraph;
 
-			GLSceneGraph m_Scene;
+	template GraphicsApiGLOptions& GraphicsApi::GetOptions<GraphicsApiGLOptions>();
 
-			private:
-			void SetupVertexArrays();
-			void SetupBuffers();
-			void SetupShaders();
-			void SetupUniforms();
+	class GraphicsApiGL : public GraphicsApi
+	{
+	    friend class GraphicsApiGLOptions;
 
-			private:
-			inline void* GetUniformInternal(char* name) override
-			{
-				size_t targetKeyLength = strlen(name);
+	    private:
+	    static const uint8_t _meshCount = 2;
+	    struct
+	    {
+		/// @brief Handle to the vertex array objects.
+		GLuint vao;
 
-				// TODO: unordered_map doesn't really work with string keys... add actual hashing!
-				for (auto it = m_Pipeline.uniformMap.begin(); it != m_Pipeline.uniformMap.end(); it++)
-				{
-					size_t keyLength = strlen(it->first);
-					if (targetKeyLength == keyLength && !strcmp(name, it->first))
-					{
-						return it->second;
-					}
-				}
+		/// @brief List with all uniforms used by the API.
+		// TODO: Change to array - might get better cache/locality to improve access times.
+		std::forward_list<lepus::gfx::GLUniformBinding<void*>*> uniforms;
 
-				return nullptr;
-			}
+		/// @brief Uniform map to update the values.
+		// TODO: Move to a Material class?
+		std::unordered_map<const char*, lepus::gfx::GLUniformBinding<void*>*> uniformMap;
+	    } m_Pipeline;
 
-			public:
-			GraphicsApiGL(GraphicsApiGLOptions options)
-			{
-				Init(&options);
-			}
+	    GLuint m_Programs[GraphicsApiGLOptions::ProgramCount];
 
-			void Init(GraphicsApiOptions* options) override;
+	    GLSceneGraph m_Scene;
 
-			void CreatePipeline() override;
+	    private:
+	    void SetupVertexArrays();
+	    void SetupBuffers();
+	    void SetupShaders();
+	    void SetupUniforms();
 
-			void UpdateUniforms() override;
+	    private:
+	    inline void* GetUniformInternal(char* name) override
+	    {
+		size_t targetKeyLength = strlen(name);
 
-			inline GLSceneGraph& GetSceneGraph()
-			{
-				return m_Scene;
-			}
+		// TODO: unordered_map doesn't really work with string keys... add actual hashing!
+		for (auto it = m_Pipeline.uniformMap.begin(); it != m_Pipeline.uniformMap.end(); it++)
+		{
+		    size_t keyLength = strlen(it->first);
+		    if (targetKeyLength == keyLength && !strcmp(name, it->first))
+		    {
+			return it->second;
+		    }
+		}
 
-			void Draw() override;
+		return nullptr;
+	    }
 
-			void ClearFrameBuffer(float r, float g, float b) override;
+	    public:
+	    GraphicsApiGL(GraphicsApiGLOptions options)
+	    {
+		GraphicsApiGL::Init(&options);
+	    }
 
-			/// @brief Dummy method as OpenGL itself doesn't need to do anything for the swap chain to work.
-			void SwapBuffers() override {}
+	    GraphicsApiGL(GraphicsApiGLOptions* options)
+	    {
+		GraphicsApiGL::Init(options);
+	    }
 
-			void Shutdown() override;
-		};
+	    void Init(GraphicsApiOptions* options) override;
 
-		template const lepus::gfx::GLUniformBinding<void*>* GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(char* name);
+	    void CreatePipeline() override;
 
-		template GraphicsApiGL& GraphicsEngine::GetApi<GraphicsApiGL>();
-	}
-}
+	    void UpdateUniforms() override;
+
+	    inline GLSceneGraph& GetSceneGraph()
+	    {
+		return m_Scene;
+	    }
+
+	    void Draw() override;
+
+	    void ClearFrameBuffer(float r, float g, float b) override;
+
+	    /// @brief Dummy method as OpenGL itself doesn't need to do anything for the swap chain to work.
+	    void SwapBuffers() override {}
+
+	    void Shutdown() override;
+	};
+
+	template const lepus::gfx::GLUniformBinding<void*>* GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(char* name);
+
+	template GraphicsApiGL& GraphicsEngine::GetApi<GraphicsApiGL>();
+    } // namespace gfx
+} // namespace lepus
 
 #endif

@@ -22,12 +22,14 @@ void GraphicsEngine::InitApi(GraphicsApiOptions* options)
 	switch (options->GetType())
 	{
 		case GraphicsApiType::GraphicsApiOpenGL:
-			m_Api = new GraphicsApiGL(*(GraphicsApiGLOptions*)options);
+			m_Api = new GraphicsApiGL(*dynamic_cast<GraphicsApiGLOptions*>(options));
 			break;
 		case GraphicsApiType::GraphicsApiVulkan:
 			// TODO
+			break;
 		case GraphicsApiType::GraphicsApiTest:
 			// Ignore test/mock APIs.
+			break;
 		case GraphicsApiType::GraphicsApiUnknown:
 		default:
 			// Assert if the API type is not part of the enum.
@@ -41,7 +43,7 @@ void GraphicsEngine::Setup()
 	m_Api->CreatePipeline();
 }
 
-void GraphicsEngine::Render(float r, float g, float b)
+void GraphicsEngine::Render(const float r, const float g, const float b)
 {
 	m_Api->ClearFrameBuffer(r, g, b);
 
