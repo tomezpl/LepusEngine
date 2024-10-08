@@ -63,7 +63,7 @@ namespace lepus
 	    }
 	};
 
-	typedef lepus::gfx::SceneGraph<GLMesh, lepus::gfx::Renderable<GLMesh>> GLSceneGraph;
+	typedef lepus::gfx::SceneGraph GLSceneGraph;
 
 	template GraphicsApiGLOptions& GraphicsApi::GetOptions<GraphicsApiGLOptions>();
 
