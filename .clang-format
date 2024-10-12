@@ -1,0 +1,15 @@
+AllowShortFunctionsOnASingleLine: InlineOnly
+BreakBeforeBraces: Allman
+Language: Cpp
+SpaceAroundPointerQualifiers: Default
+PointerAlignment: Left
+NamespaceIndentation: All
+IndentWidth: 4
+AccessModifierOffset: 0
+ColumnLimit: 0
+UseTab: ForIndentation
+AllowShortBlocksOnASingleLine: Always
+BreakInheritanceList: AfterComma
+BreakBeforeInheritanceComma: false
+BreakConstructorInitializersBeforeComma: false
+SortIncludes: Never
