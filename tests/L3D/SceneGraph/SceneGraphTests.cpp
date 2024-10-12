@@ -3,7 +3,6 @@
 
 class SceneGraphTest : public testing::Test
 {
-
 };
 
 TEST(SceneGraphTest, SceneGraphIsInitialisedCorrectly)
@@ -14,7 +13,7 @@ TEST(SceneGraphTest, SceneGraphIsInitialisedCorrectly)
     ASSERT_EQ(sceneGraph.Root()->FirstChild(), nullptr);
     ASSERT_EQ(sceneGraph.Root()->NextSibling(), nullptr);
     ASSERT_EQ(sceneGraph.Root()->Parent(), nullptr);
-    ASSERT_EQ(sceneGraph.Root()->GetRenderable(), nullptr);
+    ASSERT_EQ(sceneGraph.Root()->GetTransformable(), nullptr);
 }
 
 TEST(SceneGraphTest, SceneGraphChildIsAddedCorrectly)
@@ -25,7 +24,7 @@ TEST(SceneGraphTest, SceneGraphChildIsAddedCorrectly)
     lepus::gfx::Renderable someRenderable = lepus::gfx::Renderable(&someMesh, someTransform);
 
     sceneGraph.AddChild(&someRenderable);
-    ASSERT_EQ(sceneGraph.Root()->FirstChild()->GetRenderable(), &someRenderable);
+    ASSERT_EQ(sceneGraph.Root()->FirstChild()->GetTransformable(), &someRenderable);
     ASSERT_EQ(sceneGraph.Root()->NextSibling(), nullptr);
     ASSERT_EQ(sceneGraph.Root()->FirstChild()->FirstChild(), nullptr);
     ASSERT_EQ(sceneGraph.Root()->FirstChild()->NextSibling(), nullptr);
