@@ -11,7 +11,7 @@ namespace lepus
     namespace gfx
     {
 	template <class MeshType = lepus::engine::objects::Mesh>
-	class Renderable : protected Transformable
+	class Renderable : public Transformable
 	{
 	    private:
 	    const MeshType* m_Mesh;
@@ -47,21 +47,6 @@ namespace lepus
 	    const MeshType* GetMesh() const
 	    {
 		return m_Mesh;
-	    }
-
-	    [[nodiscard]] lepus::math::Transform& GetTransform() const
-	    {
-		return const_cast<lepus::math::Transform&>(*reinterpret_cast<const lepus::math::Transform*>(m_Transform));
-	    }
-
-	    /// @brief Constructs a world transform for this Renderable by traversing up the scene hierarchy.
-	    [[nodiscard]] lepus::math::Transform GetWorldTransform(const lepus::gfx::SceneNode* parent) const
-	    {
-		auto ownTransform = this->GetTransform();
-
-		lepus::math::Transform worldTransform = lepus::math::Transform();
-
-		return worldTransform;
 	    }
 	};
     } // namespace gfx

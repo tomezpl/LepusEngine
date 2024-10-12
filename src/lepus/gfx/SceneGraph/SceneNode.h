@@ -2,12 +2,13 @@
 #define LEPUS_GFX_SCENEGRAPH_SCENENODE
 
 #include <lepus/gfx/SceneGraph.h>
-#include "Transformable.h"
 
 namespace lepus
 {
     namespace gfx
     {
+	class Transformable;
+
 	class SceneNode
 	{
 	    private:
@@ -39,7 +40,7 @@ namespace lepus
 
 	    [[nodiscard]] inline bool IsRoot() const { return Parent() == nullptr; }
 
-	    inline const SceneNode* AddChild(const Transformable* transformable)
+	    inline SceneNode* AddChild(const Transformable* transformable)
 	    {
 		SceneNode* currentNode = m_Child;
 		SceneNode* lastChild = m_Child;

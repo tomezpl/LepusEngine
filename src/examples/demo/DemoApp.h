@@ -151,19 +151,7 @@ class DemoApp : public system::BaseApp
 	auto cube = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
 	auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
 
-	// Also a cube to test each X-axis (pitch), Y-axis (yaw) and Z-axis (roll) rotation.
-	auto cubeX = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
-	auto cubeY = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
-	auto cubeZ = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
-	// api.GetSceneGraph().AddChild(&cube);
-	api.GetSceneGraph().AddChild(&cube2);
-	api.GetSceneGraph().AddChild(&cubeX);
-	api.GetSceneGraph().AddChild(&cubeY);
-	api.GetSceneGraph().AddChild(&cubeZ);
-
-	cubeX.GetTransform().SetPosition(-1.5f, 2.f, 0.f);
-	cubeY.GetTransform().SetPosition(0.f, 2.f, 0.f);
-	cubeZ.GetTransform().SetPosition(1.5f, 2.f, 0.f);
+	auto cubeNode = api.GetSceneGraph().AddChild(&cube);
 
 	// Update projection and view matrices with data from the camera object.
 	m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
@@ -189,37 +177,18 @@ class DemoApp : public system::BaseApp
 	KeyboardState keys = {false, false, false, false, false};
 
 	float deltaTime = 0.f;
-	// cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), PI * 0.25f));
+	cube2.GetTransform().Origin(lepus::types::Vector3(0.f, 0.f, -2.f));
+
+	cubeNode->AddChild(&cube2);
 
 	while (isRunning)
 	{
-	    // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", std::to_string(cube2.GetTransform().Rotation().w()).c_str());
-	    // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", cube2.GetTransform().Rotation().Axis().ToString().c_str());
-	    cube2.GetTransform().SetPosition(1.f * sinf(runningTime), 1.f * cosf(runningTime), -1.f);
 	    windowing->Update(); // Update window before drawing
 
 	    bool eKeyPressedLastFrame = keys.e;
 	    UpdateInput(keys, windowing);
-	    // cube.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime));
-	    lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(cube2.GetTransform().Rotation().w()).c_str());
-	    // lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Tick", std::to_string(cube2.GetTransform().Rotation().Angle()).c_str());
-	    // cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 1.f, 1.f), deltaTime));
-	    cubeX.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 0.f, 0.f), deltaTime));
-	    cubeY.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime));
-	    cubeZ.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), deltaTime));
+	    cube.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime));
 
-	    cube2.GetTransform().SetScale(fabs(cosf(runningTime)));
-	    // cube.GetTransform().SetScale(fabs(cosf(runningTime)));
-
-	    // cubeX.GetTransform().SetScale(fabs(cosf(runningTime)));
-	    // cubeY.GetTransform().SetScale(fabs(cosf(runningTime)));
-	    // cubeZ.GetTransform().SetScale(fabs(cosf(runningTime)));
-
-	    if (!eKeyPressedLastFrame && keys.e)
-	    {
-		// cube2.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 0.f, 1.f), PI / 4.f));
-		lepus::engine::ConsoleLogger::Global().LogInfo("DemoApp", "Run", std::to_string(cube2.GetTransform().Rotation().Angle() * (1.f / PI) * 180.f).c_str());
-	    }
 	    Tick(deltaTime, keys);
 	    UpdateUniforms(&api);
 

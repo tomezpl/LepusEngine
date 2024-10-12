@@ -21,7 +21,7 @@ namespace lepus
 	    }
 
 	    template <class TransformableType = Transformable>
-	    const Node* AddChild(const TransformableType* transformable)
+	    Node* AddChild(const TransformableType* transformable)
 	    {
 		return m_Root->AddChild((const Transformable*)transformable);
 	    }

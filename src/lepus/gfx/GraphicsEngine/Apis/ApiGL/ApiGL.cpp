@@ -114,7 +114,7 @@ void GraphicsApiGL::Draw()
 	    auto renderable = (const GLRenderable*)(currentNode->GetTransformable());
 	    if (renderable)
 	    {
-		lepus::math::Matrix4x4 modelMat = renderable->GetTransform().BuildMatrix();
+		lepus::math::Matrix4x4 modelMat = renderable->GetWorldMatrix(currentNode);
 		auto modelMatUniformLoation = GetUniform<GLuint, GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_MODEL_MATRIX);
 		// TODO: integrate this with UpdateUniforms somehow, the model matrix uniform needs to be different for each renderable!
 		glUniformMatrix4fv(modelMatUniformLoation->Location(), 1, true, modelMat.data());
