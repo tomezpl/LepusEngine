@@ -179,6 +179,7 @@ class DemoApp : public system::BaseApp
 	float deltaTime = 0.f;
 	cube2.GetTransform().Origin(lepus::types::Vector3(0.f, 0.f, -2.f));
 
+        // Parent the second cube to the first cube.
 	cubeNode->AddChild(&cube2);
 
 	while (isRunning)
@@ -187,7 +188,12 @@ class DemoApp : public system::BaseApp
 
 	    bool eKeyPressedLastFrame = keys.e;
 	    UpdateInput(keys, windowing);
+
+	    // Rotate the parent cube
 	    cube.GetTransform().Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime));
+
+	    // Move the child cube back and forth along the parent's Z-axis
+	    cube2.GetTransform().Origin(lepus::types::Vector3(0.f, 0.f, -1.f + ((sinf(runningTime) + 1.f) * 0.5f) * -2.f));
 
 	    Tick(deltaTime, keys);
 	    UpdateUniforms(&api);
