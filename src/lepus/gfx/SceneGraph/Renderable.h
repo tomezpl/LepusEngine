@@ -20,7 +20,7 @@ namespace lepus
 	    public:
 	    Renderable() = delete;
 
-	    Renderable(const MeshType* mesh, const lepus::math::Transform& transform)
+	    Renderable(const MeshType* mesh, lepus::math::Transform& transform)
 	    {
 		m_Mesh = mesh;
 		m_Transform = &transform;
