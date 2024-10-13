@@ -3,7 +3,6 @@
     "name": "lepus-engine",
     "version": "1.0.0",
     "dependencies": [
-        "glfw3",
-        "bullet3"
+        "glfw3"
     ]
 }
