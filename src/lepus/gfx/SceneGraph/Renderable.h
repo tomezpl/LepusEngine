@@ -10,6 +10,7 @@ namespace lepus
 {
     namespace gfx
     {
+	/// @brief A base class for any renderable node that can appear in a scene.
 	template <class MeshType = lepus::engine::objects::Mesh>
 	class Renderable : public Transformable
 	{

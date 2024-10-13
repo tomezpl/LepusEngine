@@ -9,10 +9,11 @@ namespace lepus
     {
 	class SceneNode;
 
+	/// @brief A base class for any node that has a transform in a scene.
 	class Transformable
 	{
 	    protected:
-	    const lepus::math::Transform* m_Transform;
+	    lepus::math::Transform* m_Transform;
 	    bool m_OwnsTransform;
 
 	    public:
@@ -22,9 +23,9 @@ namespace lepus
 		m_OwnsTransform = true;
 	    }
 
-	    [[nodiscard]] lepus::math::Transform& GetTransform() const
+	    [[nodiscard]] lepus::math::Transform* GetTransform() const
 	    {
-		return const_cast<lepus::math::Transform&>(*reinterpret_cast<const lepus::math::Transform*>(m_Transform));
+		return m_Transform;
 	    }
 
 	    /// @brief Constructs a world transform matrix for this Transformable by traversing up the scene hierarchy.
@@ -33,9 +34,9 @@ namespace lepus
 		auto ownTransform = this->GetTransform();
 
 		// If this is already the root of the scene subtree then this is our world matrix.
-		if (!node->Parent() || !node->Parent()->Parent())
+		if (!node->Parent() || node->Parent()->IsRoot())
 		{
-		    return ownTransform.BuildMatrix();
+		    return ownTransform->BuildMatrix();
 		}
 
 		// Double work but this should be lighter than using a vector for this.
@@ -43,7 +44,7 @@ namespace lepus
 		auto* root = const_cast<SceneNode*>(node);
 		const SceneNode** leaves = nullptr;
 		uint8_t depth = 1;
-		while (root->Parent() != nullptr && root->Parent()->Parent() != nullptr)
+		while (root->Parent() != nullptr && !root->Parent()->IsRoot())
 		{
 		    root = const_cast<SceneNode*>(root->Parent());
 		    depth++;
@@ -65,25 +66,25 @@ namespace lepus
 
 		// Accumulate position and rotation
 		lepus::types::Vector3 accPos(0.f, 0.f, 0.f);
-		lepus::types::Quaternion accRot = lepus::types::Quaternion();
-		lepus::types::Vector3 accScale(1.f, 1.f, 1.f);
+		lepus::types::Quaternion accRot = this->m_Transform->Rotation();
+		lepus::types::Vector3 accScale = this->m_Transform->Scale();
 
 		for (uint8_t i = 1; i < depth; i++)
 		{
-		    lepus::types::Vector4 rotated(leaves[i]->GetTransformable()->GetTransform().Origin());
+		    lepus::types::Vector4 rotated(leaves[i]->GetTransformable()->GetTransform()->Origin());
 		    rotated.w(1.f);
 
-		    const lepus::math::Transform& parentTransform = leaves[i - 1]->GetTransformable()->GetTransform();
-		    lepus::math::Matrix4x4 mat = parentTransform.BuildMatrix();
+		    auto parentTransform = leaves[i - 1]->GetTransformable()->GetTransform();
+		    lepus::math::Matrix4x4 mat = parentTransform->BuildMatrix();
 
-		    accRot = accRot * (parentTransform.Rotation());
+		    accRot = accRot * (parentTransform->Rotation());
 		    rotated = mat.Multiply(rotated);
 
 		    accPos.x(accPos.x() + rotated.x());
 		    accPos.y(accPos.y() + rotated.y());
 		    accPos.z(accPos.z() + rotated.z());
 
-		    accScale.Multiply(parentTransform.Scale());
+		    accScale.Multiply(parentTransform->Scale());
 		}
 
 		lepus::math::Transform worldTransform = lepus::math::Transform();

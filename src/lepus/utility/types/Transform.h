@@ -12,7 +12,7 @@ namespace lepus
 	{
 	    private:
 	    lepus::types::Vector3 m_Origin, m_Forward, m_Right, m_Up;
-	    // axis-angle
+
 	    lepus::types::Quaternion m_Rotation;
 
 	    lepus::types::Vector3 m_Scale;
@@ -159,24 +159,27 @@ namespace lepus
 		model.set<1, 3>(m_Origin.y());
 		model.set<2, 3>(m_Origin.z());
 
-		// TODO: add scaling and rotation
+		// Normalised rotation quaternion for the rotation matrix
 		lepus::types::Quaternion normRot = m_Rotation.Normalised();
 		lepus::types::Vector3 axis = normRot.Axis();
-		// axis = axis * (1.f / axis.Magnitude());
 		float angle = normRot.Angle();
 
 		float cosTheta = cosf(angle);
 		float invCosTheta = 1.f - cosTheta;
 		float sinTheta = sinf(angle);
-		model.set<0, 0>(m_Scale.x() * ((axis.x() * axis.x()) * invCosTheta + cosTheta));
+
+		// Build the rotation & scaling components of the matrix.
+		model.set<0, 0>(m_Scale.x() * (axis.x() * axis.x() * invCosTheta + cosTheta));
 		model.set<0, 1>(m_Scale.y() * (axis.x() * axis.y() * invCosTheta + axis.z() * sinTheta));
-		model.set<1, 1>(m_Scale.y() * ((axis.y() * axis.y()) * invCosTheta + cosTheta));
+		model.set<0, 2>(m_Scale.z() * (axis.x() * axis.z() * invCosTheta - axis.y() * sinTheta));
+
 		model.set<1, 0>(m_Scale.x() * (axis.y() * axis.x() * invCosTheta - axis.z() * sinTheta));
+		model.set<1, 1>(m_Scale.y() * (axis.y() * axis.y() * invCosTheta + cosTheta));
+		model.set<1, 2>(m_Scale.z() * (axis.y() * axis.z() * invCosTheta + axis.x() * sinTheta));
+
 		model.set<2, 0>(m_Scale.x() * (axis.z() * axis.x() * invCosTheta + axis.y() * sinTheta));
 		model.set<2, 1>(m_Scale.y() * (axis.z() * axis.y() * invCosTheta - axis.x() * sinTheta));
-		model.set<0, 2>(m_Scale.z() * (axis.x() * axis.z() * invCosTheta - axis.y() * sinTheta));
-		model.set<1, 2>(m_Scale.z() * (axis.y() * axis.z() * invCosTheta + axis.x() * sinTheta));
-		model.set<2, 2>(m_Scale.z() * ((axis.z() * axis.z()) * invCosTheta + cosTheta));
+		model.set<2, 2>(m_Scale.z() * (axis.z() * axis.z() * invCosTheta + cosTheta));
 
 		return model;
 	    }

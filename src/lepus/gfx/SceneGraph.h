@@ -23,7 +23,7 @@ namespace lepus
 	    template <class TransformableType = Transformable>
 	    Node* AddChild(const TransformableType* transformable)
 	    {
-		return m_Root->AddChild((const Transformable*)transformable);
+		return m_Root->AddChild(static_cast<const Transformable*>(transformable));
 	    }
 
 	    ~SceneGraph()
