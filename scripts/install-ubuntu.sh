@@ -14,7 +14,7 @@ sudo apt install git
 
 # OpenGL
 echo "Installing OpenGL and Xorg dependencies"
-sudo apt install libopengl-dev libgl-dev libgl1-mesa-dev libgl1-mesa-glx libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev
+sudo apt install libopengl-dev libgl-dev libgl1-mesa-dev libgl1-mesa-glx libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev libwayland-dev libxkbcommon-dev
 
 # VCPKG
 echo "Installing vcpkg"
