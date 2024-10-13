@@ -43,8 +43,11 @@ namespace lepus
 		    {
 			bool wasRoot = currentNode->IsRoot();
 			parent->m_Child = currentNode->m_Sibling;
-			delete currentNode;
-			currentNode = wasRoot ? nullptr : parent;
+			if (currentNode)
+			{
+			    delete currentNode;
+			}
+			currentNode = wasRoot ? nullptr : (parent->m_Child ? parent : parent->m_Parent);
 		    }
 		}
 	    }

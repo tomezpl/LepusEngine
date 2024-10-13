@@ -103,7 +103,7 @@ namespace lepus
 
 	    ~Transformable()
 	    {
-		if (m_OwnsTransform)
+		if (m_OwnsTransform && m_Transform)
 		{
 		    delete m_Transform;
 		    m_Transform = nullptr;
