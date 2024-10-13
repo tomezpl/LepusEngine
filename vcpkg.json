@@ -3,7 +3,6 @@
     "version": "1.0.0",
     "dependencies": [
         "glfw3",
-        "glew",
         "bullet3"
     ],
     "builtin-baseline": "8dbd66f5a7821ced1ed57696b50375a977006813"
