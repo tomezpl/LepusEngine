@@ -150,6 +150,22 @@ class DemoApp : public system::BaseApp
 	auto cubeMesh = lepus::gfx::GLMesh(lepus::utility::Primitives::Cube());
 	auto cube = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
 	auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+	auto cube3 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+	auto cube4 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+
+	cube.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -2.f));
+	cube2.GetTransform()->Origin(lepus::types::Vector3(2.f, 0.f, 0.f));
+	cube3.GetTransform()->Origin(lepus::types::Vector3(-3.f, 0.f, -3.f));
+	cube4.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, 6.f));
+
+	auto rootNode = api.GetSceneGraph().AddChild(&cube);
+	auto childNode1 = rootNode->AddChild(&cube2);
+	auto childNode2 = childNode1->AddChild(&cube3);
+	auto childNode3 = childNode2->AddChild(&cube4);
+
+	cube.GetTransform()->Rotate(lepus::types::Quaternion(0.f, 1.f, 0.f, (float)PI * -0.5f));
+	cube2.GetTransform()->SetScale(1.f / 1.5f);
+	cube3.GetTransform()->Rotate(lepus::types::Quaternion(0.f, 1.f, 0.f, (float)PI * (-50.f / 180.f)));
 
 	auto cubeNode = api.GetSceneGraph().AddChild(&cube);
 
@@ -178,11 +194,11 @@ class DemoApp : public system::BaseApp
 
 	float deltaTime = 0.f;
 	auto transform = cube2.GetTransform();
-	transform->Origin(lepus::types::Vector3(0.f, 0.f, -2.f));
-	transform->SetScale(0.5f, 0.25f, 1.f);
+	// transform->Origin(lepus::types::Vector3(0.f, 0.f, -2.f));
+	// transform->SetScale(0.5f, 0.25f, 1.f);
 
 	// Parent the second cube to the first cube.
-	cubeNode->AddChild(&cube2);
+	// cubeNode->AddChild(&cube2);
 
 	while (isRunning)
 	{
@@ -192,10 +208,10 @@ class DemoApp : public system::BaseApp
 	    UpdateInput(keys, windowing);
 
 	    // Rotate the parent cube
-	    cube.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime));
+	    cube.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime * 0.5f));
 
 	    // Move the child cube back and forth along the parent's Z-axis
-	    cube2.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -1.f + ((sinf(runningTime) + 1.f) * 0.5f) * -2.f));
+	    // cube2.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -1.f + ((sinf(runningTime) + 1.f) * 0.5f) * -2.f));
 
 	    Tick(deltaTime, keys);
 	    UpdateUniforms(&api);
