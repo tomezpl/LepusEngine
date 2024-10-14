@@ -66,15 +66,17 @@ namespace lepus
 
 		// Accumulate position and rotation
 		lepus::types::Vector3 accPos(leaves[0]->GetTransformable()->GetTransform()->Origin());
-		lepus::types::Quaternion accRot = this->m_Transform->Rotation();
-		lepus::types::Vector3 accScale = this->m_Transform->Scale();
+		lepus::types::Quaternion accRot = lepus::types::Quaternion();
+		lepus::types::Vector3 accScale = lepus::types::Vector3(1.f, 1.f, 1.f);
 
 		for (uint8_t i = 1; i < depth; i++)
 		{
-		    lepus::types::Vector4 rotated(leaves[i]->GetTransformable()->GetTransform()->Origin());
-		    rotated.w(1.f);
-
 		    auto parentTransform = *(leaves[i - 1]->GetTransformable()->GetTransform());
+
+		    lepus::types::Vector4 rotated(leaves[i]->GetTransformable()->GetTransform()->Origin() * accScale);
+		    rotated.w(1.f);
+		    accScale.Multiply(parentTransform.Scale());
+
 		    parentTransform.Origin(lepus::types::Vector3());
 
 		    accRot = accRot * (parentTransform.Rotation());
@@ -85,14 +87,13 @@ namespace lepus
 		    accPos.x(accPos.x() + rotated.x());
 		    accPos.y(accPos.y() + rotated.y());
 		    accPos.z(accPos.z() + rotated.z());
-
-		    accScale.Multiply(parentTransform.Scale());
 		}
 
 		lepus::math::Transform worldTransform = lepus::math::Transform();
 
 		worldTransform.Origin(accPos);
-		worldTransform.Rotate(accRot);
+		worldTransform.Rotate(accRot * this->m_Transform->Rotation());
+		accScale = accScale * this->m_Transform->Scale();
 		worldTransform.SetScale(accScale.x(), accScale.y(), accScale.z());
 
 		if (leaves)
