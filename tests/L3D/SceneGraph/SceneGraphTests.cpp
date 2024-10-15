@@ -91,9 +91,13 @@ TEST(SceneGraphTest, SceneGraphChildTransformsCreateCorrectWorldCoords)
     ASSERT_NEAR(cn2Z, -2.f, 0.0001f);
 
     float cn3X = childNode3World.x(), cn3Y = childNode3World.y(), cn3Z = childNode3World.z();
+    // To explain: child node 2 is at (0, 0, -4) before the root node's rotation is applied.
+    // child node 3 is at (0, 0, 4) in child node 2's local space. Before child node 2's rotation is applied, that's (0,0,0)
+    // Thus we rotate child node 3 by node 2's theta around node 2, and we get child node 3's world-space position before the root node's rotation is applied.
+    // Since the root node is rotated by 90 degrees, to make things easier we just swap the Z and X coords
     float cn3PreRotX = 0.f + 4.f * sinf((float)PI * (nodeCTheta / 180.f));
     float cn3PreRotZ = -4.f + 4.f * cosf((float)PI * (nodeCTheta / 180.f));
-    ASSERT_NEAR(cn3X, 0.f - (cn3PreRotZ - -2.f), 0.03f);
+    ASSERT_NEAR(cn3X, 0.f - (cn3PreRotZ - -2.f), 0.0001f);
     ASSERT_NEAR(cn3Y, 0.f, 0.0001f);
-    ASSERT_NEAR(cn3Z, -2.f + (cn3PreRotX - 0.f), 0.01f);
+    ASSERT_NEAR(cn3Z, -2.f + (cn3PreRotX - 0.f), 0.0001f);
 }
