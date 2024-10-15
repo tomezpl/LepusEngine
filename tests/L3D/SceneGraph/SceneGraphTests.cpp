@@ -60,9 +60,11 @@ TEST(SceneGraphTest, SceneGraphChildTransformsCreateCorrectWorldCoords)
     auto childNode2 = childNode1->AddChild(&childTransformable2);
     auto childNode3 = childNode2->AddChild(&childTransformable3);
 
+    const float nodeCTheta = -50.f;
+
     rootTransformable.GetTransform()->Rotate(lepus::types::Quaternion(0.f, 1.f, 0.f, (float)PI * -0.5f));
     childTransformable1.GetTransform()->SetScale(1.f / 1.5f);
-    childTransformable2.GetTransform()->Rotate(lepus::types::Quaternion(0.f, 1.f, 0.f, (float)PI * (-50.f / 180.f)));
+    childTransformable2.GetTransform()->Rotate(lepus::types::Quaternion(0.f, 1.f, 0.f, (float)PI * (nodeCTheta / 180.f)));
 
     auto childNode3WorldMat = childTransformable3.GetWorldMatrix(childNode3);
     lepus::types::Vector3 childNode3World(childNode3WorldMat.get(0, 3), childNode3WorldMat.get(1, 3), childNode3WorldMat.get(2, 3));
@@ -89,7 +91,9 @@ TEST(SceneGraphTest, SceneGraphChildTransformsCreateCorrectWorldCoords)
     ASSERT_NEAR(cn2Z, -2.f, 0.0001f);
 
     float cn3X = childNode3World.x(), cn3Y = childNode3World.y(), cn3Z = childNode3World.z();
-    ASSERT_NEAR(cn3X, -0.55f, 0.03f);
+    float cn3PreRotX = 0.f + 4.f * sinf((float)PI * (nodeCTheta / 180.f));
+    float cn3PreRotZ = -4.f + 4.f * cosf((float)PI * (nodeCTheta / 180.f));
+    ASSERT_NEAR(cn3X, 0.f - (cn3PreRotZ - -2.f), 0.03f);
     ASSERT_NEAR(cn3Y, 0.f, 0.0001f);
-    ASSERT_NEAR(cn3Z, -5.06f, 0.01f);
+    ASSERT_NEAR(cn3Z, -2.f + (cn3PreRotX - 0.f), 0.01f);
 }
