@@ -37,8 +37,6 @@ namespace lepus
 	    /// @param angle Rotation angle around the axis
 	    Quaternion(float axisX, float axisY, float axisZ, float angle)
 	    {
-		// Negating the angle here so that the Quaternion represents a clockwise rotation along an axis as observed looking towards the origin/object.
-		angle *= -1.f;
 		float const q[] = {axisX * sinf(angle / 2.f), axisY * sinf(angle / 2.f), axisZ * sinf(angle / 2.f), cos(angle / 2.f)};
 		init((float*)q);
 	    }
@@ -123,7 +121,7 @@ namespace lepus
 	    inline lepus::types::Vector3 Rotate(const lepus::types::Vector3& v) const
 	    {
 		Quaternion p = Quaternion();
-		p.w(0.f);
+		p.w(1.f);
 		p.x(v.x());
 		p.y(v.y());
 		p.z(v.z());

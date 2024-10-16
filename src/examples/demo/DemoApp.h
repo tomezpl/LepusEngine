@@ -89,7 +89,7 @@ class DemoApp : public system::BaseApp
     {
 	float deltaX = (xpos - m_MouseState.lastX) / 300.0;
 	float deltaY = (ypos - m_MouseState.lastY) / 300.0;
-	lepus::types::Quaternion rotationYaw = lepus::types::Quaternion(0.f, 1.f, 0.f, -deltaX);
+	lepus::types::Quaternion rotationYaw = lepus::types::Quaternion(0.f, 1.f, 0.f, deltaX);
 
 	auto combined = rotationYaw;
 	float angle = combined.Angle();
@@ -97,7 +97,7 @@ class DemoApp : public system::BaseApp
 	{
 	    m_Camera.Transform().Rotate(rotationYaw);
 	}
-	lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(m_Camera.Transform().Right(), -deltaY);
+	lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(m_Camera.Transform().Right(), deltaY);
 	angle = rotationPitch.Angle();
 	if (abs(angle) > 0.001f)
 	{
@@ -155,17 +155,17 @@ class DemoApp : public system::BaseApp
 
 	cube.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -2.f));
 	cube2.GetTransform()->Origin(lepus::types::Vector3(2.f, 0.f, 0.f));
-	cube3.GetTransform()->Origin(lepus::types::Vector3(-3.f, 0.f, -3.f));
-	cube4.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, 6.f));
+	cube3.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, 2.f));
+	cube4.GetTransform()->Origin(lepus::types::Vector3(0.f, -2.f, 0.f));
 
 	auto rootNode = api.GetSceneGraph().AddChild(&cube);
 	auto childNode1 = rootNode->AddChild(&cube2);
 	auto childNode2 = childNode1->AddChild(&cube3);
-	auto childNode3 = childNode2->AddChild(&cube4);
+	// auto childNode3 = childNode2->AddChild(&cube4);
 
 	cube.GetTransform()->Rotate(lepus::types::Quaternion(0.f, 1.f, 0.f, (float)PI * -0.5f));
-	cube2.GetTransform()->SetScale(1.f / 1.5f);
-	cube3.GetTransform()->Rotate(lepus::types::Quaternion(0.f, 1.f, 0.f, (float)PI * (-50.f / 180.f)));
+	// cube2.GetTransform()->SetScale(1.f / 1.5f);
+	cube2.GetTransform()->Rotate(lepus::types::Quaternion(1.f, 0.f, 0.f, (float)PI * (-90.f / 180.f)));
 
 	auto cubeNode = api.GetSceneGraph().AddChild(&cube);
 
@@ -208,7 +208,13 @@ class DemoApp : public system::BaseApp
 	    UpdateInput(keys, windowing);
 
 	    // Rotate the parent cube
-	    cube.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), deltaTime * 0.5f));
+	    if (!keys.e && eKeyPressedLastFrame)
+	    {
+		cube.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), PI * -0.25f));
+	    }
+	    cube.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), -deltaTime));
+	    cube2.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 0.f, 0.f), -deltaTime));
+	    cube3.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 1.f, 1.f), -deltaTime));
 
 	    // Move the child cube back and forth along the parent's Z-axis
 	    // cube2.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -1.f + ((sinf(runningTime) + 1.f) * 0.5f) * -2.f));

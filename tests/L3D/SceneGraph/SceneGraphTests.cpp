@@ -39,7 +39,7 @@ TEST(SceneGraphTest, SceneGraphChildIsAddedCorrectly)
 /// C's local coords are scaled by (1.0/1.5), and are therefore (-2, 0, -2) away from B in world units, and (0, 0, -2) away fom A in world units.
 /// Therefore, C should end up at (2, 0, -2) in world space, effectively taking B's original world-space position.
 /// C is also rotated counter-clockwise around the Y axis by 50 degrees. Before applying A's rotation, D ends up at approx. (-3.1, 0, -0.55) away from A in world units.
-/// Once A's 90deg rotation is applied then, D should end up at approx (-0.55, 0, -5.06) in world space.
+/// Once A's 90deg rotation is applied then, D should end up at approx (-0.57, 0, -5.06) in world space.
 ///
 /// (it may be helpful to draw this on a piece of paper)
 TEST(SceneGraphTest, SceneGraphChildTransformsCreateCorrectWorldCoords)
@@ -60,9 +60,9 @@ TEST(SceneGraphTest, SceneGraphChildTransformsCreateCorrectWorldCoords)
     auto childNode2 = childNode1->AddChild(&childTransformable2);
     auto childNode3 = childNode2->AddChild(&childTransformable3);
 
-    const float nodeCTheta = -50.f;
+    const float nodeCTheta = 50.f;
 
-    rootTransformable.GetTransform()->Rotate(lepus::types::Quaternion(0.f, 1.f, 0.f, (float)PI * -0.5f));
+    rootTransformable.GetTransform()->Rotate(lepus::types::Quaternion(0.f, 1.f, 0.f, (float)PI * 0.5f));
     childTransformable1.GetTransform()->SetScale(1.f / 1.5f);
     childTransformable2.GetTransform()->Rotate(lepus::types::Quaternion(0.f, 1.f, 0.f, (float)PI * (nodeCTheta / 180.f)));
 
@@ -99,5 +99,5 @@ TEST(SceneGraphTest, SceneGraphChildTransformsCreateCorrectWorldCoords)
     float cn3PreRotZ = -4.f + 4.f * cosf((float)PI * (nodeCTheta / 180.f));
     ASSERT_NEAR(cn3X, 0.f - (cn3PreRotZ - -2.f), 0.0001f);
     ASSERT_NEAR(cn3Y, 0.f, 0.0001f);
-    ASSERT_NEAR(cn3Z, -2.f + (cn3PreRotX - 0.f), 0.0001f);
+    ASSERT_NEAR(cn3Z, -2.f - (cn3PreRotX - 0.f), 0.0001f);
 }

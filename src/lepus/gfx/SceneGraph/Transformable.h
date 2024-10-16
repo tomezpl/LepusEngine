@@ -76,23 +76,58 @@ namespace lepus
 		    lepus::types::Vector4 rotated(leaves[i]->GetTransformable()->GetTransform()->Origin() * accScale);
 		    rotated.w(1.f);
 		    accScale.Multiply(parentTransform.Scale());
-
+		    //
 		    parentTransform.Origin(lepus::types::Vector3());
+		    //
+		    lepus::types::Quaternion normParentRot = parentTransform.Rotation().Normalised();
+		    lepus::types::Vector3 axis = normParentRot.Axis();
+		    float angle = normParentRot.Angle();
+
+		    parentTransform.Rotation(accRot);
+		    lepus::math::Matrix4x4 mat = parentTransform.BuildMatrix();
+		    lepus::types::Vector4 rotatedAxis = mat.Multiply(lepus::types::Vector4(axis));
+
+		    parentTransform.Rotation(lepus::types::Quaternion(rotatedAxis.x(), rotatedAxis.y(), rotatedAxis.z(), angle));
+		    mat = parentTransform.BuildMatrix();
+		    // rotated = mat.Multiply(rotated);
+		    // rotated = accRot.Rotate(rotated);
 
 		    accRot = accRot * (parentTransform.Rotation());
 		    parentTransform.Rotation(accRot);
-		    lepus::math::Matrix4x4 mat = parentTransform.BuildMatrix();
-		    rotated = mat.Multiply(rotated);
+		    mat = parentTransform.BuildMatrix();
+		    auto fwd = mat.Multiply(lepus::types::Vector4(0, 0, 1, 1)),
+		         rgt = mat.Multiply(lepus::types::Vector4(1, 0, 0, 1)),
+		         up = mat.Multiply(lepus::types::Vector4(0, 1, 0, 1));
 
-		    accPos.x(accPos.x() + rotated.x());
-		    accPos.y(accPos.y() + rotated.y());
-		    accPos.z(accPos.z() + rotated.z());
+		    auto forward = lepus::types::Vector3(fwd.x(), fwd.y(), fwd.z());
+		    auto right = lepus::types::Vector3(rgt.x(), rgt.y(), rgt.z());
+		    auto newUp = lepus::types::Vector3(up.x(), up.y(), up.z());
+
+		    //    if (i == 1)
+		    //    {
+		    // accPos.x(accPos.x() + rotated.x());
+		    // accPos.y(accPos.y() + rotated.y());
+		    // accPos.z(accPos.z() + rotated.z());
+		    //    }
+		    //    else
+		    {
+			accPos = accPos + forward * rotated.z() + right * rotated.x() + newUp * rotated.y();
+		    }
 		}
 
 		lepus::math::Transform worldTransform = lepus::math::Transform();
 
+		lepus::types::Quaternion normRot = this->m_Transform->Rotation().Normalised();
+		lepus::types::Vector3 axis = normRot.Axis();
+		float angle = normRot.Angle();
+		worldTransform.Rotation(accRot);
+		lepus::types::Vector4 rotatedAxis = worldTransform.BuildMatrix().Multiply(lepus::types::Vector4(axis));
+		axis.x(rotatedAxis.x());
+		axis.y(rotatedAxis.y());
+		axis.z(rotatedAxis.z());
+
 		worldTransform.Origin(accPos);
-		worldTransform.Rotate(accRot * this->m_Transform->Rotation());
+		worldTransform.Rotate(lepus::types::Quaternion(axis, angle));
 		accScale = accScale * this->m_Transform->Scale();
 		worldTransform.SetScale(accScale.x(), accScale.y(), accScale.z());
 
