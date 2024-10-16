@@ -193,12 +193,9 @@ class DemoApp : public system::BaseApp
 	KeyboardState keys = {false, false, false, false, false};
 
 	float deltaTime = 0.f;
-	auto transform = cube2.GetTransform();
-	// transform->Origin(lepus::types::Vector3(0.f, 0.f, -2.f));
-	// transform->SetScale(0.5f, 0.25f, 1.f);
 
-	// Parent the second cube to the first cube.
-	// cubeNode->AddChild(&cube2);
+	cube2.GetTransform()->SetScale(1.f, 0.5f, 1.f);
+	cube3.GetTransform()->SetScale(1.f, 2.f, 1.f);
 
 	while (isRunning)
 	{
@@ -213,7 +210,7 @@ class DemoApp : public system::BaseApp
 		cube.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), PI * -0.25f));
 	    }
 	    cube.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), -deltaTime));
-	    cube2.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 0.f, 0.f), -deltaTime));
+	    // cube2.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 0.f, 0.f), -deltaTime));
 	    cube3.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 1.f, 1.f), -deltaTime));
 
 	    // Move the child cube back and forth along the parent's Z-axis

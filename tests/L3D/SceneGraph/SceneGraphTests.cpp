@@ -41,7 +41,7 @@ TEST(SceneGraphTest, SceneGraphChildIsAddedCorrectly)
 /// C is also rotated counter-clockwise around the Y axis by 50 degrees. Before applying A's rotation, D ends up at approx. (-3.1, 0, -0.55) away from A in world units.
 /// Once A's 90deg rotation is applied then, D should end up at approx (-0.57, 0, -5.06) in world space.
 ///
-/// (it may be helpful to draw this on a piece of paper)
+/// (it may be helpful to draw this on a piece of paper - which means this test will also not cover everything as it's limited to the XZ plane)
 TEST(SceneGraphTest, SceneGraphChildTransformsCreateCorrectWorldCoords)
 {
     lepus::gfx::SceneGraph sceneGraph = lepus::gfx::SceneGraph();

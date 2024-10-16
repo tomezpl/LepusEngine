@@ -73,12 +73,12 @@ namespace lepus
 		{
 		    auto parentTransform = *(leaves[i - 1]->GetTransformable()->GetTransform());
 
-		    lepus::types::Vector4 rotated(leaves[i]->GetTransformable()->GetTransform()->Origin() * accScale);
-		    rotated.w(1.f);
+		    lepus::types::Vector3 scaled = leaves[i]->GetTransformable()->GetTransform()->Origin() * accScale;
+
 		    accScale.Multiply(parentTransform.Scale());
-		    //
+
 		    parentTransform.Origin(lepus::types::Vector3());
-		    //
+
 		    lepus::types::Quaternion normParentRot = parentTransform.Rotation().Normalised();
 		    lepus::types::Vector3 axis = normParentRot.Axis();
 		    float angle = normParentRot.Angle();
@@ -88,31 +88,17 @@ namespace lepus
 		    lepus::types::Vector4 rotatedAxis = mat.Multiply(lepus::types::Vector4(axis));
 
 		    parentTransform.Rotation(lepus::types::Quaternion(rotatedAxis.x(), rotatedAxis.y(), rotatedAxis.z(), angle));
-		    mat = parentTransform.BuildMatrix();
-		    // rotated = mat.Multiply(rotated);
-		    // rotated = accRot.Rotate(rotated);
 
 		    accRot = accRot * (parentTransform.Rotation());
 		    parentTransform.Rotation(accRot);
 		    mat = parentTransform.BuildMatrix();
-		    auto fwd = mat.Multiply(lepus::types::Vector4(0, 0, 1, 1)),
-		         rgt = mat.Multiply(lepus::types::Vector4(1, 0, 0, 1)),
+		    auto forward = mat.Multiply(lepus::types::Vector4(0, 0, 1, 1)),
+		         right = mat.Multiply(lepus::types::Vector4(1, 0, 0, 1)),
 		         up = mat.Multiply(lepus::types::Vector4(0, 1, 0, 1));
 
-		    auto forward = lepus::types::Vector3(fwd.x(), fwd.y(), fwd.z());
-		    auto right = lepus::types::Vector3(rgt.x(), rgt.y(), rgt.z());
-		    auto newUp = lepus::types::Vector3(up.x(), up.y(), up.z());
-
-		    //    if (i == 1)
-		    //    {
-		    // accPos.x(accPos.x() + rotated.x());
-		    // accPos.y(accPos.y() + rotated.y());
-		    // accPos.z(accPos.z() + rotated.z());
-		    //    }
-		    //    else
-		    {
-			accPos = accPos + forward * rotated.z() + right * rotated.x() + newUp * rotated.y();
-		    }
+		    accPos.x(accPos.x() + forward.x() * scaled.z() + right.x() * scaled.x() + up.x() * scaled.y());
+		    accPos.y(accPos.y() + forward.y() * scaled.z() + right.y() * scaled.x() + up.y() * scaled.y());
+		    accPos.z(accPos.z() + forward.z() * scaled.z() + right.z() * scaled.x() + up.z() * scaled.y());
 		}
 
 		lepus::math::Transform worldTransform = lepus::math::Transform();
