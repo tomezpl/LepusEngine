@@ -38,10 +38,7 @@ namespace lepus
 			/// @brief Main viewport used by the application.
 			lepus::types::Viewport mainViewport = {};
 
-			virtual ~GraphicsApiOptions()
-			{
-
-			}
+			virtual ~GraphicsApiOptions() {}
 		};
 
 		/// @brief API wrapper to be used by GraphicsEngine.
@@ -52,8 +49,10 @@ namespace lepus
 		{
 			private:
 			bool m_ShutdownCalled;
+
 			protected:
 			GraphicsApiOptions* m_Options;
+
 			protected:
 			/// @brief Performs internal, boilerplate setup for all API wrappers.
 			/// @tparam TGraphicsApiOptions An options type derived from GraphicsApiOptions for a specific graphics API.
@@ -71,6 +70,7 @@ namespace lepus
 			/// @param name The name of the uniform to fetch.
 			/// @return API-specific handle for a uniform of a given type.
 			virtual void* GetUniformInternal(char* name) = 0;
+
 			public:
 			/// @brief Default constructor. Does nothing, so Init(GraphicsApiOptions*) needs to be called manually.
 			GraphicsApi()
@@ -81,15 +81,25 @@ namespace lepus
 
 			GraphicsApi(GraphicsApiOptions* options)
 			{
-				Init(options);
-				m_ShutdownCalled = false;
+				m_Options = nullptr;
+				GraphicsApi::Init(options);
 			}
 
-			/// @brief Initialises the API with the provided options.
-			/// @param options An options object using a GraphicsApiOptions type for the requested API.
-			/// Make sure you don't pass a pointer to a new object here. Implementations of this class must copy the options,
-			/// not reference a pointer, so there's a potential risk of a memory leak there.
-			virtual void Init(GraphicsApiOptions* options) = 0;
+			/// @brief Initialises the API with the provided
+			/// options.
+			/// @param options An options object using a
+			/// GraphicsApiOptions type for the requested API. Make
+			/// sure you don't pass a pointer to a new object here.
+			/// Implementations of this class must copy the options,
+			/// not reference a pointer, so there's a potential risk
+			/// of a memory leak there.
+			virtual inline void Init(GraphicsApiOptions* options)
+			{
+				assert(options == nullptr);
+
+				InitInternal(options);
+				m_ShutdownCalled = false;
+			}
 
 			/// @brief Obtains the options object this GraphicsApi was initialised with.
 			/// 
@@ -146,7 +156,7 @@ namespace lepus
 				Shutdown();
 			}
 		};
-	}
-}
+	} // namespace gfx
+} // namespace lepus
 
 #endif
