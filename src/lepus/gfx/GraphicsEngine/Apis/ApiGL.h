@@ -98,7 +98,7 @@ namespace lepus
 	    void SetupUniforms();
 
 	    private:
-	    inline void* GetUniformInternal(char* name) override
+	    inline void* GetUniformInternal(const char* name) override
 	    {
 		size_t targetKeyLength = strlen(name);
 
@@ -147,7 +147,7 @@ namespace lepus
 	    void Shutdown() override;
 	};
 
-	template const lepus::gfx::GLUniformBinding<void*>* GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(char* name);
+	template lepus::gfx::GLUniformBinding<void*>* const GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(const char* name);
 
 	template GraphicsApiGL& GraphicsEngine::GetApi<GraphicsApiGL>();
     } // namespace gfx

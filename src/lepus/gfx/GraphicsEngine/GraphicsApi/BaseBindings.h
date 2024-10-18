@@ -7,59 +7,58 @@ namespace lepus
 {
     namespace gfx
     {
-        /// @brief An API-agnostic wrapper around a generic uniform.
-        /// @tparam TUniformHandle API-specific uniform handle type
-        /// @tparam TUniformValue Datatype held by this uniform (usually a POD type).
-        template<typename TUniformHandle, typename TUniformValue = void*>
-        class UniformBinding
-        {
-            private:
-            size_t m_Size = 0;
-            TUniformValue m_Value;
-            bool m_Dirty = false;
-            protected:
-            TUniformHandle m_Location;
+	/// @brief An API-agnostic wrapper around a generic uniform.
+	/// @tparam TUniformHandle API-specific uniform handle type
+	/// @tparam TUniformValue Datatype held by this uniform (usually a POD type).
+	template <typename TUniformHandle, typename TUniformValue = const void*>
+	class UniformBinding
+	{
+	    private:
+	    size_t m_Size = 0;
+	    TUniformValue m_Value;
+	    bool m_Dirty = false;
 
-            public:
+	    protected:
+	    TUniformHandle m_Location;
 
-            UniformBinding(TUniformHandle location)
-            {
-                memcpy(&m_Location, &location, sizeof(TUniformHandle));
-            }
+	    public:
+	    explicit UniformBinding(TUniformHandle location)
+	    {
+		memcpy(&m_Location, &location, sizeof(TUniformHandle));
+	    }
 
-            virtual const TUniformHandle& Location() const = 0;
+	    virtual const TUniformHandle& Location() const = 0;
 
-            /// @brief Sets the value of the uniform.
-            /// @remarks Careful when passing data by reference/pointer - e.g. arrays. This class does NOT copy the data, and if the passed array has gone out of scope, the data will not be uploaded to the GPU!
-            /// @param value 
-            inline void Value(TUniformValue value)
-            {
-                m_Value = value;
-                m_Dirty = true;
-            }
+	    /// @brief Sets the value of the uniform.
+	    /// @remarks Careful when passing data by reference/pointer - e.g. arrays. This class does NOT copy the data, and if the passed array has gone out of scope, the data will not be uploaded to the GPU!
+	    /// @param value
+	    inline void Value(TUniformValue value)
+	    {
+		m_Value = value;
+		m_Dirty = true;
+	    }
 
-            inline const TUniformValue& Value() const
-            {
-                return m_Value;
-            }
+	    inline const TUniformValue& Value() const
+	    {
+		return m_Value;
+	    }
 
-            /// @brief Has the uniform been invalidated since it's last been applied?
-            /// @return True if uniform has been invalidated and pending update in shader, false if no changes to data
-            inline bool IsDirty() { return m_Dirty; }
+	    /// @brief Has the uniform been invalidated since it's last been applied?
+	    /// @return True if uniform has been invalidated and pending update in shader, false if no changes to data
+	    inline bool IsDirty() { return m_Dirty; }
 
-            virtual UniformType Type() = 0;
+	    virtual UniformType Type() = 0;
 
-            virtual void Release()
-            {
+	    virtual void Release()
+	    {
+	    }
 
-            }
-
-            virtual ~UniformBinding()
-            {
-                Release();
-            }
-        };
-    }
-}
+	    virtual ~UniformBinding()
+	    {
+		Release();
+	    }
+	};
+    } // namespace gfx
+} // namespace lepus
 
 #endif

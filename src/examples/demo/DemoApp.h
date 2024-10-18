@@ -249,8 +249,8 @@ class DemoApp : public system::BaseApp
 	m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
 	m_UniformState.viewMatrix = m_Camera.BuildViewMatrix();
 
-	((lepus::gfx::GLMatrixUniformBinding*)api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX))->Value((float*)m_UniformState.projMatrix.data());
-	((lepus::gfx::GLMatrixUniformBinding*)api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX))->Value((float*)m_UniformState.viewMatrix.data());
+	api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX)->Value(m_UniformState.projMatrix.data());
+	api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX)->Value(m_UniformState.viewMatrix.data());
     }
 
     inline void Tick(float deltaTime, const KeyboardState& keys)
