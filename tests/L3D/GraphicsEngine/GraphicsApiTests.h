@@ -11,7 +11,7 @@ class GraphicsApiStub : public lepus::gfx::GraphicsApi
 	bool* m_ShutdownReceiver = nullptr;
 
 	private:
-	inline void* GetUniformInternal(char*) override
+	inline void* GetUniformInternal(const char*) override
 	{
 		return (void*)nullptr;
 	}
@@ -78,6 +78,6 @@ class GraphicsApiStub : public lepus::gfx::GraphicsApi
 };
 
 
-template const lepus::gfx::UniformBinding<void*>* lepus::gfx::GraphicsApi::GetUniform<lepus::gfx::UniformBinding<void*>*>(char* name);
+template lepus::gfx::UniformBinding<void*>* const lepus::gfx::GraphicsApi::GetUniform<lepus::gfx::UniformBinding<void*>*>(const char* name);
 
 #endif
