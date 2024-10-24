@@ -24,7 +24,8 @@ namespace lepus
 	    public:
 	    explicit UniformBinding(TUniformHandle location)
 	    {
-		memcpy(&m_Location, &location, sizeof(TUniformHandle));
+		m_Size = sizeof(TUniformHandle);
+		memcpy(&m_Location, &location, m_Size);
 	    }
 
 	    virtual const TUniformHandle& Location() const = 0;
@@ -45,7 +46,7 @@ namespace lepus
 
 	    /// @brief Has the uniform been invalidated since it's last been applied?
 	    /// @return True if uniform has been invalidated and pending update in shader, false if no changes to data
-	    inline bool IsDirty() { return m_Dirty; }
+	    [[nodiscard]] inline bool IsDirty() const { return m_Dirty; }
 
 	    virtual UniformType Type() = 0;
 

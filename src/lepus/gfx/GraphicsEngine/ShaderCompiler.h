@@ -5,43 +5,42 @@
 
 namespace lepus
 {
-	namespace gfx
+    namespace gfx
+    {
+	enum ShaderType
 	{
-		enum ShaderType
-		{
-			FragmentShader,
-			VertexShader,
-			GeometryShader
-		};
+	    FragmentShader,
+	    VertexShader,
+	    GeometryShader
+	};
 
-		template <typename TShaderHandle>
-		class ShaderCompiledResult
-		{
-			public:
-			inline ShaderCompiledResult(TShaderHandle shaderHandle)
-			{
-				ShaderHandle = shaderHandle;
-			}
+	template <typename TShaderHandle>
+	class ShaderCompiledResult
+	{
+	    public:
+	    inline explicit ShaderCompiledResult(TShaderHandle shaderHandle)
+	    {
+		ShaderHandle = shaderHandle;
+	    }
 
-			TShaderHandle ShaderHandle;
+	    TShaderHandle ShaderHandle;
 
-			/*template <typename TShaderHandle>
-			inline TShaderHandle GetShaderHandle() const { return reinterpret_cast<TShaderHandle>(ShaderHandle); }*/
-		};
+	    /*template <typename TShaderHandle>
+	    inline TShaderHandle GetShaderHandle() const { return reinterpret_cast<TShaderHandle>(ShaderHandle); }*/
+	};
 
-		template <typename TShaderHandle>
-		class ShaderCompiler
-		{
-			public:
-			virtual void Init() = 0;
-			virtual ShaderCompiledResult<TShaderHandle> CompileShader(const char* shaderSource, size_t shaderSourceLength, ShaderType type) = 0;
+	template <typename TShaderHandle>
+	class ShaderCompiler
+	{
+	    public:
+	    virtual void Init() = 0;
+	    virtual ShaderCompiledResult<TShaderHandle> CompileShader(const char* shaderSource, size_t shaderSourceLength, ShaderType type) = 0;
 
-			virtual ~ShaderCompiler()
-			{
-
-			}
-		};
-	}
-}
+	    virtual ~ShaderCompiler()
+	    {
+	    }
+	};
+    } // namespace gfx
+} // namespace lepus
 
 #endif

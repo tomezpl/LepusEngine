@@ -1,5 +1,6 @@
 #ifndef LEPUS_GFX_SCENEGRAPH
 #define LEPUS_GFX_SCENEGRAPH
+#include "Camera.h"
 #include "SceneGraph/Renderable.h"
 
 namespace lepus
@@ -14,16 +15,29 @@ namespace lepus
 	    protected:
 	    Node* m_Root;
 
+	    const lepus::gfx::Camera* m_ActiveCamera;
+
 	    public:
 	    SceneGraph()
 	    {
 		m_Root = new Node();
+		m_ActiveCamera = nullptr;
 	    }
 
 	    template <class TransformableType = Transformable>
-	    Node* AddChild(const TransformableType* transformable)
+	    inline Node* AddChild(const TransformableType* transformable)
 	    {
 		return m_Root->AddChild(static_cast<const Transformable*>(transformable));
+	    }
+
+	    inline void SetCamera(const lepus::gfx::Camera* const camera)
+	    {
+		m_ActiveCamera = camera;
+	    }
+
+	    inline const lepus::gfx::Camera* const Camera()
+	    {
+		return m_ActiveCamera;
 	    }
 
 	    ~SceneGraph()

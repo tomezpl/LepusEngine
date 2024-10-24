@@ -10,21 +10,21 @@ namespace lepus
 {
     namespace gfx
     {
-        template<typename TUniformValue> class GLUniformBinding : public lepus::gfx::UniformBinding<GLint, TUniformValue>
-        {
-            public:
-            GLUniformBinding(GLint location) : UniformBinding<GLint, TUniformValue>(location)
-            {
-                // TODO: No idea why, but sometimes the location won't assign correctly, so we do this terribleness...
-                this->m_Location = location;
-            }
+	template <typename TUniformValue>
+	class GLUniformBinding : public lepus::gfx::UniformBinding<GLint, TUniformValue>
+	{
+	    public:
+	    explicit GLUniformBinding(GLint location)
+	        : UniformBinding<GLint, TUniformValue>(location)
+	    {
+	    }
 
-            const GLint& Location() const override
-            {
-                return this->m_Location;
-            }
-        };
-    }
-}
+	    const GLint& Location() const override
+	    {
+		return this->m_Location;
+	    }
+	};
+    } // namespace gfx
+} // namespace lepus
 
 #endif

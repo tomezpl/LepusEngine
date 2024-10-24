@@ -1,3 +1,5 @@
+#include "lepus/gfx/GraphicsEngine/Apis/ApiGL/Types/GLShader.h"
+
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
@@ -140,7 +142,12 @@ class DemoApp : public system::BaseApp
 
 	// Register shader with the API.
 	auto& api = engine.GetApi<gfx::GraphicsApiGL>();
-	api.GetOptions<gfx::GraphicsApiGLOptions>().RegisterShader(&vertShader, &fragShader);
+	api.GetSceneGraph().SetCamera(&m_Camera);
+
+	lepus::gfx::Material baseMaterial;
+	lepus::gfx::GLShader baseShader(lepus::gfx::ShaderInfo("RGBVertex"));
+	baseShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader, fragShader));
+	baseMaterial.SetShader(&baseShader);
 
 	// Set up engine for drawing.
 	engine.Setup();
@@ -148,10 +155,10 @@ class DemoApp : public system::BaseApp
 
 	// Instantiate two Renderables in the scene graph, each with its own transform, using the same cube mesh data.
 	auto cubeMesh = lepus::gfx::GLMesh(lepus::utility::Primitives::Cube());
-	auto cube = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
-	auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
-	auto cube3 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
-	auto cube4 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform());
+	auto cube = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), baseMaterial);
+	auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), baseMaterial);
+	auto cube3 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), baseMaterial);
+	auto cube4 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), baseMaterial);
 
 	cube.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -2.f));
 	cube2.GetTransform()->Origin(lepus::types::Vector3(2.f, 0.f, 0.f));
@@ -168,12 +175,6 @@ class DemoApp : public system::BaseApp
 	cube2.GetTransform()->Rotate(lepus::types::Quaternion(1.f, 0.f, 0.f, (float)PI * (-90.f / 180.f)));
 
 	auto cubeNode = api.GetSceneGraph().AddChild(&cube);
-
-	// Update projection and view matrices with data from the camera object.
-	m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
-	((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX))->Value((float*)m_UniformState.projMatrix.data());
-	m_UniformState.viewMatrix = m_Camera.BuildViewMatrix();
-	((lepus::gfx::GLMatrixUniformBinding*)api.GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX))->Value((float*)m_UniformState.viewMatrix.data());
 
 	// Initialise the FOV variable and set up a callback so we can let the user adjust it with the mouse scroll wheel.
 	m_FOV = m_Camera.FOV();
@@ -235,7 +236,7 @@ class DemoApp : public system::BaseApp
 
     inline void UpdateInput(KeyboardState& keys, std::shared_ptr<system::WindowingGLFW> windowing)
     {
-	GLFWwindow* window = (GLFWwindow*)windowing->GetWindowPtr();
+	auto window = static_cast<GLFWwindow*>(windowing->GetWindowPtr());
 
 	keys.w = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
 	keys.a = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
@@ -246,11 +247,11 @@ class DemoApp : public system::BaseApp
 
     inline void UpdateUniforms(gfx::GraphicsApi* api)
     {
-	m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
-	m_UniformState.viewMatrix = m_Camera.BuildViewMatrix();
+	// m_UniformState.projMatrix = m_Camera.BuildPerspectiveMatrix();
+	// m_UniformState.viewMatrix = m_Camera.BuildViewMatrix();
 
-	api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX)->Value(m_UniformState.projMatrix.data());
-	api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX)->Value(m_UniformState.viewMatrix.data());
+	// api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_PROJECTION_MATRIX)->Value(m_UniformState.projMatrix.data());
+	// api->GetUniform<lepus::gfx::GLMatrixUniformBinding>(LEPUS_GFX_UNIFORMS_GLOBAL_VIEW_MATRIX)->Value(m_UniformState.viewMatrix.data());
     }
 
     inline void Tick(float deltaTime, const KeyboardState& keys)

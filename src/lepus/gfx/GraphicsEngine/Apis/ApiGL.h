@@ -19,7 +19,7 @@ namespace lepus
 	class GraphicsApiGLOptions : public GraphicsApiOptions
 	{
 	    public:
-	    static const size_t ProgramCount = 8;
+	    static constexpr size_t ProgramCount = 8;
 
 	    private:
 	    GLuint m_FragmentShaders[ProgramCount];
@@ -37,8 +37,8 @@ namespace lepus
 		memset(m_VertexShaders, 0, ProgramCount * sizeof(GLuint));
 	    }
 
-	    inline GLuint const GetFragmentShader(size_t index) { return m_FragmentShaders[index]; }
-	    inline GLuint const GetVertexShader(size_t index) { return m_VertexShaders[index]; }
+	    [[nodiscard]] inline const GLuint GetFragmentShader(size_t index) const { return m_FragmentShaders[index]; }
+	    [[nodiscard]] inline const GLuint GetVertexShader(size_t index) const { return m_VertexShaders[index]; }
 
 	    const size_t RegisterShader(GLShaderCompiledResult const* vertexShader = nullptr, GLShaderCompiledResult const* fragShader = nullptr, GLShaderCompiledResult const* geomShader = nullptr)
 	    {
@@ -65,6 +65,8 @@ namespace lepus
 
 	typedef lepus::gfx::SceneGraph GLSceneGraph;
 
+	typedef lepus::gfx::Renderable<GLMesh> GLRenderable;
+
 	template GraphicsApiGLOptions& GraphicsApi::GetOptions<GraphicsApiGLOptions>();
 
 	class GraphicsApiGL : public GraphicsApi
@@ -72,11 +74,10 @@ namespace lepus
 	    friend class GraphicsApiGLOptions;
 
 	    private:
-	    static const uint8_t _meshCount = 2;
 	    struct
 	    {
 		/// @brief Handle to the vertex array objects.
-		GLuint vao;
+		GLuint vao = 0;
 
 		/// @brief List with all uniforms used by the API.
 		// TODO: Change to array - might get better cache/locality to improve access times.
@@ -90,6 +91,10 @@ namespace lepus
 	    GLuint m_Programs[GraphicsApiGLOptions::ProgramCount];
 
 	    GLSceneGraph m_Scene;
+
+	    bool m_DrawStarted;
+
+	    GLuint m_ActiveProgram;
 
 	    private:
 	    void SetupVertexArrays();
@@ -131,6 +136,8 @@ namespace lepus
 	    void CreatePipeline() override;
 
 	    void UpdateUniforms() override;
+
+	    void UpdateUniforms(const GLRenderable* renderable, const MaterialAttributes& materialAttribs, GLuint program, const lepus::math::Matrix4x4& worldMatrix);
 
 	    inline GLSceneGraph& GetSceneGraph()
 	    {
