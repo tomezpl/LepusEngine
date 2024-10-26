@@ -10,6 +10,7 @@ namespace lepus
 	    INVALID = 0,
 	    MATRIX4,
 	    FLOAT,
+	    VEC3
 	};
 
 #pragma region Engine global uniform names

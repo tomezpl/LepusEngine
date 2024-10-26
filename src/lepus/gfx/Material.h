@@ -37,7 +37,7 @@ namespace lepus
 		m_Shader = shader;
 	    }
 
-	    [[nodiscard]] const lepus::gfx::MaterialAttributes& Attributes() const
+	    [[nodiscard]] lepus::gfx::MaterialAttributes& Attributes()
 	    {
 		return m_Attributes;
 	    }

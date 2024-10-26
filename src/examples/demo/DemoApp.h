@@ -135,19 +135,30 @@ class DemoApp : public system::BaseApp
 	engine::ConsoleLogger::Global().LogInfo("", "main", "Demo starting!");
 
 	// Load & compile shaders.
-	std::string vertShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.vert"), fragShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.frag");
+	std::string
+	    vertShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.vert"),
+	    fragShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.frag"),
+	    vertShaderSrc2 = system::FileSystem::Read("../../Content/GLSL/Unlit/SolidColour.vert"),
+	    fragShaderSrc2 = system::FileSystem::Read("../../Content/GLSL/Unlit/SolidColour.frag");
 	gfx::ShaderCompiledResult
 	    vertShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(vertShaderSrc.c_str(), vertShaderSrc.length(), gfx::VertexShader),
-	    fragShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc.c_str(), fragShaderSrc.length(), gfx::FragmentShader);
+	    fragShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc.c_str(), fragShaderSrc.length(), gfx::FragmentShader),
+	    vertShader2 = gfx::ShaderCompilerGLSL::Singleton().CompileShader(vertShaderSrc2.c_str(), vertShaderSrc2.length(), gfx::VertexShader),
+	    fragShader2 = gfx::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc2.c_str(), fragShaderSrc2.length(), gfx::FragmentShader);
 
 	// Register shader with the API.
 	auto& api = engine.GetApi<gfx::GraphicsApiGL>();
 	api.GetSceneGraph().SetCamera(&m_Camera);
 
-	lepus::gfx::Material baseMaterial;
-	lepus::gfx::GLShader baseShader(lepus::gfx::ShaderInfo("RGBVertex"));
+	lepus::gfx::Material baseMaterial, otherMaterial;
+	lepus::gfx::GLShader baseShader(lepus::gfx::ShaderInfo("RGBVertex")), redShader(lepus::gfx::ShaderInfo("SolidColour"));
 	baseShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader, fragShader));
+	redShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader2, fragShader2));
 	baseMaterial.SetShader(&baseShader);
+	otherMaterial.SetShader(&redShader);
+
+	types::Vector3 baseColour(1.f, 1.f, 1.f);
+	auto baseColourIndex = otherMaterial.Attributes().Add<const types::Vector3&>("colour", baseColour);
 
 	// Set up engine for drawing.
 	engine.Setup();
@@ -156,8 +167,8 @@ class DemoApp : public system::BaseApp
 	// Instantiate two Renderables in the scene graph, each with its own transform, using the same cube mesh data.
 	auto cubeMesh = lepus::gfx::GLMesh(lepus::utility::Primitives::Cube());
 	auto cube = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), baseMaterial);
-	auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), baseMaterial);
-	auto cube3 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), baseMaterial);
+	auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), otherMaterial);
+	auto cube3 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), otherMaterial);
 	auto cube4 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), baseMaterial);
 
 	cube.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -2.f));
@@ -176,13 +187,13 @@ class DemoApp : public system::BaseApp
 
 	auto cubeNode = api.GetSceneGraph().AddChild(&cube);
 
+	auto window = static_cast<GLFWwindow*>(windowing->GetWindowPtr());
+
 	// Initialise the FOV variable and set up a callback so we can let the user adjust it with the mouse scroll wheel.
 	m_FOV = m_Camera.FOV();
-	glfwSetScrollCallback(reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr()), DemoAppGLFWCallbacks::scroll);
+	glfwSetScrollCallback(window, DemoAppGLFWCallbacks::scroll);
 
 	float runningTime = glfwGetTime();
-
-	GLFWwindow* window = reinterpret_cast<GLFWwindow*>(windowing->GetWindowPtr());
 
 	// Set up mouse input for camera freelook.
 	glfwGetCursorPos(window, &m_MouseState.lastX, &m_MouseState.lastY);
@@ -219,6 +230,12 @@ class DemoApp : public system::BaseApp
 
 	    Tick(deltaTime, keys);
 	    UpdateUniforms(&api);
+
+	    baseColour.x(sinf(runningTime));
+	    baseColour.y(cosf(runningTime));
+	    baseColour.z(baseColour.x() * baseColour.y());
+
+	    otherMaterial.Attributes().Set<const types::Vector3&>(baseColourIndex, baseColour);
 
 	    engine.Render<unsigned char, gfx::GraphicsEngine::PixelFormat::RGBA32>(100, 149, 237);
 

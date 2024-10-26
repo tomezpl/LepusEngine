@@ -71,6 +71,7 @@ namespace lepus
 		m_AttribCount = 0;
 		m_AttribNames = nullptr;
 		m_AttribValues = nullptr;
+		m_AttribTypes = nullptr;
 	    }
 
 	    /// @brief Adds an attribute and returns its index.
@@ -80,9 +81,11 @@ namespace lepus
 		this->_EnsureCapacity(1);
 
 		size_t numChars = strlen(name);
-		m_AttribNames[m_AttribCount] = new char[numChars];
+		m_AttribNames[m_AttribCount] = new char[numChars + 1];
+		memset((void*)m_AttribNames[m_AttribCount], 0, sizeof(char) * (numChars + 1));
 		memcpy((void*)m_AttribNames[m_AttribCount], name, numChars);
-		m_AttribValues[m_AttribValues] = value;
+
+		Set<TValue>(m_AttribCount, value);
 
 		return m_AttribCount++;
 	    }
@@ -105,8 +108,30 @@ namespace lepus
 	    template <>
 	    inline void Set<const lepus::math::Matrix4x4&>(uint8_t index, const lepus::math::Matrix4x4& value)
 	    {
+		// Clear existing data
+		if (m_AttribTypes[index] == UniformType::MATRIX4)
+		{
+		    delete[] static_cast<float*>(m_AttribValues[index]);
+		}
+
+		m_AttribValues[index] = new float[4 * 4];
+
 		m_AttribTypes[index] = UniformType::MATRIX4;
 		memcpy((void*)m_AttribValues[index], value.data(), sizeof(float) * 4 * 4);
+	    }
+
+	    template <>
+	    inline void Set<const lepus::types::Vector3&>(uint8_t index, const lepus::types::Vector3& value)
+	    {
+		if (m_AttribTypes[index] == UniformType::VEC3)
+		{
+		    delete[] static_cast<float*>(m_AttribValues[index]);
+		}
+
+		m_AttribValues[index] = new float[3];
+
+		m_AttribTypes[index] = UniformType::VEC3;
+		memcpy((void*)m_AttribValues[index], value.GetData(), sizeof(float) * 3);
 	    }
 
 	    template <typename TValue = void*>
@@ -114,22 +139,22 @@ namespace lepus
 	    {
 		assert(index < m_AttribCount);
 
-		return m_AttribValues[index];
+		return (TValue)(m_AttribValues[index]);
 	    }
 
-	    inline const char* GetName(uint8_t index) const
+	    [[nodiscard]] inline const char* GetName(uint8_t index) const
 	    {
 		assert(index < m_AttribCount);
 
 		return m_AttribNames[index];
 	    }
 
-	    inline const uint8_t Count() const
+	    [[nodiscard]] inline const uint8_t Count() const
 	    {
 		return m_AttribCount;
 	    }
 
-	    inline const UniformType GetType(uint8_t index) const
+	    [[nodiscard]] inline const UniformType GetType(uint8_t index) const
 	    {
 		return m_AttribTypes[index];
 	    }
@@ -163,6 +188,12 @@ namespace lepus
 	    lepus::math::Matrix4x4 mat(m_AttribValues[index]);
 
 	    return mat;
+	}
+
+	template <>
+	inline void MaterialAttributes::Set<const float* const>(uint8_t index, const float* const value)
+	{
+	    memcpy(m_AttribValues[index], value, sizeof(value));
 	}
     } // namespace gfx
 } // namespace lepus

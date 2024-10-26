@@ -55,7 +55,7 @@ void GraphicsApiGL::UpdateUniforms()
     // TODO: this method should only update "global" uniforms that aren't specific to any renderable in particular.
 }
 
-void GraphicsApiGL::UpdateUniforms(const GLRenderable* const renderable, const MaterialAttributes& materialAttribs, const GLuint program, const lepus::math::Matrix4x4& worldMatrix)
+void GraphicsApiGL::UpdateUniforms(const GLRenderable* const renderable, MaterialAttributes& materialAttribs, const GLuint program, const lepus::math::Matrix4x4& worldMatrix)
 {
     auto cam = m_Scene.Camera();
     auto proj = cam->BuildPerspectiveMatrix();
@@ -111,6 +111,9 @@ void GraphicsApiGL::UpdateUniforms(const GLRenderable* const renderable, const M
 	case lepus::gfx::UniformType::FLOAT:
 	    glUniform1f(location, materialAttribs.Get<GLfloat>(i));
 	    break;
+	case lepus::gfx::UniformType::VEC3:
+	    glUniform3fv(location, 1, materialAttribs.Get<GLfloat*>(i));
+	    break;
 	case lepus::gfx::UniformType::INVALID:
 	default:
 	    break;
@@ -130,7 +133,7 @@ void GraphicsApiGL::Draw()
     {
 	if (!branchComplete && !currentNode->IsRoot())
 	{
-	    auto renderable = (const GLRenderable*)(currentNode->GetTransformable());
+	    auto renderable = (GLRenderable*)(currentNode->GetTransformable());
 	    auto material = renderable->GetMaterial();
 	    if (renderable)
 	    {

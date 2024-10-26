@@ -137,7 +137,7 @@ namespace lepus
 
 	    void UpdateUniforms() override;
 
-	    void UpdateUniforms(const GLRenderable* renderable, const MaterialAttributes& materialAttribs, GLuint program, const lepus::math::Matrix4x4& worldMatrix);
+	    void UpdateUniforms(const GLRenderable* renderable, MaterialAttributes& materialAttribs, GLuint program, const lepus::math::Matrix4x4& worldMatrix);
 
 	    inline GLSceneGraph& GetSceneGraph()
 	    {

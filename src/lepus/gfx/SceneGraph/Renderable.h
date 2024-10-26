@@ -17,7 +17,7 @@ namespace lepus
 	{
 	    private:
 	    const MeshType* m_Mesh;
-	    const Material* m_Material;
+	    Material* m_Material;
 	    bool m_OwnsMaterial;
 
 	    public:
@@ -36,7 +36,7 @@ namespace lepus
 		}
 	    }
 
-	    Renderable(const MeshType* mesh, lepus::math::Transform& transform, const Material& material)
+	    Renderable(const MeshType* mesh, lepus::math::Transform& transform, Material& material)
 	        : Renderable(mesh, transform, false)
 	    {
 		m_Material = &material;
@@ -56,7 +56,7 @@ namespace lepus
 		}
 	    }
 
-	    Renderable(const MeshType* mesh, lepus::math::Transform&& transform, const Material& material)
+	    Renderable(const MeshType* mesh, lepus::math::Transform&& transform, Material& material)
 	        : Renderable(mesh, transform, false)
 	    {
 		m_Material = &material;
@@ -85,7 +85,7 @@ namespace lepus
 		return m_Mesh;
 	    }
 
-	    [[nodiscard]] const Material* GetMaterial() const
+	    [[nodiscard]] Material* const GetMaterial()
 	    {
 		return m_Material;
 	    }
