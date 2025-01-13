@@ -2,6 +2,7 @@
 #define L3D_GRAPHICSENGINE
 
 #include "Camera.h"
+#include "SceneGraph.h"
 #include "GraphicsEngine/GraphicsApi.h"
 #include <lepus/system/Windowing.h>
 #include <lepus/utility/types/String.h>
@@ -26,6 +27,8 @@ namespace lepus
 		lepus::types::String windowName;
 		lepus::types::Viewport viewport;
 	    } m_OutputInfo;
+
+	    SceneGraph m_Scene;
 
 	    void _InitDefault()
 	    {
@@ -93,6 +96,10 @@ namespace lepus
 	    /// @param g Solid clear colour value (green, range [0, 1])
 	    /// @param b Solid clear colour value (blue, range [0, 1])
 	    void Render(float r, float g, float b);
+
+	    inline SceneGraph& GetSceneGraph() { return m_Scene; }
+
+	    lepus::engine::objects::Mesh* CreateMesh(const utility::Primitive& geometry);
 	};
     } // namespace gfx
 } // namespace lepus

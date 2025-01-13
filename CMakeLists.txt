@@ -11,6 +11,7 @@
 cmake_minimum_required(VERSION 3.26)
 include(FindOpenGL)
 include(CMakePrintHelpers)
+include(FetchContent)
 
 set(VCPKG_FEATURE_FLAGS "manifests,registries,versions")
 
@@ -117,6 +118,15 @@ find_package(glfw3 CONFIG REQUIRED)
 ## LepusGfx: GLFW includes
 include_directories(LepusGfx ${GLFW_INCLUDES})
 
+## LepusGfx: VkBootstrap
+find_package(Vulkan REQUIRED)
+FetchContent_Declare(
+        fetch_vk_bootstrap
+        GIT_REPOSITORY https://github.com/charles-lunarg/vk-bootstrap
+        GIT_TAG v1.3.302
+)
+FetchContent_MakeAvailable(fetch_vk_bootstrap)
+
 # LepusEngine sources
 
 file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/Release)
@@ -130,7 +140,10 @@ if (OpenGL::GL)
 elseif (OpenGL::OpenGL)
     set(GL_LIBRARY OpenGL::OpenGL)
 endif (OpenGL::GL)
-target_link_libraries(LepusGfx PRIVATE GL3W glfw ${GL_LIBRARY} DearImgui LepusEngine LepusUtility LepusSystem)
+
+target_link_libraries(LepusGfx PRIVATE GL3W glfw ${GL_LIBRARY} vk-bootstrap::vk-bootstrap DearImgui LepusEngine LepusUtility LepusSystem Vulkan::Vulkan)
+
+target_include_directories(LepusGfx PUBLIC "${Vulkan_INCLUDE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/_deps/fetch_vk_bootstrap-src/src")
 target_link_libraries(LepusDemo PRIVATE DearImgui LepusGfx LepusUtility LepusEngine)
 
 # Copy content (models, GLSL, etc.)
@@ -138,7 +151,6 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Content)
 add_custom_command(TARGET LepusDemo POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Content" ${CMAKE_BINARY_DIR}/Content)
 
 # Unit testing framework
-include(FetchContent)
 FetchContent_Declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
@@ -194,7 +206,9 @@ if (MSVC)
     # 4265-5027: copy ctor, move ctor, assignment, move assignment implicitly deleted (this messes up gtest projects)
     # 5045: "compiler will insert Spectre mitigation for memory load"
     # 5262: implicit switch fallback
-    set(MSVCDisabledWarnings 4100 4514 4464 4820 4263 4625 5026 4626 5027 5045 5262)
+    # 4191: unsafe reinterpret_casts are needed for vulkan PFNs
+    # 4583: VkBootstrap destructors are not implicitly called
+    set(MSVCDisabledWarnings 4100 4514 4464 4820 4263 4625 5026 4626 5027 5045 5262 4191 4583)
 
     set(MSVCDisabledWarningsFormatted "")
     foreach (Warning IN LISTS MSVCDisabledWarnings)

@@ -152,6 +152,8 @@ namespace lepus
 	    void SwapBuffers() override {}
 
 	    void Shutdown() override;
+
+	    inline engine::objects::Mesh* WrapMesh(engine::objects::Mesh* mesh) override { return mesh; }
 	};
 
 	template lepus::gfx::GLUniformBinding<void*>* const GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(const char* name);

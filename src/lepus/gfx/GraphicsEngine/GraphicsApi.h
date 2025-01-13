@@ -6,6 +6,7 @@
 #include <cstring>
 #include <cassert>
 #include "GraphicsApi/BaseBindings.h"
+#include "lepus/engine/Objects/Mesh.h"
 
 namespace lepus
 {
@@ -149,6 +150,8 @@ namespace lepus
 	    {
 		m_ShutdownCalled = true;
 	    }
+
+	    virtual engine::objects::Mesh* WrapMesh(engine::objects::Mesh* mesh) = 0;
 
 	    virtual ~GraphicsApi()
 	    {

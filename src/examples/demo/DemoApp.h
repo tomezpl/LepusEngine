@@ -1,10 +1,9 @@
-#include "lepus/gfx/GraphicsEngine/Apis/ApiGL/Types/GLShader.h"
-
-#include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
 
 #include <lepus/system/Windowing/GLFW.h>
+#include "lepus/gfx/GraphicsEngine/Apis/ApiVk.h"
+
+#include "lepus/gfx/GraphicsEngine/Apis/ApiGL/Types/GLShader.h"
+
 #include <lepus/gfx/GraphicsEngine/Apis/ApiGL.h>
 #include <lepus/gfx/GraphicsEngine.h>
 #include <lepus/gfx/GraphicsEngine/ShaderCompilers/ShaderCompilerGLSL.h>
@@ -118,18 +117,17 @@ class DemoApp : public system::BaseApp
 
     inline int Run() override
     {
-	std::shared_ptr<system::WindowingGLFW> windowing = std::make_shared<system::WindowingGLFW>(800, 600);
+	std::shared_ptr<system::WindowingGLFW> windowing = std::make_shared<system::WindowingGLFW>(800, 600, false);
+
+	gfx::GraphicsApiVkOptions options = {};
+	options.windowingPtr = windowing;
 
 	// Create new graphics engine instance
-	gfx::GraphicsApiGLOptions options = {};
 	options.mainViewport = {800, 600};
 	gfx::GraphicsEngine engine(&options, windowing);
 
 	// Termination condition for main loop
 	bool isRunning = true;
-
-	// Set the window as the current OpenGL context.
-	windowing->SetAsCurrentContext();
 
 	// Output start message to console
 	engine::ConsoleLogger::Global().LogInfo("", "main", "Demo starting!");
@@ -140,20 +138,20 @@ class DemoApp : public system::BaseApp
 	    fragShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.frag"),
 	    vertShaderSrc2 = system::FileSystem::Read("../../Content/GLSL/Unlit/SolidColour.vert"),
 	    fragShaderSrc2 = system::FileSystem::Read("../../Content/GLSL/Unlit/SolidColour.frag");
-	gfx::ShaderCompiledResult
+	/*gfx::ShaderCompiledResult
 	    vertShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(vertShaderSrc.c_str(), vertShaderSrc.length(), gfx::VertexShader),
 	    fragShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc.c_str(), fragShaderSrc.length(), gfx::FragmentShader),
 	    vertShader2 = gfx::ShaderCompilerGLSL::Singleton().CompileShader(vertShaderSrc2.c_str(), vertShaderSrc2.length(), gfx::VertexShader),
 	    fragShader2 = gfx::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc2.c_str(), fragShaderSrc2.length(), gfx::FragmentShader);
-
+    */
 	// Register shader with the API.
-	auto& api = engine.GetApi<gfx::GraphicsApiGL>();
-	api.GetSceneGraph().SetCamera(&m_Camera);
+	auto& api = engine.GetApi<gfx::GraphicsApiVk>();
+	engine.GetSceneGraph().SetCamera(&m_Camera);
 
 	lepus::gfx::Material baseMaterial, otherMaterial;
 	lepus::gfx::GLShader baseShader(lepus::gfx::ShaderInfo("RGBVertex")), redShader(lepus::gfx::ShaderInfo("SolidColour"));
-	baseShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader, fragShader));
-	redShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader2, fragShader2));
+	// baseShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader, fragShader));
+	// redShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader2, fragShader2));
 	baseMaterial.SetShader(&baseShader);
 	otherMaterial.SetShader(&redShader);
 
@@ -165,18 +163,18 @@ class DemoApp : public system::BaseApp
 	m_Camera.Transform().Origin(m_Camera.Transform().Forward() * -2.f);
 
 	// Instantiate two Renderables in the scene graph, each with its own transform, using the same cube mesh data.
-	auto cubeMesh = lepus::gfx::GLMesh(lepus::utility::Primitives::Cube());
-	auto cube = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), baseMaterial);
-	auto cube2 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), otherMaterial);
-	auto cube3 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), otherMaterial);
-	auto cube4 = lepus::gfx::Renderable<lepus::gfx::GLMesh>(&cubeMesh, lepus::math::Transform(), baseMaterial);
+	auto cubeMesh = engine.CreateMesh(lepus::utility::Primitives::Cube());
+	auto cube = lepus::gfx::Renderable(&cubeMesh, lepus::math::Transform(), baseMaterial);
+	auto cube2 = lepus::gfx::Renderable(&cubeMesh, lepus::math::Transform(), otherMaterial);
+	auto cube3 = lepus::gfx::Renderable(&cubeMesh, lepus::math::Transform(), otherMaterial);
+	auto cube4 = lepus::gfx::Renderable(&cubeMesh, lepus::math::Transform(), baseMaterial);
 
 	cube.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -2.f));
 	cube2.GetTransform()->Origin(lepus::types::Vector3(2.f, 0.f, 0.f));
 	cube3.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, 2.f));
 	cube4.GetTransform()->Origin(lepus::types::Vector3(0.f, -2.f, 0.f));
 
-	auto rootNode = api.GetSceneGraph().AddChild(&cube);
+	auto rootNode = engine.GetSceneGraph().AddChild(&cube);
 	auto childNode1 = rootNode->AddChild(&cube2);
 	auto childNode2 = childNode1->AddChild(&cube3);
 	// auto childNode3 = childNode2->AddChild(&cube4);
@@ -185,7 +183,7 @@ class DemoApp : public system::BaseApp
 	// cube2.GetTransform()->SetScale(1.f / 1.5f);
 	cube2.GetTransform()->Rotate(lepus::types::Quaternion(1.f, 0.f, 0.f, (float)PI * (-90.f / 180.f)));
 
-	auto cubeNode = api.GetSceneGraph().AddChild(&cube);
+	auto cubeNode = engine.GetSceneGraph().AddChild(&cube);
 
 	auto window = static_cast<GLFWwindow*>(windowing->GetWindowPtr());
 

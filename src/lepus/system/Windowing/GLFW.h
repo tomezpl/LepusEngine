@@ -10,66 +10,67 @@
 
 namespace lepus
 {
-	namespace system
+    namespace system
+    {
+	class WindowingGLFW : public Windowing
 	{
-		class WindowingGLFW : public Windowing
-		{
-			private:
-			GLFWwindow* m_Window;
-			bool m_WindowDestroyed;
-			public:
-			inline void SetWindowDimensions(unsigned short width, unsigned short height) override
-			{
-				m_Dimensions.width = width;
-				m_Dimensions.height = height;
-			}
+	    private:
+	    GLFWwindow* m_Window;
+	    bool m_WindowDestroyed;
 
-			void* GetWindowPtr() override { return m_Window; }
+	    public:
+	    inline void SetWindowDimensions(unsigned short width, unsigned short height) override
+	    {
+		m_Dimensions.width = width;
+		m_Dimensions.height = height;
+	    }
 
-			WindowingGLFW()
-			{
-				m_WindowDestroyed = false;
-				m_Window = nullptr;
-			}
+	    void* GetWindowPtr() override { return m_Window; }
 
-			WindowingGLFW(unsigned short windowWidth, unsigned short windowHeight)
-			{
-				m_WindowDestroyed = false;
-				Init(windowWidth, windowHeight);
-			}
+	    WindowingGLFW()
+	    {
+		m_WindowDestroyed = false;
+		m_Window = nullptr;
+	    }
 
-			bool Init(unsigned short windowWidth, unsigned short windowHeight);
+	    WindowingGLFW(unsigned short windowWidth, unsigned short windowHeight, bool initGlContext = true)
+	    {
+		m_WindowDestroyed = false;
+		Init(windowWidth, windowHeight, initGlContext);
+	    }
 
-			void SetAsCurrentContext()
-			{
-				assert(m_Window);
-				assert(!m_WindowDestroyed);
+	    bool Init(unsigned short windowWidth, unsigned short windowHeight, bool initGlContext = true);
 
-				// Make this window current OpenGL context.
-				glfwMakeContextCurrent(m_Window);
+	    void SetAsCurrentContext()
+	    {
+		assert(m_Window);
+		assert(!m_WindowDestroyed);
 
-				// Initialise GL3W loaders.
-				assert(!gl3wInit());
-			}
+		// Make this window current OpenGL context.
+		glfwMakeContextCurrent(m_Window);
 
-			void SwapBuffers() override;
+		// Initialise GL3W loaders.
+		assert(!gl3wInit());
+	    }
 
-			bool Update();
+	    void SwapBuffers() override;
 
-			void Shutdown();
+	    bool Update();
 
-			/// @brief Calls GLFW functions to destroy contexts and release any resources used by the library.
-			static inline void Terminate()
-			{
-				glfwTerminate();
-			}
+	    void Shutdown();
 
-			~WindowingGLFW()
-			{
-				Shutdown();
-			};
-		};
-	}
-}
+	    /// @brief Calls GLFW functions to destroy contexts and release any resources used by the library.
+	    static inline void Terminate()
+	    {
+		glfwTerminate();
+	    }
+
+	    ~WindowingGLFW()
+	    {
+		Shutdown();
+	    };
+	};
+    } // namespace system
+} // namespace lepus
 
 #endif

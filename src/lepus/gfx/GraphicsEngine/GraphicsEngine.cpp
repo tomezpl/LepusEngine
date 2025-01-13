@@ -3,6 +3,7 @@
 
 #include "../GraphicsEngine.h"
 #include "Apis.h"
+#include "Apis/ApiVk.h"
 
 using namespace lepus::gfx;
 
@@ -25,6 +26,7 @@ void GraphicsEngine::InitApi(GraphicsApiOptions* options)
 	m_Api = new GraphicsApiGL(*static_cast<GraphicsApiGLOptions*>(options));
 	break;
     case GraphicsApiType::GraphicsApiVulkan:
+	m_Api = new GraphicsApiVk(options);
 	// TODO
 	break;
     case GraphicsApiType::GraphicsApiTest:
@@ -52,4 +54,23 @@ void GraphicsEngine::Render(const float r, const float g, const float b)
 
     m_Api->SwapBuffers();
     m_Windowing->SwapBuffers();
+}
+
+lepus::engine::objects::Mesh* GraphicsEngine::CreateMesh(const utility::Primitive& geometry)
+{
+    switch (m_Api->GetOptions<GraphicsApiOptions>().GetType())
+    {
+    case GraphicsApiUnknown:
+	assert(false);
+	break;
+    case GraphicsApiTest:
+	return nullptr;
+	break;
+    case GraphicsApiOpenGL:
+    case GraphicsApiVulkan:
+	return m_Api->WrapMesh(new lepus::engine::objects::Mesh(geometry, true));
+	break;
+    }
+
+    return 0;
 }
