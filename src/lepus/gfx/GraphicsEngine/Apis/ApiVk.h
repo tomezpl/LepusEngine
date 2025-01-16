@@ -38,6 +38,12 @@ namespace lepus
 	    VkFramebuffer* m_FrameBuffers;
 	    uint32_t m_FrameBufferCount;
 	    uint32_t m_CurrentImageIndex;
+	    uint32_t m_SwapChainImageCount;
+	    VkImageView* m_ImageViews;
+	    VkImage* m_Images;
+	    VkFence m_vkFence, m_vkCmdBufFence;
+	    PFN_vkCmdBeginRenderingKHR vkCmdBeginRenderingKHR;
+	    PFN_vkCmdEndRenderingKHR vkCmdEndRenderingKHR;
 
 	    inline void* GetUniformInternal(const char* name) override
 	    {
@@ -51,6 +57,11 @@ namespace lepus
 		m_FrameBuffers = nullptr;
 		m_FrameBufferCount = 0;
 		m_CurrentImageIndex = 0;
+		m_SwapChainImageCount = 0;
+		m_ImageViews = nullptr;
+		m_Images = nullptr;
+		m_vkFence = VK_NULL_HANDLE;
+		m_vkCmdBufFence = VK_NULL_HANDLE;
 	    }
 
 	    GraphicsApiVk(GraphicsApiOptions* options)
@@ -58,6 +69,11 @@ namespace lepus
 		m_FrameBuffers = nullptr;
 		m_FrameBufferCount = 0;
 		m_CurrentImageIndex = 0;
+		m_SwapChainImageCount = 0;
+		m_ImageViews = nullptr;
+		m_Images = nullptr;
+		m_vkFence = VK_NULL_HANDLE;
+		m_vkCmdBufFence = VK_NULL_HANDLE;
 		GraphicsApiVk::Init(options);
 	    }
 
