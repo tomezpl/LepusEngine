@@ -52,6 +52,8 @@ namespace lepus
 	    VkDeviceMemory m_vkMemory;
 	    VmaAllocator m_vmaAllocator;
 	    VmaAllocation m_vmaAllocation;
+	    VkRenderingInfo m_vkRenderingInfo;
+	    VkRenderingAttachmentInfo m_vkColourAttachmentInfo;
 
 	    inline void* GetUniformInternal(const char* name) override
 	    {
@@ -78,6 +80,8 @@ namespace lepus
 		m_vkMemory = VK_NULL_HANDLE;
 		m_vmaAllocator = VK_NULL_HANDLE;
 		m_vmaAllocation = VK_NULL_HANDLE;
+		m_vkRenderingInfo = {};
+		m_vkColourAttachmentInfo = {};
 	    }
 
 	    GraphicsApiVk(GraphicsApiOptions* options)
@@ -93,18 +97,20 @@ namespace lepus
 		m_vkGraphicsPipeline = VK_NULL_HANDLE;
 		m_vkVertShader = VK_NULL_HANDLE;
 		m_vkFragShader = VK_NULL_HANDLE;
+		m_vkRenderingInfo = {};
 		GraphicsApiVk::Init(options);
 	    }
 
 	    void Init(GraphicsApiOptions* options) override;
 
-	    void Draw() override {}
+	    void Draw(const SceneGraph& scene) override;
+
+	    void StartDrawing() override;
+	    void EndDrawing() override;
 
 	    void CreatePipeline() override {}
 
-	    void UpdateUniforms() override
-	    {
-	    }
+	    void UpdateUniforms(const SceneGraph& scene) override;
 
 	    void SwapBuffers() override;
 

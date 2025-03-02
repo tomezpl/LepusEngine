@@ -7,6 +7,7 @@
 #include <cassert>
 #include "GraphicsApi/BaseBindings.h"
 #include "lepus/engine/Objects/Mesh.h"
+#include "lepus/gfx/SceneGraph.h"
 
 namespace lepus
 {
@@ -134,9 +135,11 @@ namespace lepus
 	    /// @brief Applies uniforms in the shader.
 	    /// Implementations can fire & forget by issuing this before every draw, but it might be worth having a mechanism to invalidate uniforms
 	    /// and only update them once they're marked as dirty.
-	    virtual void UpdateUniforms() = 0;
+	    virtual void UpdateUniforms(const lepus::gfx::SceneGraph& scene) = 0;
 
-	    virtual void Draw() = 0;
+	    virtual void StartDrawing(){};
+	    virtual void Draw(const lepus::gfx::SceneGraph& scene) = 0;
+	    virtual void EndDrawing(){};
 
 	    virtual void ClearFrameBuffer(float r, float g, float b) = 0;
 

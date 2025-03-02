@@ -8,8 +8,6 @@ void GraphicsApiGL::Init(GraphicsApiOptions* options)
 {
     InitInternal<GraphicsApiGLOptions>((GraphicsApiGLOptions*)options);
 
-    m_Scene = GLSceneGraph();
-
     m_DrawStarted = false;
 
     m_ActiveProgram = 0;
@@ -50,14 +48,14 @@ void GraphicsApiGL::CreatePipeline()
     glFrontFace(GL_CCW);
 }
 
-void GraphicsApiGL::UpdateUniforms()
+void GraphicsApiGL::UpdateUniforms(const SceneGraph& scene)
 {
     // TODO: this method should only update "global" uniforms that aren't specific to any renderable in particular.
 }
 
-void GraphicsApiGL::UpdateUniforms(const GLRenderable* const renderable, MaterialAttributes& materialAttribs, const GLuint program, const lepus::math::Matrix4x4& worldMatrix)
+void GraphicsApiGL::UpdateUniforms(const SceneGraph& scene, const GLRenderable* const renderable, MaterialAttributes& materialAttribs, const GLuint program, const lepus::math::Matrix4x4& worldMatrix)
 {
-    auto cam = m_Scene.Camera();
+    auto cam = scene.Camera();
     auto proj = cam->BuildPerspectiveMatrix();
     auto view = cam->BuildViewMatrix();
 
@@ -121,11 +119,11 @@ void GraphicsApiGL::UpdateUniforms(const GLRenderable* const renderable, Materia
     }
 }
 
-void GraphicsApiGL::Draw()
+void GraphicsApiGL::Draw(const SceneGraph& scene)
 {
     glBindVertexArray(m_Pipeline.vao);
 
-    const GLSceneGraph::Node* currentNode = m_Scene.Root();
+    const GLSceneGraph::Node* currentNode = scene.Root();
 
     bool branchComplete = false;
 
@@ -141,7 +139,7 @@ void GraphicsApiGL::Draw()
 		GLuint program = material->GetShader<GLShader>()->GetApiHandle();
 		glUseProgram(program);
 
-		UpdateUniforms(renderable, material->Attributes(), program, renderable->GetWorldMatrix(currentNode));
+		UpdateUniforms(scene, renderable, material->Attributes(), program, renderable->GetWorldMatrix(currentNode));
 
 		glBindBuffer(GL_ARRAY_BUFFER, renderable->GetMesh()->GetVBO());
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderable->GetMesh()->GetIBO());

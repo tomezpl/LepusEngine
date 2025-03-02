@@ -49,8 +49,10 @@ void GraphicsEngine::Render(const float r, const float g, const float b)
 {
     m_Api->ClearFrameBuffer(r, g, b);
 
-    m_Api->UpdateUniforms();
-    m_Api->Draw();
+    m_Api->UpdateUniforms(m_Scene);
+    m_Api->StartDrawing();
+    m_Api->Draw(m_Scene);
+    m_Api->EndDrawing();
 
     m_Api->SwapBuffers();
     m_Windowing->SwapBuffers();

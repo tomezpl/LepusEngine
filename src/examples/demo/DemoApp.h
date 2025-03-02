@@ -117,13 +117,14 @@ class DemoApp : public system::BaseApp
 
     inline int Run() override
     {
-	std::shared_ptr<system::WindowingGLFW> windowing = std::make_shared<system::WindowingGLFW>(800, 600, false);
+	const uint32_t width = 800, height = 600;
+	std::shared_ptr<system::WindowingGLFW> windowing = std::make_shared<system::WindowingGLFW>(width, height, false);
 
 	gfx::GraphicsApiVkOptions options = {};
+	options.mainViewport = {width, height};
 	options.windowingPtr = windowing;
 
 	// Create new graphics engine instance
-	options.mainViewport = {800, 600};
 	gfx::GraphicsEngine engine(&options, windowing);
 
 	// Termination condition for main loop

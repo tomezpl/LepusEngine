@@ -90,8 +90,6 @@ namespace lepus
 
 	    GLuint m_Programs[GraphicsApiGLOptions::ProgramCount];
 
-	    GLSceneGraph m_Scene;
-
 	    bool m_DrawStarted;
 
 	    GLuint m_ActiveProgram;
@@ -135,16 +133,11 @@ namespace lepus
 
 	    void CreatePipeline() override;
 
-	    void UpdateUniforms() override;
+	    void UpdateUniforms(const SceneGraph& scene) override;
 
-	    void UpdateUniforms(const GLRenderable* renderable, MaterialAttributes& materialAttribs, GLuint program, const lepus::math::Matrix4x4& worldMatrix);
+	    void UpdateUniforms(const SceneGraph& scene, const GLRenderable* renderable, MaterialAttributes& materialAttribs, GLuint program, const lepus::math::Matrix4x4& worldMatrix);
 
-	    inline GLSceneGraph& GetSceneGraph()
-	    {
-		return m_Scene;
-	    }
-
-	    void Draw() override;
+	    void Draw(const SceneGraph& scene) override;
 
 	    void ClearFrameBuffer(float r, float g, float b) override;
 

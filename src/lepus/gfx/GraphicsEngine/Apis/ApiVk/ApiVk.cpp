@@ -209,7 +209,7 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
         static_cast<float>(width) * 1.f,
         static_cast<float>(height) * 1.f,
         0.f,
-        1.5f};
+        1.f};
     VkRect2D scissor = {};
     scissor.offset = {0, 0};
     scissor.extent = {(uint32_t)width, (uint32_t)height};
@@ -307,13 +307,6 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
         VK_SHARING_MODE_EXCLUSIVE,
         0,
         VK_NULL_HANDLE};
-    // vkCreateBuffer(m_vkDevice, &vertBufferCreateInfo, VK_NULL_HANDLE, &m_vkVertBuffer);
-    VkMemoryAllocateInfo memAllocateInfo = {
-        VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-        VK_NULL_HANDLE,
-        sizeof(float) * 3 * 3,
-
-    };
 
     VmaAllocationCreateInfo allocCreateInfo = {};
     allocCreateInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
@@ -328,6 +321,21 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     memcpy(data, verts, sizeof(float) * 3 * 3);
 
     vkUnmapMemory(m_vkDevice, m_vkMemory);
+
+    m_vkColourAttachmentInfo = {};
+    m_vkColourAttachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+    m_vkColourAttachmentInfo.clearValue = {};
+    m_vkColourAttachmentInfo.clearValue.depthStencil = {};
+    m_vkColourAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    m_vkColourAttachmentInfo.resolveMode = VK_RESOLVE_MODE_NONE;
+    m_vkColourAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    m_vkColourAttachmentInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+
+    m_vkRenderingInfo.renderArea = {};
+    m_vkRenderingInfo.renderArea.offset = {0, 0};
+    m_vkRenderingInfo.renderArea.extent = {(uint32_t)width, (uint32_t)height};
+
+    m_vkColourAttachmentInfo.clearValue.color = {{0.f, 0.f, 0.f, 0.f}};
 }
 
 lepus::engine::objects::Mesh* GraphicsApiVk::WrapMesh(engine::objects::Mesh* mesh)
@@ -359,33 +367,20 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
     ranges.baseMipLevel = 0;
     VkClearColorValue colour = {};
     const float gamma = 2.2f;
-    colour.float32[0] = powf(r, gamma);
-    colour.float32[1] = powf(g, gamma);
-    colour.float32[2] = powf(b, gamma);
-    colour.float32[3] = 0.f;
+    m_vkColourAttachmentInfo.clearValue.color.float32[0] = powf(r, gamma);
+    m_vkColourAttachmentInfo.clearValue.color.float32[1] = powf(g, gamma);
+    m_vkColourAttachmentInfo.clearValue.color.float32[2] = powf(b, gamma);
+    m_vkColourAttachmentInfo.clearValue.color.float32[3] = 0.f;
 
-    VkRenderingAttachmentInfo colourAttachment = {};
-    colourAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-    colourAttachment.clearValue = {};
-    colourAttachment.clearValue.depthStencil = {};
-    colourAttachment.clearValue.color = colour;
-    colourAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    colourAttachment.resolveMode = VK_RESOLVE_MODE_NONE;
-    colourAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    colourAttachment.imageView = m_ImageViews[m_CurrentImageIndex];
-    colourAttachment.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+    // m_vkColourAttachmentInfo.clearValue.color = colour;
+    m_vkColourAttachmentInfo.imageView = m_ImageViews[m_CurrentImageIndex];
 
-    VkRenderingInfo renderingInfo = {};
-    renderingInfo.pNext = VK_NULL_HANDLE;
-    renderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
-    renderingInfo.layerCount = 1;
-    renderingInfo.viewMask = 0;
-    renderingInfo.colorAttachmentCount = 1;
-    renderingInfo.pColorAttachments = &colourAttachment;
-    VkRect2D renderArea = {};
-    renderArea.offset = {0, 0};
-    renderArea.extent = {800, 600};
-    renderingInfo.renderArea = renderArea;
+    m_vkRenderingInfo.pNext = VK_NULL_HANDLE;
+    m_vkRenderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+    m_vkRenderingInfo.layerCount = 1;
+    m_vkRenderingInfo.viewMask = 0;
+    m_vkRenderingInfo.colorAttachmentCount = 1;
+    m_vkRenderingInfo.pColorAttachments = &m_vkColourAttachmentInfo;
 
     VkImageMemoryBarrier imgMemBarrier = {
         VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
@@ -405,11 +400,15 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
 
     vkCmdPipelineBarrier(m_CommandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &imgMemBarrier);
 
+    // vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, VK_NULL_HANDLE);
+    // vkCmdBindVertexBuffers(m_CommandBuffer, 0, 0, VK_NULL_HANDLE, VK_NULL_HANDLE);
+
+    // delete[] matrixData;
+}
+
+void GraphicsApiVk::UpdateUniforms(const SceneGraph& scene)
+{
     lepus::math::Matrix4x4 proj = lepus::math::Matrix4x4::Identity(), view = lepus::math::Matrix4x4::Identity(), model = lepus::math::Matrix4x4::Identity();
-    // float* matrixData = new float[4 * 4 * 3];
-    // memcpy(matrixData, proj.data(), sizeof(float) * 4 * 4);
-    // memcpy(matrixData + (sizeof(float) * 4 * 4), view.data(), sizeof(float) * 4 * 4);
-    // memcpy(matrixData + ((sizeof(float) * 4 * 4) * 2), model.data(), sizeof(float) * 4 * 4);
 
     vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vkGraphicsPipeline);
     vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, 0, sizeof(float) * 4 * 4, proj.data());
@@ -417,15 +416,24 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
     vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, 2 * (sizeof(float) * 4 * 4), sizeof(float) * 4 * 4, model.data());
     size_t offsets = 0;
     vkCmdBindVertexBuffers(m_CommandBuffer, 0, 1, &m_vkVertBuffer, &offsets);
+}
+
+void GraphicsApiVk::StartDrawing()
+{
 
     // vkCmdUpdateBuffer(m_CommandBuffer, m_vkVertBuffer, 0, sizeof(float) * 3 * 3, verts);
-    vkCmdBeginRenderingKHR(m_CommandBuffer, &renderingInfo);
-    vkCmdDraw(m_CommandBuffer, 3, 1, 0, 0);
-    vkCmdEndRenderingKHR(m_CommandBuffer);
-    // vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, VK_NULL_HANDLE);
-    // vkCmdBindVertexBuffers(m_CommandBuffer, 0, 0, VK_NULL_HANDLE, VK_NULL_HANDLE);
+    vkCmdBeginRenderingKHR(m_CommandBuffer, &m_vkRenderingInfo);
+}
 
-    imgMemBarrier = {
+void GraphicsApiVk::Draw(const SceneGraph& scene)
+{
+    vkCmdDraw(m_CommandBuffer, 3, 1, 0, 0);
+}
+
+void GraphicsApiVk::EndDrawing()
+{
+    vkCmdEndRenderingKHR(m_CommandBuffer);
+    VkImageMemoryBarrier imgMemBarrier = {
         VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
         VK_NULL_HANDLE,
         VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
@@ -458,7 +466,6 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
     submitInfo.pWaitDstStageMask = 0;
     vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkCmdBufFence);
     vkWaitForFences(m_vkDevice, 1, &m_vkCmdBufFence, VK_TRUE, UINT64_MAX);
-    // delete[] matrixData;
 }
 
 void GraphicsApiVk::SwapBuffers()
