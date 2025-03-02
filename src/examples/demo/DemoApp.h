@@ -98,7 +98,7 @@ class DemoApp : public system::BaseApp
 	{
 	    m_Camera.Transform().Rotate(rotationYaw);
 	}
-	lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(m_Camera.Transform().Right(), deltaY);
+	lepus::types::Quaternion rotationPitch = lepus::types::Quaternion(m_Camera.Transform().Right(), -deltaY);
 	angle = rotationPitch.Angle();
 	if (abs(angle) > 0.001f)
 	{
@@ -117,7 +117,7 @@ class DemoApp : public system::BaseApp
 
     inline int Run() override
     {
-	const uint32_t width = 800, height = 600;
+	const uint32_t width = 1280, height = 720;
 	std::shared_ptr<system::WindowingGLFW> windowing = std::make_shared<system::WindowingGLFW>(width, height, false);
 
 	gfx::GraphicsApiVkOptions options = {};

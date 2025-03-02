@@ -313,9 +313,9 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     vmaCreateBuffer(m_vmaAllocator, &vertBufferCreateInfo, &allocCreateInfo, &m_vkVertBuffer, &m_vmaAllocation, VK_NULL_HANDLE);
     m_vkMemory = m_vmaAllocation->GetMemory();
     float verts[3 * 3] = {
-        -0.75f, 0.75f, 0.5f,
-        0.75f, 0.75f, 0.5f,
-        0.f, -0.75f, 0.5f};
+        -0.75f, 0.75f, .5f,
+        0.75f, 0.75f, .5f,
+        0.f, -0.75f, .5f};
     void* data;
     vkMapMemory(m_vkDevice, m_vkMemory, 0, sizeof(float) * 3 * 3, 0, &data);
     memcpy(data, verts, sizeof(float) * 3 * 3);
@@ -408,11 +408,12 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
 
 void GraphicsApiVk::UpdateUniforms(const SceneGraph& scene)
 {
-    lepus::math::Matrix4x4 proj = lepus::math::Matrix4x4::Identity(), view = lepus::math::Matrix4x4::Identity(), model = lepus::math::Matrix4x4::Identity();
+    lepus::math::Matrix4x4 model = lepus::math::Matrix4x4::Identity();
+    auto camera = scene.Camera();
 
     vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vkGraphicsPipeline);
-    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, 0, sizeof(float) * 4 * 4, proj.data());
-    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, sizeof(float) * 4 * 4, sizeof(float) * 4 * 4, view.data());
+    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, 0, sizeof(float) * 4 * 4, camera->BuildPerspectiveMatrix().data());
+    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, sizeof(float) * 4 * 4, sizeof(float) * 4 * 4, camera->BuildViewMatrix().data());
     vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, 2 * (sizeof(float) * 4 * 4), sizeof(float) * 4 * 4, model.data());
     size_t offsets = 0;
     vkCmdBindVertexBuffers(m_CommandBuffer, 0, 1, &m_vkVertBuffer, &offsets);
