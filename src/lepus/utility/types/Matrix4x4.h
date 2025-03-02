@@ -1,7 +1,7 @@
 #ifndef LUTILITY_MATH_MATRIX4X4
 #define LUTILITY_MATH_MATRIX4X4
 
-#include "../Math.h"
+#include "../types/Vector.h"
 
 namespace lepus
 {

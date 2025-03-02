@@ -141,7 +141,8 @@ elseif (OpenGL::OpenGL)
     set(GL_LIBRARY OpenGL::OpenGL)
 endif (OpenGL::GL)
 
-target_link_libraries(LepusGfx PRIVATE GL3W glfw ${GL_LIBRARY} vk-bootstrap::vk-bootstrap DearImgui LepusEngine LepusUtility LepusSystem Vulkan::Vulkan)
+find_package(VulkanMemoryAllocator CONFIG REQUIRED)
+target_link_libraries(LepusGfx PRIVATE GL3W glfw ${GL_LIBRARY} vk-bootstrap::vk-bootstrap GPUOpen::VulkanMemoryAllocator DearImgui LepusEngine LepusUtility LepusSystem Vulkan::Vulkan)
 
 target_include_directories(LepusGfx PUBLIC "${Vulkan_INCLUDE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/_deps/fetch_vk_bootstrap-src/src")
 target_link_libraries(LepusDemo PRIVATE DearImgui LepusGfx LepusUtility LepusEngine)

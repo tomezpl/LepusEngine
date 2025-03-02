@@ -1,5 +1,9 @@
 // #include <Windows.h>
 
+#include "lepus/system/IO/FileSystem.h"
+#include "lepus/utility/types/Matrix4x4.h"
+
+#define VMA_IMPLEMENTATION
 #include <lepus/gfx/GraphicsEngine/Apis/ApiVk.h>
 
 // #include <vulkan/vulkan_win32.h>
@@ -8,6 +12,7 @@ using namespace lepus::gfx;
 
 void GraphicsApiVk::Init(GraphicsApiOptions* options)
 {
+
     GraphicsApiVkOptions* vkOptions = static_cast<GraphicsApiVkOptions*>(options);
     InitInternal(vkOptions);
 
@@ -63,6 +68,12 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     m_vkInstance = vkbInstance.instance;
     m_vkSwapchain = swapchainResult.value();
 
+    VmaAllocatorCreateInfo allocatorCreateInfo = {};
+    allocatorCreateInfo.device = m_vkDevice;
+    allocatorCreateInfo.instance = m_vkInstance;
+    allocatorCreateInfo.physicalDevice = physDevWrapper.value().physical_device;
+    vmaCreateAllocator(&allocatorCreateInfo, &m_vmaAllocator);
+
     VkCommandPoolCreateInfo cmdPoolCreateInfo;
     cmdPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     cmdPoolCreateInfo.pNext = 0;
@@ -114,6 +125,209 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     vkCreateFence(m_vkDevice, &fenceCreateInfo, VK_NULL_HANDLE, &m_vkCmdBufFence);
     vkCmdBeginRenderingKHR = (PFN_vkCmdBeginRenderingKHR)vkGetInstanceProcAddr(m_vkInstance, "vkCmdBeginRenderingKHR");
     vkCmdEndRenderingKHR = (PFN_vkCmdEndRenderingKHR)vkGetInstanceProcAddr(m_vkInstance, "vkCmdEndRenderingKHR");
+
+    size_t szFragShaderCode = 0, szVertShaderCode = 0;
+    uint32_t *fragShaderCode = system::FileSystem::ReadBinary<uint32_t>("../../Content/GLSL/Unlit/RGBVertex.frag.spv", szFragShaderCode), *vertShaderCode = system::FileSystem::ReadBinary<uint32_t>("../../Content/GLSL/Unlit/RGBVertex.vert.spv", szVertShaderCode);
+
+    szFragShaderCode = szFragShaderCode + (szFragShaderCode % 4);
+    szVertShaderCode = szVertShaderCode + (szVertShaderCode % 4);
+
+    VkShaderModuleCreateInfo fragShaderModuleCreateInfo = {};
+    fragShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    fragShaderModuleCreateInfo.codeSize = szFragShaderCode;
+    fragShaderModuleCreateInfo.pCode = fragShaderCode;
+    vkCreateShaderModule(m_vkDevice, &fragShaderModuleCreateInfo, VK_NULL_HANDLE, &m_vkFragShader);
+    VkShaderModuleCreateInfo vertShaderModuleCreateInfo = {};
+    vertShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    vertShaderModuleCreateInfo.codeSize = szVertShaderCode;
+    vertShaderModuleCreateInfo.pCode = vertShaderCode;
+    vkCreateShaderModule(m_vkDevice, &vertShaderModuleCreateInfo, VK_NULL_HANDLE, &m_vkVertShader);
+
+    VkPipelineShaderStageCreateInfo pipelineStages[2] = {};
+    pipelineStages[0] = {};
+    pipelineStages[1] = {};
+    pipelineStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    pipelineStages[0].module = m_vkVertShader;
+    pipelineStages[0].pName = "main";
+
+    pipelineStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    pipelineStages[1].module = m_vkFragShader;
+    pipelineStages[1].pName = "main";
+
+    pipelineStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    pipelineStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+    // pipelineStages[1].
+
+    VkFormat colourFormat = VK_FORMAT_B8G8R8A8_SRGB;
+    VkPipelineRenderingCreateInfoKHR pipelineRenderingCreateInfo = {};
+    pipelineRenderingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR;
+    pipelineRenderingCreateInfo.colorAttachmentCount = 1;
+    pipelineRenderingCreateInfo.pColorAttachmentFormats = &colourFormat;
+
+    VkGraphicsPipelineCreateInfo pipelineCreateInfo = {};
+    pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineCreateInfo.stageCount = 2;
+    pipelineCreateInfo.pStages = pipelineStages;
+    pipelineCreateInfo.renderPass = VK_NULL_HANDLE; // dynamic rendering
+    VkVertexInputAttributeDescription vertexAttrib = {
+        0,
+        0};
+    vertexAttrib.format = (VkFormat)(VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_R32G32B32_SFLOAT);
+    vertexAttrib.offset = 0;
+    VkVertexInputBindingDescription vertexBinding = {
+        0,
+        sizeof(float) * 3,
+        VK_VERTEX_INPUT_RATE_VERTEX};
+    VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {
+        VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+        VK_NULL_HANDLE,
+        0,
+        1,
+        &vertexBinding,
+        1,
+        &vertexAttrib};
+    pipelineCreateInfo.pVertexInputState = &vertexInputStateCreateInfo;
+    VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo = {
+        VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+        VK_NULL_HANDLE,
+        0,
+        VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+        false};
+    pipelineCreateInfo.pInputAssemblyState = &inputAssemblyStateCreateInfo;
+    VkPipelineTessellationStateCreateInfo tessStateCreateInfo = {
+        VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO,
+        VK_NULL_HANDLE,
+        0,
+        1};
+    pipelineCreateInfo.pTessellationState = &tessStateCreateInfo;
+    int width = 1, height = 1;
+    glfwGetWindowSize(window, &width, &height);
+    VkViewport viewport = {
+        0,
+        0,
+        static_cast<float>(width) * 1.f,
+        static_cast<float>(height) * 1.f,
+        0.f,
+        1.5f};
+    VkRect2D scissor = {};
+    scissor.offset = {0, 0};
+    scissor.extent = {(uint32_t)width, (uint32_t)height};
+    VkPipelineViewportStateCreateInfo viewportStateCreateInfo = {
+        VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+        VK_NULL_HANDLE,
+        0,
+        1,
+        &viewport,
+        1,
+        &scissor};
+    pipelineCreateInfo.pViewportState = &viewportStateCreateInfo;
+    VkPipelineMultisampleStateCreateInfo msStateCreateInfo = {
+        VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+        VK_NULL_HANDLE,
+        0,
+        VK_SAMPLE_COUNT_1_BIT,
+        false,
+        1.f,
+        VK_NULL_HANDLE,
+        false,
+        false};
+    pipelineCreateInfo.pMultisampleState = &msStateCreateInfo;
+    VkPipelineRasterizationStateCreateInfo rasterStateCreateInfo = {
+        VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+        VK_NULL_HANDLE,
+        0,
+        false,
+        false,
+        VK_POLYGON_MODE_FILL,
+        VK_CULL_MODE_NONE,
+        VK_FRONT_FACE_CLOCKWISE,
+        false,
+        0,
+        0,
+        0,
+        1};
+    pipelineCreateInfo.pRasterizationState = &rasterStateCreateInfo;
+    VkPipelineColorBlendAttachmentState colorBlendAttachment = {
+        false,
+    };
+    colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_A_BIT;
+    VkPipelineColorBlendStateCreateInfo colorBlendStateCreateInfo = {
+        VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+        VK_NULL_HANDLE,
+        0,
+        // true,
+        false,
+        VK_LOGIC_OP_OR,
+        1,
+        &colorBlendAttachment,
+        {1.f, 1.f, 1.f, 1.f}};
+    pipelineCreateInfo.pColorBlendState = &colorBlendStateCreateInfo;
+    VkPipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo = {
+        VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+        VK_NULL_HANDLE,
+        0,
+        true,
+        true,
+        VK_COMPARE_OP_LESS,
+        false,
+        false};
+    pipelineCreateInfo.pDepthStencilState = &depthStencilStateCreateInfo;
+    // VkDescriptorSetLayoutBinding setLayoutBinding = {
+    //     0,
+    //     VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,
+    //     1,
+    //     VK_SHADER_STAGE_ALL,
+    //
+    // } VkDescriptorSetLayoutCreateInfo setLayoutCreateInfo = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, VK_NULL_HANDLE, 0, 1, &setLayoutBinding};
+    VkPushConstantRange pushConstantRange = {
+        VK_SHADER_STAGE_ALL,
+        0,
+        sizeof(float) * 4 * 4 * 3};
+    VkPipelineLayoutCreateInfo layoutCreateInfo = {
+        VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        VK_NULL_HANDLE,
+        0,
+        0,
+        VK_NULL_HANDLE,
+        1,
+        &pushConstantRange};
+    vkCreatePipelineLayout(m_vkDevice, &layoutCreateInfo, nullptr, &m_vkGraphicsPipelineLayout);
+    pipelineCreateInfo.layout = m_vkGraphicsPipelineLayout;
+    pipelineCreateInfo.pNext = &pipelineRenderingCreateInfo;
+
+    vkCreateGraphicsPipelines(m_vkDevice, VK_NULL_HANDLE, 1, &pipelineCreateInfo, VK_NULL_HANDLE, &m_vkGraphicsPipeline);
+
+    VkBufferCreateInfo vertBufferCreateInfo = {
+        VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+        VK_NULL_HANDLE,
+        0,
+        sizeof(float) * 3 * 3,
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+        VK_SHARING_MODE_EXCLUSIVE,
+        0,
+        VK_NULL_HANDLE};
+    // vkCreateBuffer(m_vkDevice, &vertBufferCreateInfo, VK_NULL_HANDLE, &m_vkVertBuffer);
+    VkMemoryAllocateInfo memAllocateInfo = {
+        VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+        VK_NULL_HANDLE,
+        sizeof(float) * 3 * 3,
+
+    };
+
+    VmaAllocationCreateInfo allocCreateInfo = {};
+    allocCreateInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+    vmaCreateBuffer(m_vmaAllocator, &vertBufferCreateInfo, &allocCreateInfo, &m_vkVertBuffer, &m_vmaAllocation, VK_NULL_HANDLE);
+    m_vkMemory = m_vmaAllocation->GetMemory();
+    float verts[3 * 3] = {
+        -0.75f, 0.75f, 0.5f,
+        0.75f, 0.75f, 0.5f,
+        0.f, -0.75f, 0.5f};
+    void* data;
+    vkMapMemory(m_vkDevice, m_vkMemory, 0, sizeof(float) * 3 * 3, 0, &data);
+    memcpy(data, verts, sizeof(float) * 3 * 3);
+
+    vkUnmapMemory(m_vkDevice, m_vkMemory);
 }
 
 lepus::engine::objects::Mesh* GraphicsApiVk::WrapMesh(engine::objects::Mesh* mesh)
@@ -145,34 +359,10 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
     ranges.baseMipLevel = 0;
     VkClearColorValue colour = {};
     const float gamma = 2.2f;
-    // const float gamma = 1.f / 2.2f;
     colour.float32[0] = powf(r, gamma);
     colour.float32[1] = powf(g, gamma);
     colour.float32[2] = powf(b, gamma);
     colour.float32[3] = 0.f;
-    // colour.int32[0] = 100;
-    // colour.int32[1] = 149;
-    // colour.int32[2] = 237;
-    // colour.int32[3] = 255;
-    // colour.uint32[0] = 100;
-    // colour.uint32[1] = 149;
-    // colour.uint32[2] = 237;
-    // colour.uint32[3] = 255;
-    uint32_t swapchainImageCount = 0;
-    // vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapchain, &swapchainImageCount, nullptr);
-    if (swapchainImageCount > 0)
-    {
-	VkImage* swapchainImages = new VkImage[swapchainImageCount];
-	vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapchain, &swapchainImageCount, swapchainImages);
-
-	for (uint32_t i = 0; i < swapchainImageCount; i++)
-	{
-
-	    // vkCmdClearColorImage(m_CommandBuffer, swapchainImages[i], VK_IMAGE_LAYOUT_GENERAL, &colour, 1, &ranges);
-	}
-
-	// delete[] swapchainImages;
-    }
 
     VkRenderingAttachmentInfo colourAttachment = {};
     colourAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
@@ -192,20 +382,6 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
     renderingInfo.viewMask = 0;
     renderingInfo.colorAttachmentCount = 1;
     renderingInfo.pColorAttachments = &colourAttachment;
-    VkRenderingAttachmentInfo depthAttachment = {};
-    depthAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-    depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    depthAttachment.imageView = VK_NULL_HANDLE;
-    depthAttachment.resolveMode = VK_RESOLVE_MODE_NONE;
-    VkRenderingAttachmentInfo stencilAttachment = {};
-    stencilAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-    stencilAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    stencilAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    stencilAttachment.imageView = VK_NULL_HANDLE;
-    stencilAttachment.resolveMode = VK_RESOLVE_MODE_NONE;
-    // renderingInfo.pDepthAttachment = &depthAttachment;
-    // renderingInfo.pStencilAttachment = &stencilAttachment;
     VkRect2D renderArea = {};
     renderArea.offset = {0, 0};
     renderArea.extent = {800, 600};
@@ -229,8 +405,25 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
 
     vkCmdPipelineBarrier(m_CommandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &imgMemBarrier);
 
+    lepus::math::Matrix4x4 proj = lepus::math::Matrix4x4::Identity(), view = lepus::math::Matrix4x4::Identity(), model = lepus::math::Matrix4x4::Identity();
+    // float* matrixData = new float[4 * 4 * 3];
+    // memcpy(matrixData, proj.data(), sizeof(float) * 4 * 4);
+    // memcpy(matrixData + (sizeof(float) * 4 * 4), view.data(), sizeof(float) * 4 * 4);
+    // memcpy(matrixData + ((sizeof(float) * 4 * 4) * 2), model.data(), sizeof(float) * 4 * 4);
+
+    vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vkGraphicsPipeline);
+    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, 0, sizeof(float) * 4 * 4, proj.data());
+    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, sizeof(float) * 4 * 4, sizeof(float) * 4 * 4, view.data());
+    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, 2 * (sizeof(float) * 4 * 4), sizeof(float) * 4 * 4, model.data());
+    size_t offsets = 0;
+    vkCmdBindVertexBuffers(m_CommandBuffer, 0, 1, &m_vkVertBuffer, &offsets);
+
+    // vkCmdUpdateBuffer(m_CommandBuffer, m_vkVertBuffer, 0, sizeof(float) * 3 * 3, verts);
     vkCmdBeginRenderingKHR(m_CommandBuffer, &renderingInfo);
+    vkCmdDraw(m_CommandBuffer, 3, 1, 0, 0);
     vkCmdEndRenderingKHR(m_CommandBuffer);
+    // vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, VK_NULL_HANDLE);
+    // vkCmdBindVertexBuffers(m_CommandBuffer, 0, 0, VK_NULL_HANDLE, VK_NULL_HANDLE);
 
     imgMemBarrier = {
         VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
@@ -249,7 +442,6 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
          1}};
 
     vkCmdPipelineBarrier(m_CommandBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &imgMemBarrier);
-
     vkEndCommandBuffer(m_CommandBuffer);
 
     // assert(acquireResult == VK_SUCCESS);
@@ -266,6 +458,7 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
     submitInfo.pWaitDstStageMask = 0;
     vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkCmdBufFence);
     vkWaitForFences(m_vkDevice, 1, &m_vkCmdBufFence, VK_TRUE, UINT64_MAX);
+    // delete[] matrixData;
 }
 
 void GraphicsApiVk::SwapBuffers()
@@ -294,6 +487,10 @@ void GraphicsApiVk::Shutdown()
 
     vkDestroyCommandPool(m_vkDevice, m_CommandPool, nullptr);
     vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
+    vkDestroyPipelineLayout(m_vkDevice, m_vkGraphicsPipelineLayout, nullptr);
+    vkDestroyPipeline(m_vkDevice, m_vkGraphicsPipeline, nullptr);
+    vmaDestroyBuffer(m_vmaAllocator, m_vkVertBuffer, m_vmaAllocation);
+    vmaDestroyAllocator(m_vmaAllocator);
     vkDestroyDevice(m_vkDevice, nullptr);
     vkDestroySurfaceKHR(m_vkInstance, m_vkSurface, nullptr);
 }

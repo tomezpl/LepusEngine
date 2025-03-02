@@ -1,7 +1,7 @@
-#version 330 core
+#version 430 core
 
-out vec4 color;
-in vec3 vertColor;
+layout(location = 0) out vec4 color;
+layout(location = 0) in vec3 vertColor;
 
 void main()
 {

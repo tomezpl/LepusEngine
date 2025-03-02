@@ -5,6 +5,7 @@
 
 #define VK_USE_PLATFORM_WIN32_KHR
 #include <VkBootstrap.h>
+#include <vma/vk_mem_alloc.h>
 
 #include "lepus/system/Windowing/GLFW.h"
 
@@ -44,6 +45,13 @@ namespace lepus
 	    VkFence m_vkFence, m_vkCmdBufFence;
 	    PFN_vkCmdBeginRenderingKHR vkCmdBeginRenderingKHR;
 	    PFN_vkCmdEndRenderingKHR vkCmdEndRenderingKHR;
+	    VkPipeline m_vkGraphicsPipeline;
+	    VkPipelineLayout m_vkGraphicsPipelineLayout;
+	    VkShaderModule m_vkVertShader, m_vkFragShader;
+	    VkBuffer m_vkVertBuffer;
+	    VkDeviceMemory m_vkMemory;
+	    VmaAllocator m_vmaAllocator;
+	    VmaAllocation m_vmaAllocation;
 
 	    inline void* GetUniformInternal(const char* name) override
 	    {
@@ -62,6 +70,14 @@ namespace lepus
 		m_Images = nullptr;
 		m_vkFence = VK_NULL_HANDLE;
 		m_vkCmdBufFence = VK_NULL_HANDLE;
+		m_vkGraphicsPipeline = VK_NULL_HANDLE;
+		m_vkGraphicsPipelineLayout = VK_NULL_HANDLE;
+		m_vkVertShader = VK_NULL_HANDLE;
+		m_vkFragShader = VK_NULL_HANDLE;
+		m_vkVertBuffer = VK_NULL_HANDLE;
+		m_vkMemory = VK_NULL_HANDLE;
+		m_vmaAllocator = VK_NULL_HANDLE;
+		m_vmaAllocation = VK_NULL_HANDLE;
 	    }
 
 	    GraphicsApiVk(GraphicsApiOptions* options)
@@ -74,6 +90,9 @@ namespace lepus
 		m_Images = nullptr;
 		m_vkFence = VK_NULL_HANDLE;
 		m_vkCmdBufFence = VK_NULL_HANDLE;
+		m_vkGraphicsPipeline = VK_NULL_HANDLE;
+		m_vkVertShader = VK_NULL_HANDLE;
+		m_vkFragShader = VK_NULL_HANDLE;
 		GraphicsApiVk::Init(options);
 	    }
 
