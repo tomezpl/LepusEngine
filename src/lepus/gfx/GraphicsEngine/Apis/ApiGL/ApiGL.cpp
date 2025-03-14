@@ -44,7 +44,7 @@ void GraphicsApiGL::CreatePipeline()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    glCullFace(GL_FRONT);
     glFrontFace(GL_CCW);
 }
 

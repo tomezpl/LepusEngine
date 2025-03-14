@@ -48,7 +48,10 @@ namespace lepus
 	    VkPipeline m_vkGraphicsPipeline;
 	    VkPipelineLayout m_vkGraphicsPipelineLayout;
 	    VkShaderModule m_vkVertShader, m_vkFragShader;
-	    VkBuffer m_vkVertBuffer;
+	    const VkBuffer* m_vkVertBuffers;
+	    const VkBuffer* m_vkIndexBuffers;
+	    size_t m_vkVertBufferCount;
+	    size_t m_vkIndexBufferCount;
 	    VkDeviceMemory m_vkMemory;
 	    VmaAllocator m_vmaAllocator;
 	    VmaAllocation m_vmaAllocation;
@@ -60,7 +63,22 @@ namespace lepus
 		return nullptr;
 	    }
 
+	    /**
+	     * Checks that the vertex buffer array has enough capacity to insert new buffer(s).
+	     * @param newCount New count (or capacity) for the vertex buffer array.
+	     * @return Newly allocated number of vertex buffers.
+	     */
+	    size_t _EnsureVertBufferCapacity(size_t newCount);
+
+	    size_t _EnsureIndexBufferCapacity(size_t newCount);
+
 	    public:
+	    enum BufferType
+	    {
+		VertexBuffer,
+		IndexBuffer
+	    };
+
 	    GraphicsApiVk()
 	        : GraphicsApi()
 	    {
@@ -76,7 +94,10 @@ namespace lepus
 		m_vkGraphicsPipelineLayout = VK_NULL_HANDLE;
 		m_vkVertShader = VK_NULL_HANDLE;
 		m_vkFragShader = VK_NULL_HANDLE;
-		m_vkVertBuffer = VK_NULL_HANDLE;
+		m_vkVertBufferCount = 0;
+		m_vkIndexBufferCount = 0;
+		m_vkVertBuffers = new VkBuffer[m_vkVertBufferCount];
+		m_vkIndexBuffers = new VkBuffer[m_vkIndexBufferCount];
 		m_vkMemory = VK_NULL_HANDLE;
 		m_vmaAllocator = VK_NULL_HANDLE;
 		m_vmaAllocation = VK_NULL_HANDLE;
@@ -98,8 +119,14 @@ namespace lepus
 		m_vkVertShader = VK_NULL_HANDLE;
 		m_vkFragShader = VK_NULL_HANDLE;
 		m_vkRenderingInfo = {};
+		m_vkVertBufferCount = 0;
+		m_vkIndexBufferCount = 0;
+		m_vkVertBuffers = new VkBuffer[m_vkVertBufferCount];
+		m_vkIndexBuffers = new VkBuffer[m_vkIndexBufferCount];
 		GraphicsApiVk::Init(options);
 	    }
+
+	    VkBuffer CreateBuffer(BufferType type, const void* data, uint64_t elementCount);
 
 	    void Init(GraphicsApiOptions* options) override;
 

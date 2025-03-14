@@ -3,6 +3,7 @@
 #include "lepus/gfx/GraphicsEngine/Apis/ApiVk.h"
 
 #include "lepus/gfx/GraphicsEngine/Apis/ApiGL/Types/GLShader.h"
+#include "lepus/gfx/GraphicsEngine/Apis/ApiVk/Types/VkMesh.h"
 
 #include <lepus/gfx/GraphicsEngine/Apis/ApiGL.h>
 #include <lepus/gfx/GraphicsEngine.h>
@@ -124,6 +125,8 @@ class DemoApp : public system::BaseApp
 	options.mainViewport = {width, height};
 	options.windowingPtr = windowing;
 
+	// windowing->SetAsCurrentContext();
+
 	// Create new graphics engine instance
 	gfx::GraphicsEngine engine(&options, windowing);
 
@@ -135,8 +138,8 @@ class DemoApp : public system::BaseApp
 
 	// Load & compile shaders.
 	std::string
-	    vertShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.vert"),
-	    fragShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex.frag"),
+	    vertShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex_GL.vert"),
+	    fragShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex_GL.frag"),
 	    vertShaderSrc2 = system::FileSystem::Read("../../Content/GLSL/Unlit/SolidColour.vert"),
 	    fragShaderSrc2 = system::FileSystem::Read("../../Content/GLSL/Unlit/SolidColour.frag");
 	/*gfx::ShaderCompiledResult
@@ -144,17 +147,18 @@ class DemoApp : public system::BaseApp
 	    fragShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc.c_str(), fragShaderSrc.length(), gfx::FragmentShader),
 	    vertShader2 = gfx::ShaderCompilerGLSL::Singleton().CompileShader(vertShaderSrc2.c_str(), vertShaderSrc2.length(), gfx::VertexShader),
 	    fragShader2 = gfx::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc2.c_str(), fragShaderSrc2.length(), gfx::FragmentShader);
-    */
+
+*/
 	// Register shader with the API.
 	auto& api = engine.GetApi<gfx::GraphicsApiVk>();
 	engine.GetSceneGraph().SetCamera(&m_Camera);
 
 	lepus::gfx::Material baseMaterial, otherMaterial;
-	lepus::gfx::GLShader baseShader(lepus::gfx::ShaderInfo("RGBVertex")), redShader(lepus::gfx::ShaderInfo("SolidColour"));
-	// baseShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader, fragShader));
-	// redShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader2, fragShader2));
+	// lepus::gfx::GLShader baseShader(lepus::gfx::ShaderInfo("RGBVertex")), redShader(lepus::gfx::ShaderInfo("SolidColour"));
+	/*baseShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader, fragShader));
+	redShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader2, fragShader2));
 	baseMaterial.SetShader(&baseShader);
-	otherMaterial.SetShader(&redShader);
+	otherMaterial.SetShader(&redShader);*/
 
 	types::Vector3 baseColour(1.f, 1.f, 1.f);
 	auto baseColourIndex = otherMaterial.Attributes().Add<const types::Vector3&>("colour", baseColour);
@@ -164,11 +168,11 @@ class DemoApp : public system::BaseApp
 	m_Camera.Transform().Origin(m_Camera.Transform().Forward() * -2.f);
 
 	// Instantiate two Renderables in the scene graph, each with its own transform, using the same cube mesh data.
-	auto cubeMesh = engine.CreateMesh(lepus::utility::Primitives::Cube());
-	auto cube = lepus::gfx::Renderable(&cubeMesh, lepus::math::Transform(), baseMaterial);
-	auto cube2 = lepus::gfx::Renderable(&cubeMesh, lepus::math::Transform(), otherMaterial);
-	auto cube3 = lepus::gfx::Renderable(&cubeMesh, lepus::math::Transform(), otherMaterial);
-	auto cube4 = lepus::gfx::Renderable(&cubeMesh, lepus::math::Transform(), baseMaterial);
+	auto cubeMesh = static_cast<lepus::gfx::VkMesh*>(engine.CreateMesh(lepus::utility::Primitives::Cube()));
+	auto cube = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), baseMaterial);
+	auto cube2 = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), otherMaterial);
+	auto cube3 = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), otherMaterial);
+	auto cube4 = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), baseMaterial);
 
 	cube.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -2.f));
 	cube2.GetTransform()->Origin(lepus::types::Vector3(2.f, 0.f, 0.f));
@@ -221,11 +225,11 @@ class DemoApp : public system::BaseApp
 		cube.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), PI * -0.25f));
 	    }
 	    cube.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(0.f, 1.f, 0.f), -deltaTime));
-	    // cube2.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 0.f, 0.f), -deltaTime));
+	    cube2.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 0.f, 0.f), -deltaTime));
 	    cube3.GetTransform()->Rotate(lepus::types::Quaternion(lepus::types::Vector3(1.f, 1.f, 1.f), -deltaTime));
 
 	    // Move the child cube back and forth along the parent's Z-axis
-	    // cube2.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -1.f + ((sinf(runningTime) + 1.f) * 0.5f) * -2.f));
+	    cube2.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -1.f + ((sinf(runningTime) + 1.f) * 0.5f) * -2.f));
 
 	    Tick(deltaTime, keys);
 	    UpdateUniforms(&api);

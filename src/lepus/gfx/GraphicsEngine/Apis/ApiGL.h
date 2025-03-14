@@ -146,7 +146,7 @@ namespace lepus
 
 	    void Shutdown() override;
 
-	    inline engine::objects::Mesh* WrapMesh(engine::objects::Mesh* mesh) override { return mesh; }
+	    inline engine::objects::Mesh* WrapMesh(engine::objects::Mesh* mesh) override { return new GLMesh((void*)mesh->GetVertices(), mesh->VertexBufferSize(), mesh->GetFormat(), (uint32_t*)mesh->GetIndices(), mesh->IndexCount(), false); }
 	};
 
 	template lepus::gfx::GLUniformBinding<void*>* const GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(const char* name);

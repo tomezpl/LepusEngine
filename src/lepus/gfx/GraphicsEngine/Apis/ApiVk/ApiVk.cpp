@@ -4,6 +4,8 @@
 #include "lepus/utility/types/Matrix4x4.h"
 
 #define VMA_IMPLEMENTATION
+#include "Types/VkMesh.h"
+
 #include <lepus/gfx/GraphicsEngine/Apis/ApiVk.h>
 
 // #include <vulkan/vulkan_win32.h>
@@ -240,7 +242,7 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
         false,
         false,
         VK_POLYGON_MODE_FILL,
-        VK_CULL_MODE_NONE,
+        VK_CULL_MODE_FRONT_BIT,
         VK_FRONT_FACE_CLOCKWISE,
         false,
         0,
@@ -298,30 +300,6 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
 
     vkCreateGraphicsPipelines(m_vkDevice, VK_NULL_HANDLE, 1, &pipelineCreateInfo, VK_NULL_HANDLE, &m_vkGraphicsPipeline);
 
-    VkBufferCreateInfo vertBufferCreateInfo = {
-        VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-        VK_NULL_HANDLE,
-        0,
-        sizeof(float) * 3 * 3,
-        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-        VK_SHARING_MODE_EXCLUSIVE,
-        0,
-        VK_NULL_HANDLE};
-
-    VmaAllocationCreateInfo allocCreateInfo = {};
-    allocCreateInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
-    vmaCreateBuffer(m_vmaAllocator, &vertBufferCreateInfo, &allocCreateInfo, &m_vkVertBuffer, &m_vmaAllocation, VK_NULL_HANDLE);
-    m_vkMemory = m_vmaAllocation->GetMemory();
-    float verts[3 * 3] = {
-        -0.75f, 0.75f, .5f,
-        0.75f, 0.75f, .5f,
-        0.f, -0.75f, .5f};
-    void* data;
-    vkMapMemory(m_vkDevice, m_vkMemory, 0, sizeof(float) * 3 * 3, 0, &data);
-    memcpy(data, verts, sizeof(float) * 3 * 3);
-
-    vkUnmapMemory(m_vkDevice, m_vkMemory);
-
     m_vkColourAttachmentInfo = {};
     m_vkColourAttachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
     m_vkColourAttachmentInfo.clearValue = {};
@@ -338,10 +316,99 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     m_vkColourAttachmentInfo.clearValue.color = {{0.f, 0.f, 0.f, 0.f}};
 }
 
+size_t GraphicsApiVk::_EnsureVertBufferCapacity(size_t newCount)
+{
+    if (m_vkVertBufferCount < newCount)
+    {
+	const VkBuffer* temp = m_vkVertBuffers;
+
+	m_vkVertBuffers = new VkBuffer[newCount];
+
+	memset((void*)m_vkVertBuffers, 0, newCount * sizeof(VkBuffer));
+	memcpy((void*)m_vkVertBuffers, temp, m_vkVertBufferCount * sizeof(VkBuffer));
+	m_vkVertBufferCount = newCount;
+
+	delete[] temp;
+    }
+
+    return m_vkVertBufferCount;
+}
+
+size_t GraphicsApiVk::_EnsureIndexBufferCapacity(size_t newCount)
+{
+    if (m_vkIndexBufferCount < newCount)
+    {
+	const VkBuffer* temp = m_vkIndexBuffers;
+
+	m_vkIndexBuffers = new VkBuffer[newCount];
+
+	memset((void*)m_vkIndexBuffers, 0, newCount * sizeof(VkBuffer));
+	memcpy((void*)m_vkIndexBuffers, temp, m_vkIndexBufferCount * sizeof(VkBuffer));
+	m_vkIndexBufferCount = newCount;
+
+	delete[] temp;
+    }
+
+    return m_vkIndexBufferCount;
+}
+
+VkBuffer GraphicsApiVk::CreateBuffer(GraphicsApiVk::BufferType type, const void* vertexOrIndexData, uint64_t vertexCount)
+{
+    size_t bufferIndex = 0;
+    VkBufferCreateInfo bufferCreateInfo = {
+        VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+        VK_NULL_HANDLE,
+        0,
+        vertexCount,
+        VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM,
+        VK_SHARING_MODE_EXCLUSIVE,
+        0,
+        VK_NULL_HANDLE};
+
+    VmaAllocationCreateInfo allocCreateInfo = {};
+    allocCreateInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+
+    VmaAllocationInfo allocInfo = {};
+
+    const VkBuffer* buffers = nullptr;
+
+    switch (type)
+    {
+    case IndexBuffer:
+	buffers = m_vkIndexBuffers;
+	bufferIndex = m_vkIndexBufferCount;
+	_EnsureIndexBufferCapacity(bufferIndex + 1);
+
+	bufferCreateInfo.size *= sizeof(uint64_t);
+	bufferCreateInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+	break;
+    case VertexBuffer:
+	buffers = m_vkVertBuffers;
+	bufferIndex = m_vkVertBufferCount;
+	_EnsureVertBufferCapacity(bufferIndex + 1);
+
+	bufferCreateInfo.size *= sizeof(float) * 3;
+	bufferCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+	break;
+    default:
+	assert(false);
+	break;
+    }
+
+    assert(buffers);
+    vmaCreateBuffer(m_vmaAllocator, &bufferCreateInfo, &allocCreateInfo, (VkBuffer*)&buffers[bufferIndex], &m_vmaAllocation, &allocInfo);
+    m_vkMemory = m_vmaAllocation->GetMemory();
+    void* data;
+    vkMapMemory(m_vkDevice, m_vkMemory, allocInfo.offset, allocInfo.size, 0, &data);
+    memcpy(data, vertexOrIndexData, allocInfo.size);
+    vkUnmapMemory(m_vkDevice, m_vkMemory);
+    return buffers[bufferIndex];
+}
+
 lepus::engine::objects::Mesh* GraphicsApiVk::WrapMesh(engine::objects::Mesh* mesh)
 {
     // TODO: create IBO, VBO etc
-    return mesh;
+    return new lepus::gfx::VkMesh((float*)mesh->GetVertices(), mesh->VertexCount(), mesh->GetIndices(), (uint32_t)mesh->IndexCount(), *this);
 }
 
 void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
@@ -412,11 +479,11 @@ void GraphicsApiVk::UpdateUniforms(const SceneGraph& scene)
     auto camera = scene.Camera();
 
     vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vkGraphicsPipeline);
-    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, 0, sizeof(float) * 4 * 4, camera->BuildPerspectiveMatrix().data());
+    auto proj = camera->BuildPerspectiveMatrix();
+    float aspectRatio = (1.f * (float)m_vkRenderingInfo.renderArea.extent.width) / (1.f * (float)m_vkRenderingInfo.renderArea.extent.height);
+    proj.set<0, 0>(proj.get(0, 0) / aspectRatio);
+    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, 0, sizeof(float) * 4 * 4, proj.data());
     vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, sizeof(float) * 4 * 4, sizeof(float) * 4 * 4, camera->BuildViewMatrix().data());
-    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, 2 * (sizeof(float) * 4 * 4), sizeof(float) * 4 * 4, model.data());
-    size_t offsets = 0;
-    vkCmdBindVertexBuffers(m_CommandBuffer, 0, 1, &m_vkVertBuffer, &offsets);
 }
 
 void GraphicsApiVk::StartDrawing()
@@ -428,7 +495,46 @@ void GraphicsApiVk::StartDrawing()
 
 void GraphicsApiVk::Draw(const SceneGraph& scene)
 {
-    vkCmdDraw(m_CommandBuffer, 3, 1, 0, 0);
+    auto currentNode = scene.Root();
+
+    bool branchComplete = false;
+
+    while (currentNode)
+    {
+	if (!branchComplete && !currentNode->IsRoot())
+	{
+	    const lepus::gfx::Renderable<VkMesh>* renderable = (const lepus::gfx::Renderable<VkMesh>*)(currentNode->GetTransformable());
+	    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayout, VK_SHADER_STAGE_ALL, 2 * (sizeof(float) * 4 * 4), sizeof(float) * 4 * 4, renderable->GetWorldMatrix(currentNode).data());
+	    size_t offsets = 0;
+
+	    const VkBuffer& vertBuffer = renderable->GetMesh()->GetVkVertBuffer();
+	    vkCmdBindVertexBuffers(m_CommandBuffer, 0, 1, &vertBuffer, &offsets);
+	    if (renderable->GetMesh()->IndexCount() > 0)
+	    {
+		vkCmdBindIndexBuffer(m_CommandBuffer, renderable->GetMesh()->GetVkIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
+		vkCmdDrawIndexed(m_CommandBuffer, (uint32_t)renderable->GetMesh()->IndexCount(), 1, 0, 0, 0);
+	    }
+	    else
+	    {
+		vkCmdDraw(m_CommandBuffer, renderable->GetMesh()->GetVertCount(), 1, 0, 0);
+	    }
+	}
+
+	if (!branchComplete && currentNode->FirstChild())
+	{
+	    currentNode = currentNode->FirstChild();
+	}
+	else if (currentNode->NextSibling())
+	{
+	    currentNode = currentNode->NextSibling();
+	    branchComplete = false;
+	}
+	else
+	{
+	    branchComplete = true;
+	    currentNode = currentNode->Parent();
+	}
+    }
 }
 
 void GraphicsApiVk::EndDrawing()
@@ -497,7 +603,14 @@ void GraphicsApiVk::Shutdown()
     vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
     vkDestroyPipelineLayout(m_vkDevice, m_vkGraphicsPipelineLayout, nullptr);
     vkDestroyPipeline(m_vkDevice, m_vkGraphicsPipeline, nullptr);
-    vmaDestroyBuffer(m_vmaAllocator, m_vkVertBuffer, m_vmaAllocation);
+    for (size_t i = 0; i < m_vkVertBufferCount; i++)
+    {
+	if (m_vkVertBuffers[i] != VK_NULL_HANDLE)
+	{
+	    vmaDestroyBuffer(m_vmaAllocator, m_vkVertBuffers[i], m_vmaAllocation);
+	}
+    }
+    delete[] m_vkVertBuffers;
     vmaDestroyAllocator(m_vmaAllocator);
     vkDestroyDevice(m_vkDevice, nullptr);
     vkDestroySurfaceKHR(m_vkInstance, m_vkSurface, nullptr);
