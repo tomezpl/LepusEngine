@@ -46,6 +46,7 @@ void GraphicsApiGL::CreatePipeline()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
     glFrontFace(GL_CCW);
+    glEnable(GL_FRAMEBUFFER_SRGB);
 }
 
 void GraphicsApiGL::UpdateUniforms(const SceneGraph& scene)
@@ -169,7 +170,9 @@ void GraphicsApiGL::Draw(const SceneGraph& scene)
 
 void GraphicsApiGL::ClearFrameBuffer(float r, float g, float b)
 {
-    glClearColor(r, g, b, 1.f);
+    // Adjust for OpenGL's sRGB mapping (gamma correction)
+    const float gamma = 2.2f;
+    glClearColor(powf(r, gamma), powf(g, gamma), powf(b, gamma), 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
