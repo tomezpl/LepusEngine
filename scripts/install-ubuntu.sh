@@ -16,6 +16,10 @@ sudo apt install git
 echo "Installing OpenGL and Xorg dependencies"
 sudo apt install libopengl-dev libgl-dev libgl1-mesa-dev libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev libwayland-dev libxkbcommon-dev pkg-config
 
+# Vulkan
+echo "Installing Vulkan dependencies"
+sudo apt install vulkan-sdk
+
 # VCPKG
 echo "Installing vcpkg"
 git clone https://github.com/microsoft/vcpkg
