@@ -5,6 +5,7 @@
 
 #ifndef WIN32
 #include "vk_mem_alloc.h"
+#include <VkBootstrap.h>
 #else
 #define VK_USE_PLATFORM_WIN32_KHR
 #include <VkBootstrap.h>
