@@ -3,11 +3,11 @@
 
 #include "lepus/gfx/GraphicsEngine/GraphicsApi.h"
 
-#define VK_USE_PLATFORM_WIN32_KHR
-#include <VkBootstrap.h>
 #ifndef WIN32
 #include "vk_mem_alloc.h"
 #else
+#define VK_USE_PLATFORM_WIN32_KHR
+#include <VkBootstrap.h>
 #include <vma/vk_mem_alloc.h>
 #endif
 
