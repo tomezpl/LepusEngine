@@ -6,77 +6,78 @@
 
 class GraphicsApiStub : public lepus::gfx::GraphicsApi
 {
-	private:
-	/// @brief Pointer to a bool that will be set to true upon Shutdown being called.
-	bool* m_ShutdownReceiver = nullptr;
+    private:
+    /// @brief Pointer to a bool that will be set to true upon Shutdown being called.
+    bool* m_ShutdownReceiver = nullptr;
 
-	private:
-	inline void* GetUniformInternal(const char*) override
+    private:
+    inline void* GetUniformInternal(const char*) override
+    {
+	return (void*)nullptr;
+    }
+
+    public:
+    GraphicsApiStub(GraphicsApiStubOptions* options, bool* shutdownReceiver = nullptr)
+    {
+	Init(options);
+
+	m_ShutdownReceiver = shutdownReceiver;
+    }
+
+    void Init(lepus::gfx::GraphicsApiOptions* options) override
+    {
+	InitInternal<GraphicsApiStubOptions>((GraphicsApiStubOptions*)options);
+    }
+
+    void CreatePipeline() override
+    {
+    }
+
+    void Draw(const lepus::gfx::SceneGraph& scene) override
+    {
+    }
+
+    void UpdateUniforms(const lepus::gfx::SceneGraph& scene) override
+    {
+    }
+
+    lepus::engine::objects::Mesh* WrapMesh(lepus::engine::objects::Mesh* mesh) override
+    {
+	return nullptr;
+    }
+
+    void setOptionsTestValue(long long testValue)
+    {
+	GetOptions<GraphicsApiStubOptions>().testValue = testValue;
+    }
+
+    long long getOptionsTestValue()
+    {
+	return GetOptions<GraphicsApiStubOptions>().testValue;
+    }
+
+    void Shutdown() override
+    {
+	GraphicsApi::Shutdown();
+
+	if (m_Options)
 	{
-		return (void*)nullptr;
+	    if (m_ShutdownReceiver)
+	    {
+		*m_ShutdownReceiver = true;
+	    }
+
+	    // TODO: is this cast needed?
+	    delete (GraphicsApiStubOptions*)m_Options;
+	    m_Options = nullptr;
 	}
+    }
 
-	public:
-	GraphicsApiStub(GraphicsApiStubOptions* options, bool* shutdownReceiver = nullptr)
-	{
-		Init(options);
-
-		m_ShutdownReceiver = shutdownReceiver;
-	}
-
-	void Init(lepus::gfx::GraphicsApiOptions* options) override
-	{
-		InitInternal<GraphicsApiStubOptions>((GraphicsApiStubOptions*)options);
-	}
-
-	void CreatePipeline() override
-	{
-
-	}
-
-	void Draw() override
-	{
-
-	}
-
-	void UpdateUniforms() override
-	{
-
-	}
-
-	void setOptionsTestValue(long long testValue)
-	{
-		GetOptions<GraphicsApiStubOptions>().testValue = testValue;
-	}
-
-	long long getOptionsTestValue()
-	{
-		return GetOptions<GraphicsApiStubOptions>().testValue;
-	}
-
-	void Shutdown() override
-	{
-		GraphicsApi::Shutdown();
-
-		if (m_Options)
-		{
-			if (m_ShutdownReceiver)
-			{
-				*m_ShutdownReceiver = true;
-			}
-
-			// TODO: is this cast needed?
-			delete (GraphicsApiStubOptions*)m_Options;
-			m_Options = nullptr;
-		}
-	}
-
-	void ClearFrameBuffer(float r, float g, float b) override
-	{
-		// Do nothing.
-	}
+    void ClearFrameBuffer(float r, float g, float b) override
+    {
+	// Do nothing.
+    }
 };
-
 
 template lepus::gfx::UniformBinding<void*>* const lepus::gfx::GraphicsApi::GetUniform<lepus::gfx::UniformBinding<void*>*>(const char* name);
 
