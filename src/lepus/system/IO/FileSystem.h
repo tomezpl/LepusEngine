@@ -2,6 +2,7 @@
 #define LSYSTEM_IO_FILESYSTEM
 
 #include <fstream>
+#include <cstring>
 
 namespace lepus
 {
