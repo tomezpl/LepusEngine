@@ -29,9 +29,9 @@ namespace lepus
 		    size_t szRead = static_cast<size_t>(reader.gcount());
 
 		    char* temp = new char[size + szRead];
-		    memmove(temp, bytes, size);
+		    memmove((void*)temp, (void*)bytes, size);
 		    delete[] bytes;
-		    memmove(temp + size, buffer, szRead);
+		    memmove((void*)(temp + size), (void*)buffer, szRead);
 		    bytes = temp;
 
 		    size += szRead;
