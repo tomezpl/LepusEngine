@@ -98,42 +98,6 @@ namespace lepus
 		m_AttribValues[index] = value;
 	    }
 
-	    template <>
-	    inline void Set<float>(uint8_t index, float value)
-	    {
-		m_AttribTypes[index] = UniformType::FLOAT;
-		UnsafeSet(index, value);
-	    }
-
-	    template <>
-	    inline void Set<const lepus::math::Matrix4x4&>(uint8_t index, const lepus::math::Matrix4x4& value)
-	    {
-		// Clear existing data
-		if (m_AttribTypes[index] == UniformType::MATRIX4)
-		{
-		    delete[] static_cast<float*>(m_AttribValues[index]);
-		}
-
-		m_AttribValues[index] = new float[4 * 4];
-
-		m_AttribTypes[index] = UniformType::MATRIX4;
-		memcpy((void*)m_AttribValues[index], value.data(), sizeof(float) * 4 * 4);
-	    }
-
-	    template <>
-	    inline void Set<const lepus::types::Vector3&>(uint8_t index, const lepus::types::Vector3& value)
-	    {
-		if (m_AttribTypes[index] == UniformType::VEC3)
-		{
-		    delete[] static_cast<float*>(m_AttribValues[index]);
-		}
-
-		m_AttribValues[index] = new float[3];
-
-		m_AttribTypes[index] = UniformType::VEC3;
-		memcpy((void*)m_AttribValues[index], value.GetData(), sizeof(float) * 3);
-	    }
-
 	    template <typename TValue = void*>
 	    inline TValue Get(uint8_t index) const
 	    {
@@ -173,6 +137,42 @@ namespace lepus
 		m_AttribValues = nullptr;
 	    }
 	};
+
+	template <>
+	inline void MaterialAttributes::Set<float>(uint8_t index, float value)
+	{
+	    m_AttribTypes[index] = UniformType::FLOAT;
+	    UnsafeSet(index, value);
+	}
+
+	template <>
+	inline void MaterialAttributes::Set<const lepus::math::Matrix4x4&>(uint8_t index, const lepus::math::Matrix4x4& value)
+	{
+	    // Clear existing data
+	    if (m_AttribTypes[index] == UniformType::MATRIX4)
+	    {
+		delete[] static_cast<float*>(m_AttribValues[index]);
+	    }
+
+	    m_AttribValues[index] = new float[4 * 4];
+
+	    m_AttribTypes[index] = UniformType::MATRIX4;
+	    memcpy((void*)m_AttribValues[index], value.data(), sizeof(float) * 4 * 4);
+	}
+
+	template <>
+	inline void MaterialAttributes::Set<const lepus::types::Vector3&>(uint8_t index, const lepus::types::Vector3& value)
+	{
+	    if (m_AttribTypes[index] == UniformType::VEC3)
+	    {
+		delete[] static_cast<float*>(m_AttribValues[index]);
+	    }
+
+	    m_AttribValues[index] = new float[3];
+
+	    m_AttribTypes[index] = UniformType::VEC3;
+	    memcpy((void*)m_AttribValues[index], value.GetData(), sizeof(float) * 3);
+	}
 
 	template <>
 	inline float MaterialAttributes::Get<float>(uint8_t index) const
