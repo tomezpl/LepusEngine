@@ -10,7 +10,7 @@ out vec3 vertColor;
 
 void main()
 {
-    gl_Position = PROJ * VIEW * MODEL * vec4(position, 1.0);
+    gl_Position = (PROJ * VIEW * MODEL * vec4(position, 1.0)) * vec4(1.0, -1.0, 1.0, 1.0);
 
     float normalisedIndex = mod(float(gl_VertexID), 3.0f);
     float r = step(normalisedIndex, 0.0f);
