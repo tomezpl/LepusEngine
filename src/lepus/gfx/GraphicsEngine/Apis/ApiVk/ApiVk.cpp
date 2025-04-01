@@ -166,6 +166,7 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     pipelineRenderingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR;
     pipelineRenderingCreateInfo.colorAttachmentCount = 1;
     pipelineRenderingCreateInfo.pColorAttachmentFormats = &colourFormat;
+    pipelineRenderingCreateInfo.depthAttachmentFormat = VK_FORMAT_D32_SFLOAT;
 
     VkGraphicsPipelineCreateInfo pipelineCreateInfo = {};
     pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -314,6 +315,50 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     m_vkRenderingInfo.renderArea.extent = {(uint32_t)width, (uint32_t)height};
 
     m_vkColourAttachmentInfo.clearValue.color = {{0.f, 0.f, 0.f, 0.f}};
+
+    m_vkDepthAttachmentInfo = {};
+    m_vkDepthAttachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+    m_vkDepthAttachmentInfo.clearValue = {};
+    m_vkDepthAttachmentInfo.clearValue.color = {{0.f, 0.f, 0.f, 0.f}};
+    m_vkDepthAttachmentInfo.clearValue.depthStencil = {1.f, 1};
+    m_vkDepthAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    m_vkDepthAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    m_vkDepthAttachmentInfo.resolveMode = VK_RESOLVE_MODE_NONE;
+    m_vkDepthAttachmentInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    VkImageCreateInfo depthBufferCreateInfo = {VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO, nullptr};
+    depthBufferCreateInfo.format = VK_FORMAT_D32_SFLOAT;
+    depthBufferCreateInfo.extent = {(uint32_t)width, (uint32_t)height, 1};
+    depthBufferCreateInfo.flags = 0;
+    depthBufferCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    depthBufferCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+    depthBufferCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    depthBufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    depthBufferCreateInfo.arrayLayers = 1;
+    depthBufferCreateInfo.mipLevels = 1;
+    depthBufferCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+    depthBufferCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    depthBufferCreateInfo.queueFamilyIndexCount = 1;
+    uint32_t queueFamilyIndex = vkbDevice.get_queue_index(vkb::QueueType::graphics).value();
+    depthBufferCreateInfo.pQueueFamilyIndices = &queueFamilyIndex;
+    VmaAllocationCreateInfo depthBufAllocCreateInfo = {};
+    depthBufAllocCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+    vmaCreateImage(m_vmaAllocator, &depthBufferCreateInfo, &depthBufAllocCreateInfo, &m_vkDepthBuffer, &m_vmaDepthBufAllocation, VMA_NULL);
+    // vkCreateImage(m_vkDevice, &depthBufferCreateInfo, VK_NULL_HANDLE, &m_vkDepthBuffer);
+
+    VkImageViewCreateInfo depthBufferViewCreateInfo = {VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO, VK_NULL_HANDLE, 0};
+    depthBufferViewCreateInfo.components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY};
+    depthBufferViewCreateInfo.format = VK_FORMAT_D32_SFLOAT;
+    depthBufferViewCreateInfo.image = m_vkDepthBuffer;
+    depthBufferViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    depthBufferViewCreateInfo.subresourceRange = {
+        VK_IMAGE_ASPECT_DEPTH_BIT,
+        0,
+        1,
+        0,
+        1};
+
+    vkCreateImageView(m_vkDevice, &depthBufferViewCreateInfo, nullptr, &m_vkDepthBufferView);
 }
 
 size_t GraphicsApiVk::_EnsureVertBufferCapacity(size_t newCount)
@@ -426,21 +471,18 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
     vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, nullptr, m_vkFence, &m_CurrentImageIndex);
     vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
 
-    VkImageSubresourceRange ranges;
-    ranges.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    ranges.layerCount = 1;
-    ranges.levelCount = 1;
-    ranges.baseArrayLayer = 0;
-    ranges.baseMipLevel = 0;
-    VkClearColorValue colour = {};
     const float gamma = 2.2f;
     m_vkColourAttachmentInfo.clearValue.color.float32[0] = powf(r, gamma);
     m_vkColourAttachmentInfo.clearValue.color.float32[1] = powf(g, gamma);
     m_vkColourAttachmentInfo.clearValue.color.float32[2] = powf(b, gamma);
     m_vkColourAttachmentInfo.clearValue.color.float32[3] = 0.f;
 
+    m_vkDepthAttachmentInfo.clearValue.depthStencil.depth = 1.0f;
+    m_vkDepthAttachmentInfo.clearValue.depthStencil.stencil = 1;
+
     // m_vkColourAttachmentInfo.clearValue.color = colour;
     m_vkColourAttachmentInfo.imageView = m_ImageViews[m_CurrentImageIndex];
+    m_vkDepthAttachmentInfo.imageView = m_vkDepthBufferView;
 
     m_vkRenderingInfo.pNext = VK_NULL_HANDLE;
     m_vkRenderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
@@ -448,11 +490,12 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
     m_vkRenderingInfo.viewMask = 0;
     m_vkRenderingInfo.colorAttachmentCount = 1;
     m_vkRenderingInfo.pColorAttachments = &m_vkColourAttachmentInfo;
+    m_vkRenderingInfo.pDepthAttachment = &m_vkDepthAttachmentInfo;
 
     VkImageMemoryBarrier imgMemBarrier = {
         VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
         VK_NULL_HANDLE,
-        VK_ACCESS_NONE,
+        0,
         VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
         VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -603,6 +646,7 @@ void GraphicsApiVk::Shutdown()
     vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
     vkDestroyPipelineLayout(m_vkDevice, m_vkGraphicsPipelineLayout, nullptr);
     vkDestroyPipeline(m_vkDevice, m_vkGraphicsPipeline, nullptr);
+    vmaDestroyImage(m_vmaAllocator, m_vkDepthBuffer, m_vmaDepthBufAllocation);
     for (size_t i = 0; i < m_vkVertBufferCount; i++)
     {
 	if (m_vkVertBuffers[i] != VK_NULL_HANDLE)

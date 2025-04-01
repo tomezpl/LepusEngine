@@ -60,8 +60,11 @@ namespace lepus
 	    VkDeviceMemory m_vkMemory;
 	    VmaAllocator m_vmaAllocator;
 	    VmaAllocation m_vmaAllocation;
+	    VmaAllocation m_vmaDepthBufAllocation;
 	    VkRenderingInfo m_vkRenderingInfo;
-	    VkRenderingAttachmentInfo m_vkColourAttachmentInfo;
+	    VkRenderingAttachmentInfo m_vkColourAttachmentInfo, m_vkDepthAttachmentInfo;
+	    VkImage m_vkDepthBuffer;
+	    VkImageView m_vkDepthBufferView;
 
 	    inline void* GetUniformInternal(const char* name) override
 	    {
@@ -108,6 +111,9 @@ namespace lepus
 		m_vmaAllocation = VK_NULL_HANDLE;
 		m_vkRenderingInfo = {};
 		m_vkColourAttachmentInfo = {};
+		m_vkDepthAttachmentInfo = {};
+		m_vkDepthBuffer = VK_NULL_HANDLE;
+		m_vkDepthBufferView = VK_NULL_HANDLE;
 	    }
 
 	    GraphicsApiVk(GraphicsApiOptions* options)
@@ -128,6 +134,9 @@ namespace lepus
 		m_vkIndexBufferCount = 0;
 		m_vkVertBuffers = new VkBuffer[m_vkVertBufferCount];
 		m_vkIndexBuffers = new VkBuffer[m_vkIndexBufferCount];
+		m_vkDepthAttachmentInfo = {};
+		m_vkDepthBuffer = VK_NULL_HANDLE;
+		m_vkDepthBufferView = VK_NULL_HANDLE;
 		GraphicsApiVk::Init(options);
 	    }
 
