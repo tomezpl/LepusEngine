@@ -5,15 +5,15 @@ void GLMesh::_CreateVBO()
 {
     if (GetFormat() != lepus::engine::MeshVertexFormat::Invalid)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glCreateBuffers(1, &m_VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, 0);
-        glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)VertexBufferSize(), GetVertices(), GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glCreateBuffers(1, &m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, nullptr);
+	glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)VertexBufferSize(), GetVertices(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        m_HasVBO = true;
+	m_HasVBO = true;
     }
 }
 

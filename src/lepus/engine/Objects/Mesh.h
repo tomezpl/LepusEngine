@@ -24,7 +24,7 @@ namespace lepus
 	    /// Can be specialised for different parts of the engine (e.g.rendering, physics) by inheriting and adding API-specific logic as needed.
 	    class Mesh
 	    {
-		private:
+		protected:
 		/// @brief The vertex format used by the mesh data.
 		MeshVertexFormat m_Format = MeshVertexFormat::Invalid;
 
@@ -42,7 +42,6 @@ namespace lepus
 		/// @brief Is the Mesh indexed?
 		bool m_IsIndexed = false;
 
-		protected:
 		inline void CopyInternal(const Mesh& other)
 		{
 		    m_Format = other.m_Format;

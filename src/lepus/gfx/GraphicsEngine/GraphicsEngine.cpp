@@ -60,19 +60,41 @@ void GraphicsEngine::Render(const float r, const float g, const float b)
 
 lepus::engine::objects::Mesh* GraphicsEngine::CreateMesh(const utility::Primitive& geometry)
 {
+    lepus::engine::objects::Mesh* createdMesh = nullptr;
+
+    // Need to wrap geometry in a mesh object first (it's OK for this to be on stack, APIs need to copy the data from it anyway)
+    lepus::engine::objects::Mesh tempMesh = lepus::engine::objects::Mesh(geometry, false);
     switch (m_Api->GetOptions<GraphicsApiOptions>().GetType())
     {
     case GraphicsApiUnknown:
 	assert(false);
 	break;
     case GraphicsApiTest:
-	return nullptr;
+	createdMesh = nullptr;
 	break;
     case GraphicsApiOpenGL:
     case GraphicsApiVulkan:
-	return m_Api->WrapMesh(new lepus::engine::objects::Mesh(geometry, true));
+	createdMesh = m_Api->WrapMesh(&tempMesh);
 	break;
     }
 
-    return 0;
+    // Store for resource management
+    if (createdMesh)
+    {
+	m_Resources.meshes.push_front(createdMesh);
+    }
+
+    return createdMesh;
+}
+
+void GraphicsEngine::Dispose()
+{
+    for (auto it = m_Resources.meshes.begin(); it != m_Resources.meshes.end(); ++it)
+    {
+	lepus::engine::objects::Mesh* mesh = *it;
+	mesh->Dispose();
+	delete mesh;
+    }
+
+    m_Resources.meshes.clear();
 }

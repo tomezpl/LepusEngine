@@ -4,6 +4,8 @@
 #include "Camera.h"
 #include "SceneGraph.h"
 #include "GraphicsEngine/GraphicsApi.h"
+
+#include <forward_list>
 #include <lepus/system/Windowing.h>
 #include <lepus/utility/types/String.h>
 #include <lepus/utility/types/Viewport.h>
@@ -29,6 +31,11 @@ namespace lepus
 	    } m_OutputInfo;
 
 	    SceneGraph m_Scene;
+
+	    struct
+	    {
+		std::forward_list<lepus::engine::objects::Mesh*> meshes;
+	    } m_Resources;
 
 	    void _InitDefault()
 	    {
@@ -99,7 +106,11 @@ namespace lepus
 
 	    inline SceneGraph& GetSceneGraph() { return m_Scene; }
 
+	    /// @brief Creates a renderable mesh from provided geometry. The geometry data is copied and an API-specific resource is created for the returned object.
+	    /// @param geometry Primitive object to copy geometry data from.
 	    lepus::engine::objects::Mesh* CreateMesh(const utility::Primitive& geometry);
+
+	    void Dispose();
 	};
     } // namespace gfx
 } // namespace lepus

@@ -248,6 +248,7 @@ class DemoApp : public system::BaseApp
 	    isRunning = windowing->Update();
 	}
 
+	engine.Dispose();
 	Shutdown(windowing);
 
 	return 0;

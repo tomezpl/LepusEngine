@@ -154,6 +154,8 @@ namespace lepus
 		m_ShutdownCalled = true;
 	    }
 
+	    /// @brief Wraps the provided mesh object in an API-specific subclass.
+	    /// @remarks The API implementation MUST by default copy the data from the mesh rather than reference it.
 	    virtual engine::objects::Mesh* WrapMesh(engine::objects::Mesh* mesh) = 0;
 
 	    virtual ~GraphicsApi()
