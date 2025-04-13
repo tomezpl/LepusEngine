@@ -77,6 +77,16 @@ class GraphicsApiStub : public lepus::gfx::GraphicsApi
     {
 	// Do nothing.
     }
+
+    const char* GetShaderFileName(const char* shaderName, lepus::gfx::ShaderStage stage) const override
+    {
+	return shaderName;
+    }
+
+    lepus::engine::ShaderAssetType GetShaderAssetType() const override
+    {
+	return lepus::engine::ShaderAssetTypeInvalid;
+    }
 };
 
 template lepus::gfx::UniformBinding<void*>* const lepus::gfx::GraphicsApi::GetUniform<lepus::gfx::UniformBinding<void*>*>(const char* name);
