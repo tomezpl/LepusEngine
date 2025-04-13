@@ -131,22 +131,6 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     vkCmdBeginRenderingKHR = (PFN_vkCmdBeginRenderingKHR)vkGetInstanceProcAddr(m_vkInstance, "vkCmdBeginRenderingKHR");
     vkCmdEndRenderingKHR = (PFN_vkCmdEndRenderingKHR)vkGetInstanceProcAddr(m_vkInstance, "vkCmdEndRenderingKHR");
 
-    VkPipelineShaderStageCreateInfo pipelineStages[2] = {};
-    pipelineStages[0] = {};
-    pipelineStages[1] = {};
-    pipelineStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    pipelineStages[0].module = m_vkVertShader;
-    pipelineStages[0].pName = "main";
-
-    pipelineStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    pipelineStages[1].module = m_vkFragShader;
-    pipelineStages[1].pName = "main";
-
-    pipelineStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-    pipelineStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    // pipelineStages[1].
-
     m_Defaults.colourFormat = VK_FORMAT_B8G8R8A8_SRGB;
     m_Defaults.pipelineRenderingCreateInfo = {};
     m_Defaults.pipelineRenderingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR;

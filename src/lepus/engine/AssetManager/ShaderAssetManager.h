@@ -48,7 +48,7 @@ namespace lepus
 		// Copy the base path
 		memcpy((void*)path, (void const*)(basePath ? basePath : _DefaultBasePath), numBasePathChars * sizeof(char));
 		// Copy the filename
-		memcpy((void*)(path + numBasePathChars * sizeof(char)), shaderFileName, sizeof(char) * numPathChars);
+		memcpy((void*)(path + numBasePathChars * sizeof(char)), shaderFileName, sizeof(char) * (numPathChars - numBasePathChars));
 		// Set last character to null terminating
 		memset((void*)(path + numPathChars * sizeof(char)), 0, sizeof(char));
 		size_t szData = 0;
