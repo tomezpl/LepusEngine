@@ -12,7 +12,9 @@
 #include <vma/vk_mem_alloc.h>
 #endif
 
+#include "ApiVk/Types/VkShader.h"
 #include "lepus/system/Windowing/GLFW.h"
+#include "lepus/utility/types/List.h"
 
 namespace lepus
 {
@@ -66,6 +68,36 @@ namespace lepus
 	    VkImage m_vkDepthBuffer;
 	    VkImageView m_vkDepthBufferView;
 
+	    struct VulkanDefaults
+	    {
+		VkFormat colourFormat = VK_FORMAT_B8G8R8A8_SRGB;
+		VkPipelineRenderingCreateInfoKHR pipelineRenderingCreateInfo = {};
+		VkGraphicsPipelineCreateInfo pipelineCreateInfo = {};
+		VkVertexInputBindingDescription vertexBinding = {};
+		VkVertexInputAttributeDescription vertexAttributes = {};
+		VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {};
+		VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo = {};
+		VkPipelineTessellationStateCreateInfo tessStateCreateInfo = {};
+		VkPipelineViewportStateCreateInfo viewportStateCreateInfo = {};
+		VkPipelineMultisampleStateCreateInfo msStateCreateInfo = {};
+		VkPipelineRasterizationStateCreateInfo rasterStateCreateInfo = {};
+		VkPipelineColorBlendStateCreateInfo colorBlendStateCreateInfo = {};
+		VkPipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo = {};
+		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
+		VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
+		VkPushConstantRange pushConstantRange = {};
+		VkViewport viewport = {};
+		VkRect2D scissor = {};
+		VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
+	    } m_Defaults;
+
+	    utility::List<VkPipeline> m_vkGraphicsPipelines;
+	    utility::List<VkPipelineLayout> m_vkGraphicsPipelineLayouts;
+	    utility::List<const VkShader*> m_vkGraphicsPipelineMetadata;
+	    size_t m_GraphicsPipelineCount;
+
+	    const char* m_TempShaderNameOut = nullptr;
+
 	    inline void* GetUniformInternal(const char* name) override
 	    {
 		return nullptr;
@@ -79,6 +111,19 @@ namespace lepus
 	    size_t _EnsureVertBufferCapacity(size_t newCount);
 
 	    size_t _EnsureIndexBufferCapacity(size_t newCount);
+
+	    inline size_t findPipelineIndex(const ShaderInfo* shaderInfo)
+	    {
+		for (size_t i = 0; i < m_GraphicsPipelineCount; i++)
+		{
+		    if (m_vkGraphicsPipelineMetadata.Get(i) == shaderInfo)
+		    {
+			return i;
+		    }
+		}
+
+		return SIZE_MAX;
+	    }
 
 	    public:
 	    enum BufferType
@@ -149,7 +194,7 @@ namespace lepus
 	    void StartDrawing() override;
 	    void EndDrawing() override;
 
-	    void CreatePipeline() override {}
+	    void CreatePipeline() override;
 
 	    void UpdateUniforms(const SceneGraph& scene) override;
 
@@ -158,6 +203,18 @@ namespace lepus
 	    void ClearFrameBuffer(float r, float g, float b) override;
 
 	    engine::objects::Mesh* WrapMesh(engine::objects::Mesh* mesh) override;
+
+	    [[nodiscard]] engine::ShaderAssetType GetShaderAssetType() const override
+	    {
+		return engine::ShaderAssetTypeSPV;
+	    }
+
+	    const char* GetShaderFileName(const char* shaderName, ShaderStage stage) const override;
+
+	    inline void AddShader(const VkShader* shader)
+	    {
+		m_GraphicsPipelineCount = m_vkGraphicsPipelineMetadata.Push(shader);
+	    }
 
 	    void Shutdown() override;
 	};

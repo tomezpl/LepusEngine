@@ -38,7 +38,7 @@ namespace lepus
 		                       0);
 	    }
 
-	    inline GLShaderCompiledResult CompileShader(const char* shaderSource, size_t shaderSrcLength, ShaderType type) override
+	    inline GLShaderCompiledResult CompileShader(const void* shaderSource, size_t shaderSrcLength, ShaderStage type) override
 	    {
 		assert(shaderSrcLength <= MAXINT);
 
@@ -46,15 +46,19 @@ namespace lepus
 
 		switch (type)
 		{
-		case VertexShader:
+		case ShaderStageVertex:
 		    shaderType = GL_VERTEX_SHADER;
 		    break;
-		case FragmentShader:
+		case ShaderStageFragment:
 		    shaderType = GL_FRAGMENT_SHADER;
 		    break;
-		case GeometryShader:
-		    shaderType = GL_GEOMETRY_SHADER;
+		case ShaderStageInvalid:
+		default:
+		    assert(false);
 		    break;
+		    // case GeometryShader:
+		    // shaderType = GL_GEOMETRY_SHADER;
+		    // break;
 		}
 
 		GLuint shaderHandle = glCreateShader(shaderType);

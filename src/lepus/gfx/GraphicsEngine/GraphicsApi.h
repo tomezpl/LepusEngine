@@ -6,6 +6,7 @@
 #include <cstring>
 #include <cassert>
 #include "GraphicsApi/BaseBindings.h"
+#include "lepus/engine/AssetManager/ShaderAssetManager.h"
 #include "lepus/engine/Objects/Mesh.h"
 #include "lepus/gfx/SceneGraph.h"
 
@@ -157,6 +158,13 @@ namespace lepus
 	    /// @brief Wraps the provided mesh object in an API-specific subclass.
 	    /// @remarks The API implementation MUST by default copy the data from the mesh rather than reference it.
 	    virtual engine::objects::Mesh* WrapMesh(engine::objects::Mesh* mesh) = 0;
+
+	    /// @brief Returns the API-and-shaderstage-specific filename for a given shader name.
+	    /// @remarks The return value of this function is transient; it is designed to be used for loading shaders using ShaderAssetManager, which copies the filename string.
+	    /// DO NOT use this return value for more than one function call, or if you do, make your own copy of it. This method is not thread-safe.
+	    [[nodiscard]] virtual const char* GetShaderFileName(const char* shaderName, ShaderStage stage) const = 0;
+
+	    [[nodiscard]] virtual engine::ShaderAssetType GetShaderAssetType() const = 0;
 
 	    virtual ~GraphicsApi()
 	    {

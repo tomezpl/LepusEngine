@@ -150,7 +150,19 @@ target_link_libraries(LepusDemo PRIVATE DearImgui LepusGfx LepusUtility LepusEng
 
 # Copy content (models, GLSL, etc.)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Content)
-add_custom_command(TARGET LepusDemo POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Content" ${CMAKE_BINARY_DIR}/Content)
+add_custom_command(TARGET LepusDemo POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Content" ${CMAKE_BINARY_DIR}/Content
+)
+
+file(GLOB_RECURSE shaderSourceFiles RELATIVE ${CMAKE_SOURCE_DIR}/Content/GLSL ${CMAKE_SOURCE_DIR}/Content/GLSL/*.vert ${CMAKE_SOURCE_DIR}/Content/GLSL/*.frag)
+foreach (file ${shaderSourceFiles})
+    string(FIND ${file} "_GL." glSuffix)
+    if (${glSuffix} EQUAL -1)
+        add_custom_command(TARGET LepusDemo POST_BUILD
+                COMMAND ${Vulkan_GLSLC_EXECUTABLE} --target-env=vulkan1.3 -c "${CMAKE_SOURCE_DIR}/Content/GLSL/${file}" -o "${CMAKE_BINARY_DIR}/Content/GLSL/${file}.spv"
+        )
+    endif ()
+endforeach ()
 
 # Unit testing framework
 FetchContent_Declare(

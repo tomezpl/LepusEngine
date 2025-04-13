@@ -73,7 +73,6 @@ namespace lepus
 	{
 	    friend class GraphicsApiGLOptions;
 
-	    private:
 	    struct
 	    {
 		/// @brief Handle to the vertex array objects.
@@ -145,6 +144,13 @@ namespace lepus
 	    void SwapBuffers() override {}
 
 	    void Shutdown() override;
+
+	    const char* GetShaderFileName(const char* shaderName, ShaderStage stage) const override;
+
+	    [[nodiscard]] engine::ShaderAssetType GetShaderAssetType() const override
+	    {
+		return engine::ShaderAssetTypeGLSL;
+	    }
 
 	    inline engine::objects::Mesh* WrapMesh(engine::objects::Mesh* mesh) override { return new GLMesh((void*)mesh->GetVertices(), mesh->VertexBufferSize(), mesh->GetFormat(), (uint32_t*)mesh->GetIndices(), mesh->IndexCount(), true); }
 	};

@@ -34,6 +34,40 @@ void GraphicsApiGL::SetupUniforms()
 {
 }
 
+static char shaderFileNameBuffer[UINT16_MAX];
+
+const char* GraphicsApiGL::GetShaderFileName(const char* shaderName, ShaderStage stage) const
+{
+    assert(stage != ShaderStage::ShaderStageInvalid);
+
+    const char vertShaderSuffix[] = "GL.vert";
+    const char fragShaderSuffix[] = "GL.frag";
+
+    const char* suffixPtr = nullptr;
+    size_t suffixBytes = 0;
+    switch (stage)
+    {
+    case ShaderStageVertex:
+	suffixPtr = vertShaderSuffix;
+	suffixBytes = sizeof(vertShaderSuffix);
+	break;
+    case ShaderStageFragment:
+	suffixPtr = fragShaderSuffix;
+	suffixBytes = sizeof(fragShaderSuffix);
+	break;
+    case ShaderStageInvalid:
+    default:
+	assert(false);
+	break;
+    }
+
+    size_t shaderNameLength = strlen(shaderName);
+    memcpy((void*)shaderFileNameBuffer, shaderName, sizeof(char) * shaderNameLength);
+    memcpy((void*)(shaderFileNameBuffer + shaderNameLength * sizeof(char)), suffixPtr, suffixBytes);
+
+    return shaderFileNameBuffer;
+}
+
 void GraphicsApiGL::CreatePipeline()
 {
     SetupVertexArrays();

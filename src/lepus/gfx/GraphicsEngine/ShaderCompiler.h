@@ -1,19 +1,14 @@
 #ifndef L3D_GRAPHICSENGINE_SHADERCOMPILER
 #define L3D_GRAPHICSENGINE_SHADERCOMPILER
 
+#include "lepus/gfx/Shader.h"
+
 #include <stddef.h>
 
 namespace lepus
 {
     namespace gfx
     {
-	enum ShaderType
-	{
-	    FragmentShader,
-	    VertexShader,
-	    GeometryShader
-	};
-
 	template <typename TShaderHandle>
 	class ShaderCompiledResult
 	{
@@ -34,7 +29,7 @@ namespace lepus
 	{
 	    public:
 	    virtual void Init() = 0;
-	    virtual ShaderCompiledResult<TShaderHandle> CompileShader(const char* shaderSource, size_t shaderSourceLength, ShaderType type) = 0;
+	    virtual ShaderCompiledResult<TShaderHandle> CompileShader(const void* shaderSource, size_t shaderSourceLength, ShaderStage type) = 0;
 
 	    virtual ~ShaderCompiler()
 	    {

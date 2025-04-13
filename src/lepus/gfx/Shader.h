@@ -7,11 +7,19 @@ namespace lepus
 {
     namespace gfx
     {
+	enum ShaderStage
+	{
+	    ShaderStageInvalid = 0,
+	    ShaderStageVertex = 1 << 0,
+	    ShaderStageFragment = 1 << 1
+	};
+
 	/// @brief A base class for any shader. Defines metadata about the shader, such as its name.
 	class ShaderInfo
 	{
 	    private:
 	    const char* m_ShaderName;
+	    ShaderStage m_ShaderStages = ShaderStage::ShaderStageInvalid;
 
 	    protected:
 	    inline void _InitShaderName(const char* shaderName)
@@ -21,9 +29,10 @@ namespace lepus
 	    }
 
 	    public:
-	    explicit ShaderInfo(const char* shaderName)
+	    explicit ShaderInfo(const char* shaderName, ShaderStage shaderStageUnion)
 	    {
 		_InitShaderName(shaderName);
+		m_ShaderStages = shaderStageUnion;
 	    }
 
 	    ShaderInfo(ShaderInfo&& other)
@@ -65,7 +74,7 @@ namespace lepus
 	class Shader : public ShaderInfo
 	{
 	    public:
-	    virtual TApiNativeShaderHandle GetApiHandle() = 0;
+	    virtual TApiNativeShaderHandle GetApiHandle() const = 0;
 
 	    explicit Shader(ShaderInfo&& other)
 	        : ShaderInfo(std::move(other))
@@ -83,6 +92,8 @@ namespace lepus
 		return *this;
 	    }
 	};
+
+	typedef Shader<void*> AnyShader;
     } // namespace gfx
 } // namespace lepus
 

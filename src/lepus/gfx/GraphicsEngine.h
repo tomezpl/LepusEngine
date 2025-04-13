@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "SceneGraph.h"
 #include "GraphicsEngine/GraphicsApi.h"
+#include "lepus/utility/types/List.h"
 
 #include <forward_list>
 #include <lepus/system/Windowing.h>
@@ -35,6 +36,7 @@ namespace lepus
 	    struct
 	    {
 		std::forward_list<lepus::engine::objects::Mesh*> meshes;
+		utility::List<AnyShader*>* shaders;
 	    } m_Resources;
 
 	    void _InitDefault()
@@ -83,7 +85,14 @@ namespace lepus
 		return *((TGraphicsApi*)m_Api);
 	    }
 
+	    inline GraphicsApi* GetApi()
+	    {
+		return m_Api;
+	    }
+
 	    void Setup();
+
+	    const AnyShader* RegisterShader(const char* name, const engine::ShaderAsset& vertexShader, const engine::ShaderAsset& fragmentShader);
 
 	    /// @brief Renders the scene and performs buffer swap to display the results in the window.
 	    /// @tparam T Numerical type used for the solid clear colour.

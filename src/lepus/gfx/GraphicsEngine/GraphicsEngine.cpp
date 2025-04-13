@@ -4,6 +4,9 @@
 #include "../GraphicsEngine.h"
 #include "Apis.h"
 #include "Apis/ApiVk.h"
+#include "Apis/ApiGL/Types/GLShader.h"
+#include "Apis/ApiVk/Types/VkShader.h"
+#include "ShaderCompilers/ShaderCompilerVk.h"
 
 using namespace lepus::gfx;
 
@@ -24,9 +27,11 @@ void GraphicsEngine::InitApi(GraphicsApiOptions* options)
     {
     case GraphicsApiType::GraphicsApiOpenGL:
 	m_Api = new GraphicsApiGL(*static_cast<GraphicsApiGLOptions*>(options));
+	m_Resources.shaders = (utility::List<AnyShader*>*)(new utility::List<GLShader*>());
 	break;
     case GraphicsApiType::GraphicsApiVulkan:
 	m_Api = new GraphicsApiVk(options);
+	m_Resources.shaders = (utility::List<AnyShader*>*)(new utility::List<VkShader*>());
 	// TODO
 	break;
     case GraphicsApiType::GraphicsApiTest:
@@ -85,6 +90,44 @@ lepus::engine::objects::Mesh* GraphicsEngine::CreateMesh(const utility::Primitiv
     }
 
     return createdMesh;
+}
+
+const AnyShader* GraphicsEngine::RegisterShader(const char* name, const engine::ShaderAsset& vertexShader, const engine::ShaderAsset& fragmentShader)
+{
+    auto apiKind = m_Api->GetOptions<GraphicsApiOptions>().GetType();
+    ShaderInfo info = ShaderInfo(name, static_cast<ShaderStage>(ShaderStageVertex | ShaderStageFragment));
+
+    // Both shader assets need to be of the same target API type
+    assert(vertexShader.type == fragmentShader.type);
+    // Shader target API needs to match the engine's backend
+    assert((apiKind == GraphicsApiVulkan && vertexShader.type == engine::ShaderAssetTypeSPV) || (apiKind == GraphicsApiOpenGL && vertexShader.type == engine::ShaderAssetTypeGLSL));
+
+    auto& spirvCompiler = ShaderCompilerVk::Singleton();
+
+    AnyShader* newShader = nullptr;
+
+    switch (apiKind)
+    {
+    case GraphicsApiOpenGL:
+	newShader = (AnyShader*)(new GLShader(info));
+	((GLShader*)newShader)->SetGLProgram(ShaderCompilerGLSL::Singleton().BuildProgram(ShaderCompilerGLSL::Singleton().CompileShader(fragmentShader.data, fragmentShader.szData, ShaderStageFragment), ShaderCompilerGLSL::Singleton().CompileShader(vertexShader.data, vertexShader.szData, ShaderStageVertex)));
+	break;
+    case GraphicsApiVulkan:
+	newShader = (AnyShader*)(new VkShader(info));
+	((VkShader*)newShader)->SetShaderModule(spirvCompiler.CompileShader(fragmentShader.data, fragmentShader.szData, ShaderStageFragment).ShaderHandle, ShaderStageFragment);
+	((VkShader*)newShader)->SetShaderModule(spirvCompiler.CompileShader(vertexShader.data, vertexShader.szData, ShaderStageVertex).ShaderHandle, ShaderStageVertex);
+	static_cast<GraphicsApiVk*>(m_Api)->AddShader((VkShader*)newShader);
+	break;
+    case GraphicsApiTest:
+    case GraphicsApiUnknown:
+    default:
+	assert(false);
+	break;
+    }
+
+    assert(newShader != nullptr);
+    m_Resources.shaders->Push(newShader);
+    return newShader;
 }
 
 void GraphicsEngine::Dispose()

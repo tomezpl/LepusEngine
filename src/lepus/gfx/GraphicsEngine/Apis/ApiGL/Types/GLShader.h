@@ -14,7 +14,7 @@ namespace lepus
 	    GLuint m_Program;
 
 	    public:
-	    GLuint GetApiHandle() override
+	    [[nodiscard]] GLuint GetApiHandle() const override
 	    {
 		return this->m_Program;
 	    }

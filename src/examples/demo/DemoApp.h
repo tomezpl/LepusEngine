@@ -1,4 +1,6 @@
 
+#include "lepus/engine/AssetManager.h"
+
 #include <lepus/system/Windowing/GLFW.h>
 #include "lepus/gfx/GraphicsEngine/Apis/ApiVk.h"
 
@@ -130,18 +132,26 @@ class DemoApp : public system::BaseApp
 	// Create new graphics engine instance
 	gfx::GraphicsEngine engine(&options, windowing);
 
+	auto api = engine.GetApi();
+
 	// Termination condition for main loop
 	bool isRunning = true;
 
 	// Output start message to console
 	engine::ConsoleLogger::Global().LogInfo("", "main", "Demo starting!");
 
+	// Get shader source
+	auto shaderAssetType = api->GetShaderAssetType();
+	auto& shaderManager = engine::AssetManager::Singleton().Shaders();
+	auto rgbIndexVertShader = shaderManager.AddShader(api->GetShaderFileName("Unlit/RGBVertex", gfx::ShaderStageVertex), shaderAssetType);
+	auto rgbIndexFragShader = shaderManager.AddShader(api->GetShaderFileName("Unlit/RGBVertex", gfx::ShaderStageFragment), shaderAssetType);
+
 	// Load & compile shaders.
-	std::string
-	    vertShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex_GL.vert"),
-	    fragShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex_GL.frag"),
-	    vertShaderSrc2 = system::FileSystem::Read("../../Content/GLSL/Unlit/SolidColour.vert"),
-	    fragShaderSrc2 = system::FileSystem::Read("../../Content/GLSL/Unlit/SolidColour.frag");
+	// std::string
+	//     vertShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex_GL.vert"),
+	//     fragShaderSrc = system::FileSystem::Read("../../Content/GLSL/Unlit/RGBVertex_GL.frag"),
+	//     vertShaderSrc2 = system::FileSystem::Read("../../Content/GLSL/Unlit/SolidColour.vert"),
+	//     fragShaderSrc2 = system::FileSystem::Read("../../Content/GLSL/Unlit/SolidColour.frag");
 	// gfx::ShaderCompiledResult
 	//     vertShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(vertShaderSrc.c_str(), vertShaderSrc.length(), gfx::VertexShader),
 	//     fragShader = gfx::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc.c_str(), fragShaderSrc.length(), gfx::FragmentShader),
@@ -149,25 +159,27 @@ class DemoApp : public system::BaseApp
 	//     fragShader2 = gfx::ShaderCompilerGLSL::Singleton().CompileShader(fragShaderSrc2.c_str(), fragShaderSrc2.length(), gfx::FragmentShader);
 
 	// Register shader with the API.
-	auto& api = engine.GetApi<gfx::GraphicsApiVk>();
-	engine.GetSceneGraph().SetCamera(&m_Camera);
+	const gfx::AnyShader* rgbVertexShader = engine.RegisterShader("RGBVertex", rgbIndexVertShader, rgbIndexFragShader);
 
 	lepus::gfx::Material baseMaterial, otherMaterial;
-	lepus::gfx::GLShader baseShader(lepus::gfx::ShaderInfo("RGBVertex")), redShader(lepus::gfx::ShaderInfo("SolidColour"));
+	// const auto shaderStages = static_cast<gfx::ShaderStage>(gfx::ShaderStage::ShaderStageFragment | gfx::ShaderStage::ShaderStageVertex);
+	// lepus::gfx::GLShader baseShader(lepus::gfx::ShaderInfo("RGBVertex", shaderStages)), redShader(lepus::gfx::ShaderInfo("SolidColour", shaderStages));
 	// baseShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader, fragShader));
 	// redShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader2, fragShader2));
-	baseMaterial.SetShader(&baseShader);
-	otherMaterial.SetShader(&redShader);
+	baseMaterial.SetShader(rgbVertexShader);
+	otherMaterial.SetShader(rgbVertexShader);
 
-	types::Vector3 baseColour(1.f, 1.f, 1.f);
-	auto baseColourIndex = otherMaterial.Attributes().Add<const types::Vector3&>("colour", baseColour);
+	// types::Vector3 baseColour(1.f, 1.f, 1.f);
+	// auto baseColourIndex = otherMaterial.Attributes().Add<const types::Vector3&>("colour", baseColour);
+
+	engine.GetSceneGraph().SetCamera(&m_Camera);
 
 	// Set up engine for drawing.
 	engine.Setup();
 	m_Camera.Transform().Origin(m_Camera.Transform().Forward() * -2.f);
 
 	// Instantiate two Renderables in the scene graph, each with its own transform, using the same cube mesh data.
-	auto cubeMesh = static_cast<lepus::gfx::VkMesh*>(engine.CreateMesh(lepus::utility::Primitives::Cube()));
+	auto cubeMesh = engine.CreateMesh(lepus::utility::Primitives::Cube());
 	auto cube = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), baseMaterial);
 	auto cube2 = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), otherMaterial);
 	auto cube3 = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), otherMaterial);
@@ -231,13 +243,13 @@ class DemoApp : public system::BaseApp
 	    cube2.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -1.f + ((sinf(runningTime) + 1.f) * 0.5f) * -2.f));
 
 	    Tick(deltaTime, keys);
-	    UpdateUniforms(&api);
+	    UpdateUniforms(api);
 
-	    baseColour.x(sinf(runningTime));
-	    baseColour.y(cosf(runningTime));
-	    baseColour.z(baseColour.x() * baseColour.y());
+	    // baseColour.x(sinf(runningTime));
+	    // baseColour.y(cosf(runningTime));
+	    // baseColour.z(baseColour.x() * baseColour.y());
 
-	    otherMaterial.Attributes().Set<const types::Vector3&>(baseColourIndex, baseColour);
+	    // otherMaterial.Attributes().Set<const types::Vector3&>(baseColourIndex, baseColour);
 
 	    engine.Render<unsigned char, gfx::GraphicsEngine::PixelFormat::RGBA32>(100, 149, 237);
 
