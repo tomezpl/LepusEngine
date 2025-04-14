@@ -3,6 +3,7 @@
 #include "lepus/system/IO/FileSystem.h"
 
 #include <cassert>
+#include <cstdint>
 
 using namespace lepus::engine;
 const char* const ShaderAssetManager::_DefaultBasePath = "../../Content/GLSL/";
