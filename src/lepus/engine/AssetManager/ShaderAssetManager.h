@@ -3,6 +3,8 @@
 #include "IAssetManager.h"
 
 #include <forward_list>
+#include <cstring>
+#include <cstdlib>
 
 namespace lepus
 {
