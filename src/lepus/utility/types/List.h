@@ -77,7 +77,7 @@ namespace lepus
 		size_t slice = (m_Elements - index) - 1;
 		if (slice)
 		{
-		    memcpy(m_Data + index * m_ElementSize, m_Data + (index + 1 * m_ElementSize), slice * m_ElementSize);
+		    memmove(m_Data + index, m_Data + index + 1, slice * m_ElementSize);
 		}
 
 		return --m_Elements;
