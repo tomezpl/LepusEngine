@@ -15,7 +15,7 @@ const char* LoadGLSLStringFromDisk(const char* path, size_t& size)
     size_t stringLength = loadedString.length();
     const char* const stringCopy = new char[stringLength + 1];
     loadedString.copy((char*)stringCopy, stringLength);
-    memset((void*)(stringCopy + stringLength * sizeof(char)), 0, sizeof(char));
+    memset((void*)(stringCopy + stringLength), 0, sizeof(char));
     size = (stringLength + 1) * sizeof(char);
     return stringCopy;
 }
