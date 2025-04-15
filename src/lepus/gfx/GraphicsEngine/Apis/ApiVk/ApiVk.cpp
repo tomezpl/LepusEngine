@@ -4,6 +4,7 @@
 #include "lepus/utility/types/Matrix4x4.h"
 
 #define VMA_IMPLEMENTATION
+#include "Types/VkBufferAlloc.h"
 #include "Types/VkMesh.h"
 #include "Types/VkShader.h"
 #include "lepus/gfx/GraphicsEngine/ShaderCompilers/ShaderCompilerVk.h"
@@ -333,45 +334,8 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     vkCreateImageView(m_vkDevice, &depthBufferViewCreateInfo, nullptr, &m_vkDepthBufferView);
 }
 
-size_t GraphicsApiVk::_EnsureVertBufferCapacity(size_t newCount)
-{
-    if (m_vkVertBufferCount < newCount)
-    {
-	const VkBuffer* temp = m_vkVertBuffers;
-
-	m_vkVertBuffers = new VkBuffer[newCount];
-
-	memset((void*)m_vkVertBuffers, 0, newCount * sizeof(VkBuffer));
-	memcpy((void*)m_vkVertBuffers, temp, m_vkVertBufferCount * sizeof(VkBuffer));
-	m_vkVertBufferCount = newCount;
-
-	delete[] temp;
-    }
-
-    return m_vkVertBufferCount;
-}
-
-size_t GraphicsApiVk::_EnsureIndexBufferCapacity(size_t newCount)
-{
-    if (m_vkIndexBufferCount < newCount)
-    {
-	const VkBuffer* temp = m_vkIndexBuffers;
-
-	m_vkIndexBuffers = new VkBuffer[newCount];
-
-	memset((void*)m_vkIndexBuffers, 0, newCount * sizeof(VkBuffer));
-	memcpy((void*)m_vkIndexBuffers, temp, m_vkIndexBufferCount * sizeof(VkBuffer));
-	m_vkIndexBufferCount = newCount;
-
-	delete[] temp;
-    }
-
-    return m_vkIndexBufferCount;
-}
-
 VkBuffer GraphicsApiVk::CreateBuffer(GraphicsApiVk::BufferType type, const void* vertexOrIndexData, uint64_t vertexCount)
 {
-    size_t bufferIndex = 0;
     VkBufferCreateInfo bufferCreateInfo = {
         VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
         VK_NULL_HANDLE,
@@ -387,23 +351,18 @@ VkBuffer GraphicsApiVk::CreateBuffer(GraphicsApiVk::BufferType type, const void*
 
     VmaAllocationInfo allocInfo = {};
 
-    const VkBuffer* buffers = nullptr;
+    VkBuffer bufferHandle = VK_NULL_HANDLE;
+    utility::List<VkBufferAlloc>* buffers = nullptr;
 
     switch (type)
     {
     case IndexBuffer:
-	buffers = m_vkIndexBuffers;
-	bufferIndex = m_vkIndexBufferCount;
-	_EnsureIndexBufferCapacity(bufferIndex + 1);
-
 	bufferCreateInfo.size *= sizeof(uint64_t);
+	buffers = &m_vkIndexBuffers;
 	bufferCreateInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 	break;
     case VertexBuffer:
-	buffers = m_vkVertBuffers;
-	bufferIndex = m_vkVertBufferCount;
-	_EnsureVertBufferCapacity(bufferIndex + 1);
-
+	buffers = &m_vkVertBuffers;
 	bufferCreateInfo.size *= sizeof(float) * 3;
 	bufferCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 	break;
@@ -413,13 +372,15 @@ VkBuffer GraphicsApiVk::CreateBuffer(GraphicsApiVk::BufferType type, const void*
     }
 
     assert(buffers);
-    vmaCreateBuffer(m_vmaAllocator, &bufferCreateInfo, &allocCreateInfo, (VkBuffer*)&buffers[bufferIndex], &m_vmaAllocation, &allocInfo);
-    m_vkMemory = m_vmaAllocation->GetMemory();
+    VmaAllocation allocation = nullptr;
+    vmaCreateBuffer(m_vmaAllocator, &bufferCreateInfo, &allocCreateInfo, &bufferHandle, &allocation, &allocInfo);
+    buffers->Push({bufferHandle, allocation});
+    m_vkMemory = allocation->GetMemory();
     void* data;
     vkMapMemory(m_vkDevice, m_vkMemory, allocInfo.offset, allocInfo.size, 0, &data);
     memcpy(data, vertexOrIndexData, allocInfo.size);
     vkUnmapMemory(m_vkDevice, m_vkMemory);
-    return buffers[bufferIndex];
+    return bufferHandle;
 }
 
 lepus::engine::objects::Mesh* GraphicsApiVk::WrapMesh(engine::objects::Mesh* mesh)
@@ -628,14 +589,22 @@ void GraphicsApiVk::Shutdown()
     vkDestroyPipelineLayout(m_vkDevice, m_vkGraphicsPipelineLayout, nullptr);
     vkDestroyPipeline(m_vkDevice, m_vkGraphicsPipeline, nullptr);
     vmaDestroyImage(m_vmaAllocator, m_vkDepthBuffer, m_vmaDepthBufAllocation);
-    for (size_t i = 0; i < m_vkVertBufferCount; i++)
+    for (size_t i = 0; i < m_vkVertBuffers.Count(); i++)
     {
-	if (m_vkVertBuffers[i] != VK_NULL_HANDLE)
+	const VkBufferAlloc& vertBufAlloc = m_vkVertBuffers.Get(i);
+	if (vertBufAlloc.buffer != VK_NULL_HANDLE)
 	{
-	    vmaDestroyBuffer(m_vmaAllocator, m_vkVertBuffers[i], m_vmaAllocation);
+	    vmaDestroyBuffer(m_vmaAllocator, vertBufAlloc.buffer, vertBufAlloc.allocation);
 	}
     }
-    delete[] m_vkVertBuffers;
+    for (size_t i = 0; i < m_vkIndexBuffers.Count(); i++)
+    {
+	const VkBufferAlloc& indexBufAlloc = m_vkVertBuffers.Get(i);
+	if (indexBufAlloc.buffer != VK_NULL_HANDLE)
+	{
+	    vmaDestroyBuffer(m_vmaAllocator, indexBufAlloc.buffer, indexBufAlloc.allocation);
+	}
+    }
     vmaDestroyAllocator(m_vmaAllocator);
     vkDestroyDevice(m_vkDevice, nullptr);
     vkDestroySurfaceKHR(m_vkInstance, m_vkSurface, nullptr);

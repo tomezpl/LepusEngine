@@ -51,10 +51,10 @@ namespace lepus
 	class GraphicsApi
 	{
 	    private:
-	    bool m_ShutdownCalled;
+	    bool m_ShutdownCalled{false};
 
 	    protected:
-	    GraphicsApiOptions* m_Options;
+	    GraphicsApiOptions* m_Options{nullptr};
 
 	    protected:
 	    /// @brief Performs internal, boilerplate setup for all API wrappers.
@@ -78,13 +78,10 @@ namespace lepus
 	    /// @brief Default constructor. Does nothing, so Init(GraphicsApiOptions*) needs to be called manually.
 	    GraphicsApi()
 	    {
-		m_Options = nullptr;
-		m_ShutdownCalled = false;
 	    }
 
 	    GraphicsApi(GraphicsApiOptions* options)
 	    {
-		m_Options = nullptr;
 		GraphicsApi::Init(options);
 	    }
 
@@ -101,7 +98,6 @@ namespace lepus
 		assert(options == nullptr);
 
 		InitInternal(options);
-		m_ShutdownCalled = false;
 	    }
 
 	    /// @brief Obtains the options object this GraphicsApi was initialised with.

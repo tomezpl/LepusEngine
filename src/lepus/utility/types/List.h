@@ -45,16 +45,21 @@ namespace lepus
 	    }
 
 	    template <size_t index>
-	    inline TElement& Get()
+	    inline TElement& Get() const
 	    {
 		assert(index < m_Elements);
 		return m_Data[index];
 	    }
 
-	    inline TElement& Get(size_t index)
+	    inline TElement& Get(size_t index) const
 	    {
 		assert(index < m_Elements);
 		return m_Data[index];
+	    }
+
+	    inline TElement* Raw()
+	    {
+		return m_Data;
 	    }
 
 	    inline size_t Push(const TElement& element)
