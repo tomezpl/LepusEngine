@@ -40,8 +40,8 @@ const char* GraphicsApiGL::GetShaderFileName(const char* shaderName, ShaderStage
 {
     assert(stage != ShaderStage::ShaderStageInvalid);
 
-    const char vertShaderSuffix[] = "GL.vert";
-    const char fragShaderSuffix[] = "GL.frag";
+    const char vertShaderSuffix[] = "_GL.vert";
+    const char fragShaderSuffix[] = "_GL.frag";
 
     const char* suffixPtr = nullptr;
     size_t suffixBytes = 0;
