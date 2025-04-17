@@ -9,6 +9,8 @@ namespace lepus
 {
     namespace gfx
     {
+	class GraphicsApiVk;
+
 	class VkShader : public Shader<const VkPipelineShaderStageCreateInfo*>
 	{
 	    private:
