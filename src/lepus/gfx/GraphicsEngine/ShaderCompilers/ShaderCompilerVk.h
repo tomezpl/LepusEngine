@@ -19,6 +19,11 @@ namespace lepus
 	    VkDevice m_vkDevice;
 
 	    public:
+	    static constexpr size_t ShaderStageCount()
+	    {
+		return 2;
+	    }
+
 	    // Inherited via ShaderCompiler
 	    virtual void Init() override
 	    {

@@ -9,15 +9,13 @@
 #include "Types/VkShader.h"
 #include "lepus/gfx/GraphicsEngine/ShaderCompilers/ShaderCompilerVk.h"
 
+#include <iostream>
 #include <lepus/gfx/GraphicsEngine/Apis/ApiVk.h>
-
-// #include <vulkan/vulkan_win32.h>
 
 using namespace lepus::gfx;
 
 void GraphicsApiVk::Init(GraphicsApiOptions* options)
 {
-
     GraphicsApiVkOptions* vkOptions = static_cast<GraphicsApiVkOptions*>(options);
     InitInternal(vkOptions);
 
@@ -29,15 +27,6 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     // Create surface from window
     GLFWwindow* window = static_cast<GLFWwindow*>(vkOptions->windowingPtr->GetWindowPtr());
     glfwCreateWindowSurface(vkbInstance.instance, window, nullptr, &m_vkSurface);
-    // HWND hwnd = glfwGetWin32Window(window);
-    // HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWLP_HINSTANCE);
-    /*    VkWin32SurfaceCreateInfoKHR createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-        createInfo.flags = 0;
-        createInfo.pNext = nullptr;
-        createInfo.hinstance = hInstance;
-        createInfo.hwnd = hwnd;
-        vkCreateWin32SurfaceKHR(vkbInstance.instance, &createInfo, nullptr, &_vkSurface);*/
 
     vkb::PhysicalDeviceSelector deviceSelector(vkbInstance);
 
@@ -249,13 +238,7 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
         false,
         false};
     m_Defaults.pipelineCreateInfo.pDepthStencilState = &m_Defaults.depthStencilStateCreateInfo;
-    // VkDescriptorSetLayoutBinding setLayoutBinding = {
-    //     0,
-    //     VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,
-    //     1,
-    //     VK_SHADER_STAGE_ALL,
-    //
-    // } VkDescriptorSetLayoutCreateInfo setLayoutCreateInfo = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, VK_NULL_HANDLE, 0, 1, &setLayoutBinding};
+
     m_Defaults.pushConstantRange = {
         VK_SHADER_STAGE_ALL,
         0,
@@ -271,8 +254,6 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     vkCreatePipelineLayout(m_vkDevice, &m_Defaults.pipelineLayoutCreateInfo, nullptr, &m_Defaults.pipelineLayout);
     m_Defaults.pipelineCreateInfo.layout = m_Defaults.pipelineLayout;
     m_Defaults.pipelineCreateInfo.pNext = &m_Defaults.pipelineRenderingCreateInfo;
-
-    // vkCreateGraphicsPipelines(m_vkDevice, VK_NULL_HANDLE, 1, &pipelineCreateInfo, VK_NULL_HANDLE, &m_vkGraphicsPipeline);
 
     m_vkColourAttachmentInfo = {};
     m_vkColourAttachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
@@ -317,7 +298,6 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     VmaAllocationCreateInfo depthBufAllocCreateInfo = {};
     depthBufAllocCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
     vmaCreateImage(m_vmaAllocator, &depthBufferCreateInfo, &depthBufAllocCreateInfo, &m_vkDepthBuffer, &m_vmaDepthBufAllocation, VMA_NULL);
-    // vkCreateImage(m_vkDevice, &depthBufferCreateInfo, VK_NULL_HANDLE, &m_vkDepthBuffer);
 
     VkImageViewCreateInfo depthBufferViewCreateInfo = {VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO, VK_NULL_HANDLE, 0};
     depthBufferViewCreateInfo.components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY};
@@ -376,26 +356,28 @@ VkBuffer GraphicsApiVk::CreateBuffer(GraphicsApiVk::BufferType type, const void*
     vmaCreateBuffer(m_vmaAllocator, &bufferCreateInfo, &allocCreateInfo, &bufferHandle, &allocation, &allocInfo);
     buffers->Push({bufferHandle, allocation});
     m_vkMemory = allocation->GetMemory();
+
+    // Get pointer to the mapped memory and upload the vertex/index data
     void* data;
     vkMapMemory(m_vkDevice, m_vkMemory, allocInfo.offset, allocInfo.size, 0, &data);
     memcpy(data, vertexOrIndexData, allocInfo.size);
     vkUnmapMemory(m_vkDevice, m_vkMemory);
+
     return bufferHandle;
 }
 
 lepus::engine::objects::Mesh* GraphicsApiVk::WrapMesh(engine::objects::Mesh* mesh)
 {
-    // TODO: create IBO, VBO etc
     return new lepus::gfx::VkMesh((float*)mesh->GetVertices(), mesh->VertexCount(), mesh->GetIndices(), (uint32_t)mesh->IndexCount(), *this);
 }
 
 void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
 {
     VkCommandBufferBeginInfo beginInfo = {};
-    beginInfo.pNext = 0;
+    beginInfo.pNext = VK_NULL_HANDLE;
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = 0;
-    beginInfo.pInheritanceInfo = 0;
+    beginInfo.pInheritanceInfo = VK_NULL_HANDLE;
 
     vkResetFences(m_vkDevice, 1, &m_vkFence);
     vkResetFences(m_vkDevice, 1, &m_vkCmdBufFence);
@@ -404,6 +386,7 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
     vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, nullptr, m_vkFence, &m_CurrentImageIndex);
     vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
 
+    // Map the clear colour from linear RGB to sRGB
     const float gamma = 2.2f;
     m_vkColourAttachmentInfo.clearValue.color.float32[0] = powf(r, gamma);
     m_vkColourAttachmentInfo.clearValue.color.float32[1] = powf(g, gamma);
@@ -413,7 +396,6 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
     m_vkDepthAttachmentInfo.clearValue.depthStencil.depth = 1.0f;
     m_vkDepthAttachmentInfo.clearValue.depthStencil.stencil = 1;
 
-    // m_vkColourAttachmentInfo.clearValue.color = colour;
     m_vkColourAttachmentInfo.imageView = m_ImageViews[m_CurrentImageIndex];
     m_vkDepthAttachmentInfo.imageView = m_vkDepthBufferView;
 
@@ -442,23 +424,20 @@ void GraphicsApiVk::ClearFrameBuffer(float r, float g, float b)
          1}};
 
     vkCmdPipelineBarrier(m_CommandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &imgMemBarrier);
-
-    // vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, VK_NULL_HANDLE);
-    // vkCmdBindVertexBuffers(m_CommandBuffer, 0, 0, VK_NULL_HANDLE, VK_NULL_HANDLE);
-
-    // delete[] matrixData;
 }
 
 void GraphicsApiVk::UpdateUniforms(const SceneGraph& scene)
 {
-    lepus::math::Matrix4x4 model = lepus::math::Matrix4x4::Identity();
     auto camera = scene.Camera();
 
+    // TODO(perf): cache the projection matrix and only update if invalidated
     auto proj = camera->BuildPerspectiveMatrix();
     float aspectRatio = (1.f * (float)m_vkRenderingInfo.renderArea.extent.width) / (1.f * (float)m_vkRenderingInfo.renderArea.extent.height);
     proj.set<0, 0>(proj.get(0, 0) / aspectRatio);
 
     auto* view = camera->BuildViewMatrix().data();
+
+    // Update global uniforms (view & projection matrix, lights etc.) in all pipelines
     for (size_t i = 0; i < m_GraphicsPipelineCount; i++)
     {
 	vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vkGraphicsPipelines.Get(i));
@@ -470,13 +449,12 @@ void GraphicsApiVk::UpdateUniforms(const SceneGraph& scene)
 
 void GraphicsApiVk::StartDrawing()
 {
-
-    // vkCmdUpdateBuffer(m_CommandBuffer, m_vkVertBuffer, 0, sizeof(float) * 3 * 3, verts);
     vkCmdBeginRenderingKHR(m_CommandBuffer, &m_vkRenderingInfo);
 }
 
 void GraphicsApiVk::Draw(const SceneGraph& scene)
 {
+    // TODO(refactor): this scene traversal code is almost exactly the same as in GraphicsApiGL. Move it out to an iterator instead?
     auto currentNode = scene.Root();
 
     bool branchComplete = false;
@@ -544,8 +522,6 @@ void GraphicsApiVk::EndDrawing()
     vkCmdPipelineBarrier(m_CommandBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &imgMemBarrier);
     vkEndCommandBuffer(m_CommandBuffer);
 
-    // assert(acquireResult == VK_SUCCESS);
-
     VkSubmitInfo submitInfo;
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.pNext = 0;
@@ -562,9 +538,9 @@ void GraphicsApiVk::EndDrawing()
 
 void GraphicsApiVk::SwapBuffers()
 {
-    VkPresentInfoKHR presentInfo;
+    VkPresentInfoKHR presentInfo = {};
 
-    presentInfo.pNext = 0;
+    presentInfo.pNext = VK_NULL_HANDLE;
     presentInfo.pSwapchains = &m_vkSwapchain;
     presentInfo.pImageIndices = &m_CurrentImageIndex;
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -586,8 +562,27 @@ void GraphicsApiVk::Shutdown()
 
     vkDestroyCommandPool(m_vkDevice, m_CommandPool, nullptr);
     vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
-    vkDestroyPipelineLayout(m_vkDevice, m_vkGraphicsPipelineLayout, nullptr);
-    vkDestroyPipeline(m_vkDevice, m_vkGraphicsPipeline, nullptr);
+    for (size_t i = 0; i < m_GraphicsPipelineCount; i++)
+    {
+	vkDestroyPipeline(m_vkDevice, m_vkGraphicsPipelines.Get(i), nullptr);
+	auto shader = m_vkGraphicsPipelineMetadata.Get(i);
+	for (size_t shaderStage = 0; shaderStage < ShaderCompilerVk::ShaderStageCount(); shaderStage++)
+	{
+	    if (shader->m_ShaderStageCreateInfo[shaderStage].sType == VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO)
+	    {
+		vkDestroyShaderModule(m_vkDevice, shader->m_ShaderStageCreateInfo[shaderStage].module, nullptr);
+	    }
+	}
+    }
+    for (size_t i = 0; i < m_GraphicsPipelineCount; i++)
+    {
+	auto pipelineLayout = m_vkGraphicsPipelineLayouts.Get(i);
+	if (pipelineLayout != m_Defaults.pipelineLayout && pipelineLayout != VK_NULL_HANDLE)
+	{
+	    vkDestroyPipelineLayout(m_vkDevice, pipelineLayout, nullptr);
+	}
+    }
+    vkDestroyPipelineLayout(m_vkDevice, m_Defaults.pipelineLayout, nullptr);
     vmaDestroyImage(m_vmaAllocator, m_vkDepthBuffer, m_vmaDepthBufAllocation);
     for (size_t i = 0; i < m_vkVertBuffers.Count(); i++)
     {
@@ -599,7 +594,7 @@ void GraphicsApiVk::Shutdown()
     }
     for (size_t i = 0; i < m_vkIndexBuffers.Count(); i++)
     {
-	const VkBufferAlloc& indexBufAlloc = m_vkVertBuffers.Get(i);
+	const VkBufferAlloc& indexBufAlloc = m_vkIndexBuffers.Get(i);
 	if (indexBufAlloc.buffer != VK_NULL_HANDLE)
 	{
 	    vmaDestroyBuffer(m_vmaAllocator, indexBufAlloc.buffer, indexBufAlloc.allocation);
@@ -608,6 +603,7 @@ void GraphicsApiVk::Shutdown()
     vmaDestroyAllocator(m_vmaAllocator);
     vkDestroyDevice(m_vkDevice, nullptr);
     vkDestroySurfaceKHR(m_vkInstance, m_vkSurface, nullptr);
+    std::cout << "Shutdown complete\n";
 }
 
 static char shaderFileNameBuffer[UINT16_MAX];
@@ -638,8 +634,8 @@ const char* GraphicsApiVk::GetShaderFileName(const char* shaderName, ShaderStage
     }
 
     size_t shaderNameLength = strlen(shaderName);
-    memcpy((void*)shaderFileNameBuffer, shaderName, sizeof(char) * shaderNameLength);
-    memcpy((void*)(shaderFileNameBuffer + shaderNameLength * sizeof(char)), suffixPtr, suffixBytes);
+    memcpy(shaderFileNameBuffer, shaderName, sizeof(char) * shaderNameLength);
+    memcpy((shaderFileNameBuffer + shaderNameLength), suffixPtr, suffixBytes);
 
     return shaderFileNameBuffer;
 }

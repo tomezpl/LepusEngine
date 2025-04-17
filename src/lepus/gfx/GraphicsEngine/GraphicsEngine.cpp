@@ -140,4 +140,6 @@ void GraphicsEngine::Dispose()
     }
 
     m_Resources.meshes.clear();
+
+    m_Api->Shutdown();
 }

@@ -52,8 +52,6 @@ namespace lepus::gfx
 	VkFence m_vkFence{VK_NULL_HANDLE}, m_vkCmdBufFence{VK_NULL_HANDLE};
 	PFN_vkCmdBeginRenderingKHR vkCmdBeginRenderingKHR{nullptr};
 	PFN_vkCmdEndRenderingKHR vkCmdEndRenderingKHR{nullptr};
-	VkPipeline m_vkGraphicsPipeline{VK_NULL_HANDLE};
-	VkPipelineLayout m_vkGraphicsPipelineLayout{VK_NULL_HANDLE};
 	utility::List<VkBufferAlloc> m_vkVertBuffers{utility::List<VkBufferAlloc>()};
 	utility::List<VkBufferAlloc> m_vkIndexBuffers{utility::List<VkBufferAlloc>()};
 	VkDeviceMemory m_vkMemory{VK_NULL_HANDLE};
