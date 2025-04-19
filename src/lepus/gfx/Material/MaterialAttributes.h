@@ -43,7 +43,7 @@ namespace lepus
 
 		auto index = m_AttribIndex.Get(handle);
 
-		utility::List<TValue>& list = getDataList(m_AttribTypes.Get(index));
+		utility::List<TValue>& list = getDataList(m_AttribTypes.Get<TValue>(index));
 		memcpy(list.Raw()[index], &value, sizeof(TValue));
 	    }
 
@@ -99,7 +99,7 @@ namespace lepus
 	    {
 		assert(handle < m_AttribCount);
 
-		auto& list = getDataList(m_AttribTypes.Get(handle));
+		auto& list = getDataList(m_AttribTypes.Get<TValue>(handle));
 		auto index = m_AttribIndex.Get(handle);
 		list.Raw()[index] = value;
 	    }
