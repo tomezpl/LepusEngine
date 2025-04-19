@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <stdexcept>
 
 #define MAT_ATTRIBUTE(type, name) lepus::utility::List<type> name{lepus::utility::List<type>()};
 
@@ -63,7 +64,7 @@ namespace lepus
 		    assert(false);
 		}
 
-		throw std::exception("getDataList: invalid uniform type");
+		throw std::invalid_argument("getDataList: invalid uniform type");
 	    }
 
 	    template <typename TValue>
