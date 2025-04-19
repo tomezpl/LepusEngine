@@ -555,6 +555,9 @@ void GraphicsApiVk::SwapBuffers()
 void GraphicsApiVk::Shutdown()
 {
     vkDestroyFence(m_vkDevice, m_vkFence, VK_NULL_HANDLE);
+    vkDestroyFence(m_vkDevice, m_vkCmdBufFence, VK_NULL_HANDLE);
+
+    vkDestroyImageView(m_vkDevice, m_vkDepthBufferView, VK_NULL_HANDLE);
     for (uint32_t i = 0; i < m_SwapChainImageCount; i++)
     {
 	vkDestroyImageView(m_vkDevice, m_ImageViews[i], VK_NULL_HANDLE);
@@ -583,6 +586,8 @@ void GraphicsApiVk::Shutdown()
 	}
     }
     vkDestroyPipelineLayout(m_vkDevice, m_Defaults.pipelineLayout, nullptr);
+    delete[] m_Images;
+    delete[] m_ImageViews;
     vmaDestroyImage(m_vmaAllocator, m_vkDepthBuffer, m_vmaDepthBufAllocation);
     for (size_t i = 0; i < m_vkVertBuffers.Count(); i++)
     {
