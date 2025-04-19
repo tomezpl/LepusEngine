@@ -62,6 +62,13 @@ namespace lepus
 		return m_Data;
 	    }
 
+	    inline void Set(size_t index, const TElement& value)
+	    {
+	        assert(index < m_Elements);
+
+                m_Data[index] = value;
+	    }
+
 	    inline size_t Push(const TElement& element)
 	    {
 		EnsureCapacity(m_Elements + 1);
