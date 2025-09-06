@@ -268,3 +268,5 @@ CMakeFiles/**
 # VCPKG
 /vcpkg
 /vcpkg_installed
+
+/build-prod

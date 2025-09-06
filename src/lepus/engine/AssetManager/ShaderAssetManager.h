@@ -34,7 +34,7 @@ namespace lepus
 	    static size_t _NumDefaultBasePathChars;
 
 	    protected:
-	    const void* const _LoadShader(const char* path, ShaderAssetType type, size_t& szData);
+	    const void* _LoadShader(const char* path, ShaderAssetType type, size_t& szData);
 
 	    public:
 	    void Init() override

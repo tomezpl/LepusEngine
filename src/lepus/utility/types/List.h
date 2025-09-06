@@ -64,9 +64,9 @@ namespace lepus
 
 	    inline void Set(size_t index, const TElement& value)
 	    {
-	        assert(index < m_Elements);
+		assert(index < m_Elements);
 
-                m_Data[index] = value;
+		m_Data[index] = value;
 	    }
 
 	    inline size_t Push(const TElement& element)
@@ -106,13 +106,19 @@ namespace lepus
 			newCapacity *= 2;
 		    }
 		    TElement* newData = new TElement[newCapacity];
-		    memcpy(newData, m_Data, m_Elements * m_ElementSize);
+		    memcpy((void*)newData, m_Data, m_Elements * m_ElementSize);
 		    delete[] m_Data;
 		    m_Data = newData;
 		    m_Capacity = newCapacity;
 		}
 
 		return m_Capacity;
+	    }
+
+	    size_t UnsafeSetCount(size_t count)
+	    {
+		m_Elements = count;
+		return m_Elements;
 	    }
 
 	    ~List()

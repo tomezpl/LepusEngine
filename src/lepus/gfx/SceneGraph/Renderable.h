@@ -85,7 +85,7 @@ namespace lepus
 		return m_Mesh;
 	    }
 
-	    [[nodiscard]] Material* const GetMaterial()
+	    [[nodiscard]] Material* GetMaterial()
 	    {
 		return m_Material;
 	    }

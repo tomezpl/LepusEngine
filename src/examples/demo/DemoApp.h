@@ -145,6 +145,8 @@ class DemoApp : public system::BaseApp
 	auto& shaderManager = engine::AssetManager::Singleton().Shaders();
 	auto rgbIndexVertShader = shaderManager.AddShader(api->GetShaderFileName("Unlit/RGBVertex", gfx::ShaderStageVertex), shaderAssetType);
 	auto rgbIndexFragShader = shaderManager.AddShader(api->GetShaderFileName("Unlit/RGBVertex", gfx::ShaderStageFragment), shaderAssetType);
+	auto solidColourVertShader = shaderManager.AddShader(api->GetShaderFileName("Unlit/SolidColour", gfx::ShaderStageVertex), shaderAssetType);
+	auto solidColourFragShader = shaderManager.AddShader(api->GetShaderFileName("Unlit/SolidColour", gfx::ShaderStageFragment), shaderAssetType);
 
 	// Load & compile shaders.
 	// std::string
@@ -160,6 +162,7 @@ class DemoApp : public system::BaseApp
 
 	// Register shader with the API.
 	const gfx::AnyShader* rgbVertexShader = engine.RegisterShader("RGBVertex", rgbIndexVertShader, rgbIndexFragShader);
+	const gfx::AnyShader* solidColourShader = engine.RegisterShader("SolidColour", solidColourVertShader, solidColourFragShader);
 
 	lepus::gfx::Material baseMaterial, otherMaterial;
 	// const auto shaderStages = static_cast<gfx::ShaderStage>(gfx::ShaderStage::ShaderStageFragment | gfx::ShaderStage::ShaderStageVertex);
@@ -167,9 +170,11 @@ class DemoApp : public system::BaseApp
 	// baseShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader, fragShader));
 	// redShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader2, fragShader2));
 	baseMaterial.SetShader(rgbVertexShader);
-	otherMaterial.SetShader(rgbVertexShader);
+	otherMaterial.SetShader(solidColourShader);
 
-	// types::Vector3 baseColour(1.f, 1.f, 1.f);
+	types::Vector3 baseColour(1.f, 1.f, 1.f);
+	auto colourAttrib = otherMaterial.Attributes().Add<MAT_ATTRIBUTE_VEC3>("colour", baseColour);
+
 	// auto baseColourIndex = otherMaterial.Attributes().Add<const types::Vector3&>("colour", baseColour);
 
 	engine.GetSceneGraph().SetCamera(&m_Camera);
@@ -243,13 +248,12 @@ class DemoApp : public system::BaseApp
 	    cube2.GetTransform()->Origin(lepus::types::Vector3(0.f, 0.f, -1.f + ((sinf(runningTime) + 1.f) * 0.5f) * -2.f));
 
 	    Tick(deltaTime, keys);
-	    UpdateUniforms(api);
 
-	    // baseColour.x(sinf(runningTime));
-	    // baseColour.y(cosf(runningTime));
-	    // baseColour.z(baseColour.x() * baseColour.y());
+	    baseColour.x(sinf(runningTime));
+	    baseColour.y(cosf(runningTime));
+	    baseColour.z(baseColour.x() * baseColour.y());
 
-	    // otherMaterial.Attributes().Set<const types::Vector3&>(baseColourIndex, baseColour);
+	    colourAttrib.Set(baseColour);
 
 	    engine.Render<unsigned char, gfx::GraphicsEngine::PixelFormat::RGBA32>(100, 149, 237);
 

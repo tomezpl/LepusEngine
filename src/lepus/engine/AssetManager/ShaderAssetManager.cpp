@@ -25,7 +25,7 @@ const void* LoadSPVBinaryFromDisk(const char* path, size_t& size)
     return lepus::system::FileSystem::ReadBinary<uint32_t>(path, size);
 }
 
-const void* const ShaderAssetManager::_LoadShader(const char* path, ShaderAssetType type, size_t& szData)
+const void* ShaderAssetManager::_LoadShader(const char* path, ShaderAssetType type, size_t& szData)
 {
     assert(type != ShaderAssetTypeInvalid);
 

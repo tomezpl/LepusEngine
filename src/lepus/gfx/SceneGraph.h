@@ -35,7 +35,7 @@ namespace lepus
 		m_ActiveCamera = camera;
 	    }
 
-	    inline const lepus::gfx::Camera* const Camera() const
+	    inline const lepus::gfx::Camera* Camera() const
 	    {
 		return m_ActiveCamera;
 	    }

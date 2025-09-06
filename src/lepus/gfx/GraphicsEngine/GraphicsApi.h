@@ -41,6 +41,14 @@ namespace lepus
 	    /// @brief Main viewport used by the application.
 	    lepus::types::Viewport mainViewport = {};
 
+	    GraphicsApiOptions()
+	        : mainViewport() {}
+
+	    GraphicsApiOptions(const GraphicsApiOptions& copy)
+	    {
+		this->mainViewport = copy.mainViewport;
+	    }
+
 	    virtual ~GraphicsApiOptions() {}
 	};
 
@@ -124,7 +132,7 @@ namespace lepus
 	    /// @param name Name of the uniform to fetch.
 	    /// @return A UniformBinding wrapper for the named uniform object.
 	    template <typename TUniformHandle = void*, class TUniformBinding = lepus::gfx::UniformBinding<TUniformHandle>>
-	    inline TUniformBinding* const GetUniform(const char* name)
+	    inline TUniformBinding* GetUniform(const char* name)
 	    {
 		return static_cast<TUniformBinding* const>(GetUniformInternal(name));
 	    }

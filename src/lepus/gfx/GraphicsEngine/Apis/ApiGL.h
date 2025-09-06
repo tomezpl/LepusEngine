@@ -37,10 +37,10 @@ namespace lepus
 		memset(m_VertexShaders, 0, ProgramCount * sizeof(GLuint));
 	    }
 
-	    [[nodiscard]] inline const GLuint GetFragmentShader(size_t index) const { return m_FragmentShaders[index]; }
-	    [[nodiscard]] inline const GLuint GetVertexShader(size_t index) const { return m_VertexShaders[index]; }
+	    [[nodiscard]] inline GLuint GetFragmentShader(size_t index) const { return m_FragmentShaders[index]; }
+	    [[nodiscard]] inline GLuint GetVertexShader(size_t index) const { return m_VertexShaders[index]; }
 
-	    const size_t RegisterShader(GLShaderCompiledResult const* vertexShader = nullptr, GLShaderCompiledResult const* fragShader = nullptr, GLShaderCompiledResult const* geomShader = nullptr)
+	    size_t RegisterShader(GLShaderCompiledResult const* vertexShader = nullptr, GLShaderCompiledResult const* fragShader = nullptr, GLShaderCompiledResult const* geomShader = nullptr)
 	    {
 		assert(m_ShaderCount < ProgramCount);
 
@@ -155,7 +155,7 @@ namespace lepus
 	    inline engine::objects::Mesh* WrapMesh(engine::objects::Mesh* mesh) override { return new GLMesh((void*)mesh->GetVertices(), mesh->VertexBufferSize(), mesh->GetFormat(), (uint32_t*)mesh->GetIndices(), mesh->IndexCount(), true); }
 	};
 
-	template lepus::gfx::GLUniformBinding<void*>* const GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(const char* name);
+	template lepus::gfx::GLUniformBinding<void*>* GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(const char* name);
 
 	template GraphicsApiGL& GraphicsEngine::GetApi<GraphicsApiGL>();
     } // namespace gfx

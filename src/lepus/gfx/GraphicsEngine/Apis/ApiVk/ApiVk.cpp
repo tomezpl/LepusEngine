@@ -242,7 +242,7 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     m_Defaults.pushConstantRange = {
         VK_SHADER_STAGE_ALL,
         0,
-        sizeof(float) * 4 * 4 * 3};
+        (uint32_t)((AttributeTypes::GetDataSize(UniformType::MATRIX4) * 3) + AttributeTypes::GetDataSize(VEC3))};
     m_Defaults.pipelineLayoutCreateInfo = {
         VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
         VK_NULL_HANDLE,
@@ -467,7 +467,21 @@ void GraphicsApiVk::Draw(const SceneGraph& scene)
 	    auto pipelineIndex = this->findPipelineIndex(renderable->GetMaterial()->GetShader<VkShader>());
 	    assert(pipelineIndex != SIZE_MAX);
 	    vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vkGraphicsPipelines.Get(pipelineIndex));
-	    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayouts.Get(pipelineIndex), VK_SHADER_STAGE_ALL, 2 * (sizeof(float) * 4 * 4), sizeof(float) * 4 * 4, renderable->GetWorldMatrix(currentNode).data());
+	    uint32_t pushConstantOffset = 0;
+	    // first update 3rd matrix (model)
+	    pushConstantOffset += 2 * (sizeof(float) * 4 * 4);
+	    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayouts.Get(pipelineIndex), VK_SHADER_STAGE_ALL, pushConstantOffset, sizeof(float) * 4 * 4, renderable->GetWorldMatrix(currentNode).data());
+	    // TODO: refactor to use AttributeTypes::GetDataSize()
+	    pushConstantOffset += sizeof(float) * 4 * 4;
+	    MaterialAttributes& materialAttributes = renderable->GetMaterial()->Attributes();
+	    auto nbAttribs = materialAttributes.Count();
+	    for (MaterialAttributeHandle i = 0; i < nbAttribs; i++)
+	    {
+		auto attribData = materialAttributes.GetRaw(i);
+		uint32_t attribSize = (uint32_t)(AttributeTypes::GetDataSize(materialAttributes.GetType(i)));
+		vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayouts.Get(pipelineIndex), VK_SHADER_STAGE_ALL, pushConstantOffset, attribSize, attribData);
+		pushConstantOffset += attribSize;
+	    }
 	    size_t offsets = 0;
 
 	    const VkBuffer& vertBuffer = renderable->GetMesh()->GetVkVertBuffer();

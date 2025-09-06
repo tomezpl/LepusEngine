@@ -24,6 +24,12 @@ namespace lepus
 		init(quat);
 	    }
 
+	    Quaternion& operator=(const Quaternion& other)
+	    {
+		init(other);
+		return *this;
+	    }
+
 	    Quaternion(float* quatData)
 	    {
 		init(quatData);

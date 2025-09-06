@@ -141,7 +141,7 @@ namespace lepus
 		return sqrtf(SqrMagnitude());
 	    }
 
-	    const float* const GetData() const
+	    const float* GetData() const
 	    {
 		return m_Components;
 	    }
@@ -225,6 +225,17 @@ namespace lepus
 	    Vector3(const Vector3& other)
 	    {
 		init(other);
+	    }
+
+	    Vector3& operator=(const Vector3& other)
+	    {
+		init(other);
+		return *this;
+	    }
+
+	    operator float*() const
+	    {
+		return const_cast<float*>(this->m_Components);
 	    }
 
 	    inline float x() const { return m_Components[0]; }
