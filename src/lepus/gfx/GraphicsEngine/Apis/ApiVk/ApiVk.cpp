@@ -469,10 +469,10 @@ void GraphicsApiVk::Draw(const SceneGraph& scene)
 	    vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vkGraphicsPipelines.Get(pipelineIndex));
 	    uint32_t pushConstantOffset = 0;
 	    // first update 3rd matrix (model)
-	    pushConstantOffset += 2 * (sizeof(float) * 4 * 4);
-	    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayouts.Get(pipelineIndex), VK_SHADER_STAGE_ALL, pushConstantOffset, sizeof(float) * 4 * 4, renderable->GetWorldMatrix(currentNode).data());
+	    pushConstantOffset += 2 * sizeof(MaterialAttributeMatrix4);
+	    vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayouts.Get(pipelineIndex), VK_SHADER_STAGE_ALL, pushConstantOffset, sizeof(MaterialAttributeMatrix4), renderable->GetWorldMatrix(currentNode).data());
 	    // TODO: refactor to use AttributeTypes::GetDataSize()
-	    pushConstantOffset += sizeof(float) * 4 * 4;
+	    pushConstantOffset += sizeof(MaterialAttributeMatrix4);
 	    MaterialAttributes& materialAttributes = renderable->GetMaterial()->Attributes();
 	    auto nbAttribs = materialAttributes.Count();
 	    for (MaterialAttributeHandle i = 0; i < nbAttribs; i++)

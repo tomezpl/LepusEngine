@@ -1,6 +1,5 @@
 #ifndef LEPUS_GFX_MATERIAL_ATTRIBUTES
 #define LEPUS_GFX_MATERIAL_ATTRIBUTES
-#include "AttributeTypes.h"
 #include "lepus/gfx/GraphicsEngine/GraphicsApi/Uniforms.h"
 #include "lepus/utility/types/List.h"
 #include "lepus/utility/types/Matrix4x4.h"
@@ -19,6 +18,34 @@ namespace lepus
 {
     namespace gfx
     {
+	typedef float MaterialAttributeMatrix4[4 * 4];
+	typedef float MaterialAttributeVector4[4];
+	typedef float MaterialAttributeVector3[3];
+	typedef float MaterialAttributeVector2[2];
+	typedef float MaterialAttributeScalar;
+
+	class AttributeTypes
+	{
+	    public:
+	    AttributeTypes() = delete;
+
+	    static inline constexpr size_t GetDataSize(UniformType type)
+	    {
+		switch (type)
+		{
+		case FLOAT:
+		    return sizeof(MaterialAttributeScalar);
+		case VEC3:
+		    return sizeof(MaterialAttributeVector3);
+		case MATRIX4:
+		    return sizeof(MaterialAttributeMatrix4);
+		case INVALID:
+		default:
+		    return 0;
+		}
+	    }
+	};
+
 	typedef uint8_t MaterialAttributeHandle;
 
 	template <typename TValue, typename TRaw = void*>
@@ -37,11 +64,11 @@ namespace lepus
 
 	    struct AttributeData
 	    {
-		MAT_ATTRIBUTE(float[4 * 4], mat4)
-		MAT_ATTRIBUTE(float, scalar)
-		MAT_ATTRIBUTE(float[2], vec2)
-		MAT_ATTRIBUTE(float[3], vec3)
-		MAT_ATTRIBUTE(float[4], vec4)
+		MAT_ATTRIBUTE(MaterialAttributeMatrix4, mat4)
+		MAT_ATTRIBUTE(MaterialAttributeScalar, scalar)
+		MAT_ATTRIBUTE(MaterialAttributeVector2, vec2)
+		MAT_ATTRIBUTE(MaterialAttributeVector3, vec3)
+		MAT_ATTRIBUTE(MaterialAttributeVector4, vec4)
 	    } m_AttribData;
 
 	    protected:
@@ -145,19 +172,19 @@ namespace lepus
 	};
 
 	template <>
-	inline constexpr UniformType MaterialAttributes::getDataType<float>()
+	inline constexpr UniformType MaterialAttributes::getDataType<MaterialAttributeScalar>()
 	{
 	    return FLOAT;
 	}
 
 	template <>
-	inline constexpr UniformType MaterialAttributes::getDataType<float[3]>()
+	inline constexpr UniformType MaterialAttributes::getDataType<MaterialAttributeVector3>()
 	{
 	    return VEC3;
 	}
 
 	template <>
-	inline constexpr UniformType MaterialAttributes::getDataType<float[4 * 4]>()
+	inline constexpr UniformType MaterialAttributes::getDataType<MaterialAttributeMatrix4>()
 	{
 	    return MATRIX4;
 	}
@@ -182,7 +209,7 @@ namespace lepus
 	    auto index = m_AttribIndex.Get(handle);
 
 	    m_AttribTypes.Set(handle, UniformType::MATRIX4);
-	    memcpy(m_AttribData.mat4.Raw()[index], value.data(), sizeof(float) * 4 * 4);
+	    memcpy(m_AttribData.mat4.Raw()[index], value.data(), sizeof(MaterialAttributeMatrix4));
 	}
 
 	template <>
@@ -191,7 +218,7 @@ namespace lepus
 	    auto index = m_AttribIndex.Get(handle);
 
 	    m_AttribTypes.Set(handle, UniformType::VEC3);
-	    memcpy(m_AttribData.vec3.Raw()[index], value.GetData(), sizeof(float) * 3);
+	    memcpy(m_AttribData.vec3.Raw()[index], value.GetData(), sizeof(MaterialAttributeVector3));
 	}
 
 	template <>
@@ -245,18 +272,7 @@ namespace lepus
 	    public:
 	    static inline constexpr size_t GetDataSize(UniformType type)
 	    {
-		switch (type)
-		{
-		case FLOAT:
-		    return sizeof(float);
-		case VEC3:
-		    return sizeof(float) * 3;
-		case MATRIX4:
-		    return sizeof(float) * 4 * 4;
-		case INVALID:
-		default:
-		    return 0;
-		}
+		return AttributeTypes::GetDataSize(type);
 	    }
 
 	    MaterialAttributeView() = delete;
