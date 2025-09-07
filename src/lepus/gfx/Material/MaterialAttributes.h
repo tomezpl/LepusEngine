@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <cstddef>
 #include <stdexcept>
 
 #define MAT_ATTRIBUTE(type, name) lepus::utility::List<type> name{lepus::utility::List<type>()};
