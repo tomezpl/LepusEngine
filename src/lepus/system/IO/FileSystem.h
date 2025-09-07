@@ -8,31 +8,47 @@ namespace lepus
 {
     namespace system
     {
+	/**
+	 * Helper class for working with files on the file system.
+	 */
 	class FileSystem
 	{
 	    public:
+	    /**
+	     * Reads all text from the specified file.
+	     * @param path Path string to the file to read.
+	     * @return A std::string that contains all text from the file.
+	     */
 	    static std::string Read(const char* path);
-	    template <typename TData = char>
+
+	    /**
+	     * Reads file contents as binary.
+	     * @tparam TData Type of each element in the array. By default, this is a std::byte, resulting in a byte array.
+	     * @param path The path of the file to read
+	     * @param size Total size read (in bytes)
+	     * @return
+	     */
+	    template <typename TData = std::byte>
 	    static TData* ReadBinary(const char* path, size_t& size)
 	    {
-		std::ifstream reader = std::ifstream(path, std::ifstream::in | std::ifstream::binary);
+		auto reader = std::basic_ifstream<std::byte>(path, std::ifstream::in | std::ifstream::binary);
 
-		const size_t bufferSz = 1024;
-		char buffer[bufferSz] = {};
+		constexpr size_t bufferSz = 1024;
+		std::byte buffer[bufferSz] = {};
 		memset(buffer, 0, bufferSz);
 
-		char* bytes = new char[bufferSz];
+		auto* bytes = new std::byte[bufferSz];
 
 		size = 0;
 		while (reader.good())
 		{
 		    reader.read(buffer, bufferSz);
-		    size_t szRead = static_cast<size_t>(reader.gcount());
+		    auto szRead = static_cast<size_t>(reader.gcount());
 
-		    char* temp = new char[size + szRead];
-		    memmove((void*)temp, (void*)bytes, size);
+		    auto* temp = new std::byte[size + szRead];
+		    memmove(temp, bytes, size);
 		    delete[] bytes;
-		    memmove((void*)(temp + size), (void*)buffer, szRead);
+		    memmove(temp + size, buffer, szRead);
 		    bytes = temp;
 
 		    size += szRead;
@@ -40,7 +56,7 @@ namespace lepus
 
 		reader.close();
 
-		return (TData*)bytes;
+		return reinterpret_cast<TData*>(bytes);
 	    }
 	};
     } // namespace system

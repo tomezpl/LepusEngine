@@ -7,6 +7,12 @@ namespace lepus
 {
     namespace utility
     {
+	/**
+	 * A generic resizable array class template.
+	 * @tparam TElement Type of values to be stored.
+	 *
+	 * @todo Refactor this to just use a std::vector<TElement> internally because there's no reason for lepus to implement its own vector-like storage
+	 */
 	template <typename TElement>
 	class List
 	{

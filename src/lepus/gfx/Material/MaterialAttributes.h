@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <stdexcept>
 
+// Helper macro to quickly define collections of material attributes of different types.
 #define MAT_ATTRIBUTE(type, name) lepus::utility::List<type> name{lepus::utility::List<type>()};
 
 namespace lepus

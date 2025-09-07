@@ -8,7 +8,6 @@
 
 #include <forward_list>
 #include <lepus/system/Windowing.h>
-#include <lepus/utility/types/String.h>
 #include <lepus/utility/types/Viewport.h>
 
 namespace lepus
@@ -27,7 +26,7 @@ namespace lepus
 
 	    struct
 	    {
-		lepus::types::String windowName;
+		std::string windowName;
 		lepus::types::Viewport viewport;
 	    } m_OutputInfo;
 
