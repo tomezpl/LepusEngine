@@ -29,7 +29,7 @@ namespace lepus
 	    }
 
 	    inline VkMesh(const float* vertices, uint32_t vertexCount, const uint32_t* indices, uint32_t indexCount, GraphicsApiVk& api)
-	        : Mesh((float*)vertices, vertexCount * sizeof(float) * 3, lepus::engine::MeshVertexFormat::VVV, (uint32_t*)indices, indexCount, true)
+	        : Mesh(const_cast<float*>(vertices), vertexCount * sizeof(float) * 3, lepus::engine::MeshVertexFormat::VVV, (uint32_t*)indices, indexCount, true)
 	    {
 		m_vkVertBuffer = VK_NULL_HANDLE;
 		m_vkIndexBuffer = VK_NULL_HANDLE;

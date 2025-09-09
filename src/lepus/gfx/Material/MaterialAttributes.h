@@ -72,6 +72,29 @@ namespace lepus
 		MAT_ATTRIBUTE(MaterialAttributeVector4, vec4)
 	    } m_AttribData;
 
+	    public:
+	    enum BindingHintType
+	    {
+		BindingHintEmpty = 0,
+
+		/** Contains hints for binding the attributes to a platform-agnostic struct */
+		BindingHintAgnosticModel = 1
+	    };
+	    struct BindingHint
+	    {
+		BindingHintType type{BindingHintEmpty};
+		union BindingHintData
+		{
+		    struct AgnosticModelBinding
+		    {
+			uint32_t uboOffsetBytes{0};
+		    } agnostic{};
+		} data{};
+	    };
+
+	    private:
+	    utility::List<BindingHint> m_AttribBindingHints{utility::List<BindingHint>()};
+
 	    protected:
 	    template <typename TValue>
 	    inline void UnsafeSet(MaterialAttributeHandle handle, TValue value)
@@ -112,7 +135,7 @@ namespace lepus
 
 	    /// @brief Adds an attribute and returns its index.
 	    template <typename TValue, typename TRaw = void*>
-	    MaterialAttributeView<TValue, TRaw> Add(const char* name, TValue value);
+	    MaterialAttributeView<TValue, TRaw> Add(const char* name, TValue value, const MaterialAttributes::BindingHint&& bindingHint = {});
 
 	    template <typename TValue = const void*>
 	    void Set(MaterialAttributeHandle handle, TValue value)
@@ -135,6 +158,14 @@ namespace lepus
 		utility::List<TValue>& list = getDataList<TValue>(m_AttribTypes.Get(handle));
 		auto index = m_AttribIndex.Get(handle);
 		return (TValue)(list.Get(index));
+	    }
+
+	    [[nodiscard]] inline const BindingHint& GetBindingHint(MaterialAttributeHandle handle) const
+	    {
+		assert(handle < m_AttribCount);
+
+		auto index = m_AttribIndex.Get(handle);
+		return m_AttribBindingHints.Get(index);
 	    }
 
 	    inline void* GetRaw(MaterialAttributeHandle handle)
@@ -264,8 +295,7 @@ namespace lepus
 	{
 	    private:
 	    bool m_Initialised{false};
-	    // utility::List<TValue>& m_Container;
-	    // uint8_t m_Index{0};
+
 	    MaterialAttributeHandle m_Handle{0};
 	    UniformType m_Type{INVALID};
 	    TRaw* m_Data{nullptr};
@@ -322,7 +352,7 @@ namespace lepus
 #define MAT_ATTRIBUTE_VEC3 const lepus::types::Vector3, float[3]
 
 	template <typename TValue, typename TRaw>
-	lepus::gfx::MaterialAttributeView<TValue, TRaw> lepus::gfx::MaterialAttributes::Add(const char* name, TValue value)
+	lepus::gfx::MaterialAttributeView<TValue, TRaw> lepus::gfx::MaterialAttributes::Add(const char* name, TValue value, const MaterialAttributes::BindingHint&& bindingHint)
 	{
 	    UniformType dataType = getDataType<TRaw>();
 	    utility::List<TRaw>& targetDataList = getDataList<TRaw>(dataType);
@@ -337,6 +367,7 @@ namespace lepus
 	    ++m_AttribCount;
 	    m_AttribTypes.Push(dataType);
 	    m_AttribIndex.Push(newValueIndex);
+	    m_AttribBindingHints.Push(bindingHint);
 	    auto& list = getDataList<TValue>(dataType);
 	    list.EnsureCapacity(newValueIndex + 1);
 	    Set<TRaw>(newValueIndex, value);

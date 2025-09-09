@@ -6,8 +6,8 @@
 #include <cstdint>
 
 using namespace lepus::engine;
-const char* const ShaderAssetManager::_DefaultBasePath = "../../Content/GLSL/";
-size_t ShaderAssetManager::_NumDefaultBasePathChars = strlen(ShaderAssetManager::_DefaultBasePath);
+const char* const ShaderAssetManager::s_DefaultBasePath = "../../Content/GLSL/";
+size_t ShaderAssetManager::s_NumDefaultBasePathChars = strlen(ShaderAssetManager::s_DefaultBasePath);
 
 const char* LoadGLSLStringFromDisk(const char* path, size_t& size)
 {

@@ -1,5 +1,7 @@
 #ifndef LEPUS_GFX_SHADER
 #define LEPUS_GFX_SHADER
+#include "Material/MaterialAttributes.h"
+
 #include <cstring>
 #include <utility>
 
@@ -69,12 +71,24 @@ namespace lepus
 	    }
 	};
 
+	struct ShaderUniformModelBase
+	{
+	    lepus::gfx::MaterialAttributeMatrix4 MODEL;
+	    lepus::gfx::MaterialAttributeMatrix4 VIEW;
+	    lepus::gfx::MaterialAttributeMatrix4 PROJ;
+	};
+
 	/// @brief An API-specific shader class that implements a handle getter for that API's shader objects (e.g. shader handle integer in GL, objects in D3D/Vk etc.).
-	template <typename TApiNativeShaderHandle = void*>
+	template <typename TApiNativeShaderHandle = void*, class TUniformModel = ShaderUniformModelBase>
 	class Shader : public ShaderInfo
 	{
 	    public:
 	    virtual TApiNativeShaderHandle GetApiHandle() const = 0;
+
+	    static const type_info& GetUniformModel()
+	    {
+		return typeid(TUniformModel);
+	    }
 
 	    explicit Shader(ShaderInfo&& other)
 	        : ShaderInfo(std::move(other))
@@ -93,7 +107,8 @@ namespace lepus
 	    }
 	};
 
-	typedef Shader<void*> AnyShader;
+	template <class UniformModel = ShaderUniformModelBase>
+	using AnyShader = Shader<void*, UniformModel>;
     } // namespace gfx
 } // namespace lepus
 

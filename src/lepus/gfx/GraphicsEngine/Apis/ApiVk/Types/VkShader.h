@@ -18,7 +18,7 @@ namespace lepus
 	    GraphicsApiVk* m_Api;
 
 	    VkPipelineShaderStageCreateInfo m_ShaderStageCreateInfo[2] = {{}, {}};
-	    static const char ENTRY_POINT_NAME[];
+	    static const char s_EntryPointName[];
 
 	    public:
 	    VkShader() = delete;
@@ -26,7 +26,7 @@ namespace lepus
 	    explicit VkShader(const ShaderInfo& shaderInfo)
 	        : Shader<const VkPipelineShaderStageCreateInfo*>(shaderInfo)
 	    {
-		VkPipelineShaderStageCreateInfo defaultInfo = {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0, VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM, VK_NULL_HANDLE, ENTRY_POINT_NAME, nullptr};
+		VkPipelineShaderStageCreateInfo defaultInfo = {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0, VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM, VK_NULL_HANDLE, s_EntryPointName, nullptr};
 		m_ShaderStageCreateInfo[0] = defaultInfo;
 		m_ShaderStageCreateInfo[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
 		m_ShaderStageCreateInfo[1] = defaultInfo;

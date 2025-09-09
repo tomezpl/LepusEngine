@@ -1,3 +1,3 @@
 #include "VkShader.h"
 
-const char lepus::gfx::VkShader::ENTRY_POINT_NAME[] = "main";
+const char lepus::gfx::VkShader::s_EntryPointName[] = "main";

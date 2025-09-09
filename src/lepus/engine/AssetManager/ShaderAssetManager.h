@@ -30,8 +30,8 @@ namespace lepus
 	    private:
 	    std::forward_list<ShaderAsset> m_Shaders;
 
-	    static const char* const _DefaultBasePath;
-	    static size_t _NumDefaultBasePathChars;
+	    static const char* const s_DefaultBasePath;
+	    static size_t s_NumDefaultBasePathChars;
 
 	    protected:
 	    const void* _LoadShader(const char* path, ShaderAssetType type, size_t& szData);
@@ -44,11 +44,11 @@ namespace lepus
 	    const ShaderAsset AddShader(const char* const shaderFileName, ShaderAssetType type, const char* const basePath = nullptr)
 	    {
 		const char* path;
-		size_t numBasePathChars = (basePath ? strlen(basePath) : _NumDefaultBasePathChars);
+		size_t numBasePathChars = (basePath ? strlen(basePath) : s_NumDefaultBasePathChars);
 		size_t numPathChars = numBasePathChars + strlen(shaderFileName);
 		path = new char[numPathChars + 1];
 		// Copy the base path
-		memcpy((void*)path, (void const*)(basePath ? basePath : _DefaultBasePath), numBasePathChars * sizeof(char));
+		memcpy((void*)path, (void const*)(basePath ? basePath : s_DefaultBasePath), numBasePathChars * sizeof(char));
 		// Copy the filename
 		memcpy((void*)(path + numBasePathChars * sizeof(char)), shaderFileName, sizeof(char) * (numPathChars - numBasePathChars));
 		// Set last character to null terminating

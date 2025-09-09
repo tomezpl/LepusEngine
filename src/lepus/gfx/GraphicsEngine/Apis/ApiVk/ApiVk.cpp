@@ -479,7 +479,14 @@ void GraphicsApiVk::Draw(const SceneGraph& scene)
 	    {
 		auto attribData = materialAttributes.GetRaw(i);
 		uint32_t attribSize = (uint32_t)(AttributeTypes::GetDataSize(materialAttributes.GetType(i)));
-		vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayouts.Get(pipelineIndex), VK_SHADER_STAGE_ALL, pushConstantOffset, attribSize, attribData);
+		auto bindingHint = materialAttributes.GetBindingHint(i);
+		uint32_t offsetInBytes = 0;
+		if (bindingHint.type == MaterialAttributes::BindingHintAgnosticModel)
+		{
+		    offsetInBytes = bindingHint.data.agnostic.uboOffsetBytes;
+		}
+
+		vkCmdPushConstants(m_CommandBuffer, m_vkGraphicsPipelineLayouts.Get(pipelineIndex), VK_SHADER_STAGE_ALL, offsetInBytes, attribSize, attribData);
 		pushConstantOffset += attribSize;
 	    }
 	    size_t offsets = 0;
