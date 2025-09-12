@@ -89,6 +89,6 @@ class GraphicsApiStub : public lepus::gfx::GraphicsApi
     }
 };
 
-template lepus::gfx::UniformBinding<void*>* const lepus::gfx::GraphicsApi::GetUniform<lepus::gfx::UniformBinding<void*>*>(const char* name);
+template lepus::gfx::UniformBinding<void*>* lepus::gfx::GraphicsApi::GetUniform<lepus::gfx::UniformBinding<void*>*>(const char* name);
 
 #endif

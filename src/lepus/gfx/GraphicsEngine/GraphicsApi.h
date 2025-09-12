@@ -46,10 +46,22 @@ namespace lepus
 
 	    GraphicsApiOptions(const GraphicsApiOptions& copy)
 	    {
-		this->mainViewport = copy.mainViewport;
+		CopyInternal(copy);
+	    }
+
+	    GraphicsApiOptions& operator=(const GraphicsApiOptions& copy)
+	    {
+		CopyInternal(copy);
+		return *this;
 	    }
 
 	    virtual ~GraphicsApiOptions() {}
+
+	    private:
+	    void CopyInternal(const GraphicsApiOptions& copy)
+	    {
+		this->mainViewport = copy.mainViewport;
+	    }
 	};
 
 	/// @brief API wrapper to be used by GraphicsEngine.

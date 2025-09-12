@@ -155,6 +155,7 @@ add_custom_command(TARGET LepusDemo POST_BUILD
 )
 
 file(GLOB_RECURSE shaderSourceFiles RELATIVE ${CMAKE_SOURCE_DIR}/Content/GLSL ${CMAKE_SOURCE_DIR}/Content/GLSL/*.vert ${CMAKE_SOURCE_DIR}/Content/GLSL/*.frag)
+# Create post-build commands to compile GLSL source into SPIR-V
 foreach (file ${shaderSourceFiles})
     string(FIND ${file} "_GL." glSuffix)
     if (${glSuffix} EQUAL -1)
