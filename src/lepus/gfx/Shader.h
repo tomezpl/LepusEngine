@@ -1,6 +1,7 @@
 #ifndef LEPUS_GFX_SHADER
 #define LEPUS_GFX_SHADER
 #include "Material/MaterialAttributes.h"
+#include "Shader/ShaderUtils.h"
 
 #include <cstring>
 #include <utility>

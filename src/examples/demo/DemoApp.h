@@ -162,28 +162,15 @@ class DemoApp : public system::BaseApp
 
 	// Register shader with the API.
 	const gfx::AnyShader<>* rgbVertexShader = engine.RegisterShader("RGBVertex", rgbIndexVertShader, rgbIndexFragShader);
-#define DEFINE_SHADER_MODEL(name, members) \
-    struct name                            \
-    {                                      \
-	members                            \
-    };                                     \
-    const char __lepus_gfx_shadermodel_def_##name##__[] = ## #members;
 
-	// struct solidColourShaderModel
-	// {
-	//     gfx::MaterialAttributeMatrix4 MODEL;
-	//     gfx::MaterialAttributeMatrix4 VIEW;
-	//     gfx::MaterialAttributeMatrix4 PROJ;
-	//     gfx::MaterialAttributeVector3 colour;
-	// };
-
-	DEFINE_SHADER_MODEL(
-	    solidColourShaderModel,
+	REGISTER_SHADER(
+	    engine,
+	    SolidColour,
 	    gfx::MaterialAttributeMatrix4 MODEL;
 	    gfx::MaterialAttributeMatrix4 VIEW;
 	    gfx::MaterialAttributeMatrix4 PROJ;
-	    gfx::MaterialAttributeVector3 colour;)
-	const auto* solidColourShader = engine.RegisterShader<solidColourShaderModel>("SolidColour", solidColourVertShader, solidColourFragShader);
+	    gfx::MaterialAttributeVector3 colour;,
+	                                         solidColourVertShader, solidColourFragShader);
 
 	lepus::gfx::Material baseMaterial, otherMaterial;
 	// const auto shaderStages = static_cast<gfx::ShaderStage>(gfx::ShaderStage::ShaderStageFragment | gfx::ShaderStage::ShaderStageVertex);
@@ -191,7 +178,7 @@ class DemoApp : public system::BaseApp
 	// baseShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader, fragShader));
 	// redShader.SetGLProgram(gfx::ShaderCompilerGLSL::Singleton().BuildProgram(vertShader2, fragShader2));
 	baseMaterial.SetShader(rgbVertexShader);
-	otherMaterial.SetShader(solidColourShader);
+	otherMaterial.SetShader(SolidColour_shader);
 
 	types::Vector3 baseColour(1.f, 1.f, 1.f);
 #define SHADER_MODEL_ATTRIB(modelName, attribName, value)                                                          \
@@ -199,7 +186,7 @@ class DemoApp : public system::BaseApp
     {                                                                                                              \
 	lepus::gfx::MaterialAttributes::BindingHintType::BindingHintAgnosticModel, offsetof(modelName, attribName) \
     }
-	auto colourAttrib = otherMaterial.Attributes().Add<MAT_ATTRIBUTE_VEC3>(SHADER_MODEL_ATTRIB(solidColourShaderModel, colour, baseColour));
+	auto colourAttrib = otherMaterial.Attributes().Add<MAT_ATTRIBUTE_VEC3>(USE_REGISTERED_SHADER_MODEL(SolidColour, colour, baseColour));
 
 	// auto baseColourIndex = otherMaterial.Attributes().Add<const types::Vector3&>("colour", baseColour);
 

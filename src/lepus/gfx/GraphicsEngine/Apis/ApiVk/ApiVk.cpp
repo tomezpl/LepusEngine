@@ -463,7 +463,7 @@ void GraphicsApiVk::Draw(const SceneGraph& scene)
     {
 	if (!branchComplete && !currentNode->IsRoot())
 	{
-	    auto* renderable = (Renderable<VkMesh>*)(currentNode->GetTransformable());
+	    auto* renderable = const_cast<Renderable<VkMesh>*>(static_cast<const Renderable<VkMesh>*>(reinterpret_cast<const void*>(currentNode->GetTransformable())));
 	    auto pipelineIndex = this->findPipelineIndex(renderable->GetMaterial()->GetShader<VkShader>());
 	    assert(pipelineIndex != SIZE_MAX);
 	    vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vkGraphicsPipelines.Get(pipelineIndex));
@@ -478,7 +478,7 @@ void GraphicsApiVk::Draw(const SceneGraph& scene)
 	    for (MaterialAttributeHandle i = 0; i < nbAttribs; i++)
 	    {
 		auto attribData = materialAttributes.GetRaw(i);
-		uint32_t attribSize = (uint32_t)(AttributeTypes::GetDataSize(materialAttributes.GetType(i)));
+		auto attribSize = static_cast<uint32_t>(AttributeTypes::GetDataSize(materialAttributes.GetType(i)));
 		auto bindingHint = materialAttributes.GetBindingHint(i);
 		uint32_t offsetInBytes = 0;
 		if (bindingHint.type == MaterialAttributes::BindingHintAgnosticModel)
@@ -496,7 +496,7 @@ void GraphicsApiVk::Draw(const SceneGraph& scene)
 	    if (renderable->GetMesh()->IndexCount() > 0)
 	    {
 		vkCmdBindIndexBuffer(m_CommandBuffer, renderable->GetMesh()->GetVkIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
-		vkCmdDrawIndexed(m_CommandBuffer, (uint32_t)renderable->GetMesh()->IndexCount(), 1, 0, 0, 0);
+		vkCmdDrawIndexed(m_CommandBuffer, static_cast<uint32_t>(renderable->GetMesh()->IndexCount()), 1, 0, 0, 0);
 	    }
 	    else
 	    {
@@ -545,14 +545,14 @@ void GraphicsApiVk::EndDrawing()
 
     VkSubmitInfo submitInfo;
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.pNext = 0;
+    submitInfo.pNext = nullptr;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &m_CommandBuffer;
-    submitInfo.pSignalSemaphores = 0;
-    submitInfo.pWaitSemaphores = 0;
+    submitInfo.pSignalSemaphores = nullptr;
+    submitInfo.pWaitSemaphores = nullptr;
     submitInfo.signalSemaphoreCount = 0;
     submitInfo.waitSemaphoreCount = 0;
-    submitInfo.pWaitDstStageMask = 0;
+    submitInfo.pWaitDstStageMask = nullptr;
     vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkCmdBufFence);
     vkWaitForFences(m_vkDevice, 1, &m_vkCmdBufFence, VK_TRUE, UINT64_MAX);
 }
