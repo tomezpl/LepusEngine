@@ -160,7 +160,7 @@ foreach (file ${shaderSourceFiles})
     string(FIND ${file} "_GL." glSuffix)
     if (${glSuffix} EQUAL -1)
         add_custom_command(TARGET LepusDemo POST_BUILD
-                COMMAND ${Vulkan_GLSLC_EXECUTABLE} --target-env=vulkan1.3 -c "${CMAKE_SOURCE_DIR}/Content/GLSL/${file}" -o "${CMAKE_BINARY_DIR}/Content/GLSL/${file}.spv"
+                COMMAND glslang.exe -V "${CMAKE_SOURCE_DIR}/Content/GLSL/${file}" -o "${CMAKE_BINARY_DIR}/Content/GLSL/${file}.spv"
         )
     endif ()
 endforeach ()
