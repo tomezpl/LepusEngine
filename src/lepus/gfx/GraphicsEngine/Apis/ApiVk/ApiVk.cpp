@@ -14,6 +14,26 @@
 
 using namespace lepus::gfx;
 
+// auto PrepareGlobalDescriptorSetLayoutCreateInfo(VkDescriptorSetLayoutCreateInfo& outCreateInfo)
+// {
+//     constexpr GraphicsApiVk::DescriptorSetLayoutBindings::Global globalBindings{};
+//     static VkDescriptorSetLayoutBinding bindings[] = {globalBindings.ubo};
+//
+//     return bindings;
+// }
+//
+// void PreparePassDescriptorSetLayoutCreateInfo(VkDescriptorSetLayoutCreateInfo& outCreateInfo)
+// {
+// }
+//
+// void PrepareMaterialDescriptorSetLayoutCreateInfo(VkDescriptorSetLayoutCreateInfo& outCreateInfo)
+// {
+// }
+//
+// void PrepareObjectDescriptorSetLayoutCreateInfo(VkDescriptorSetLayoutCreateInfo& outCreateInfo)
+// {
+// }
+
 void GraphicsApiVk::Init(GraphicsApiOptions* options)
 {
     GraphicsApiVkOptions* vkOptions = static_cast<GraphicsApiVkOptions*>(options);
@@ -63,12 +83,14 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     m_vkInstance = vkbInstance.instance;
     m_vkSwapchain = swapchainResult.value();
 
+    // Set up Vulkan Memory Allocator
     VmaAllocatorCreateInfo allocatorCreateInfo = {};
     allocatorCreateInfo.device = m_vkDevice;
     allocatorCreateInfo.instance = m_vkInstance;
     allocatorCreateInfo.physicalDevice = physDevWrapper.value().physical_device;
     vmaCreateAllocator(&allocatorCreateInfo, &m_vmaAllocator);
 
+    // Create a command pool
     VkCommandPoolCreateInfo cmdPoolCreateInfo;
     cmdPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     cmdPoolCreateInfo.pNext = 0;
@@ -76,6 +98,7 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     cmdPoolCreateInfo.queueFamilyIndex = vkbDevice.get_queue_index(vkb::QueueType::graphics).value();
     assert(vkCreateCommandPool(m_vkDevice, &cmdPoolCreateInfo, nullptr, &m_CommandPool) == VK_SUCCESS);
 
+    // Create a command buffer
     VkCommandBufferAllocateInfo cmdBufferAllocInfo;
     cmdBufferAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     cmdBufferAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -84,6 +107,7 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     cmdBufferAllocInfo.commandBufferCount = 1;
     assert(vkAllocateCommandBuffers(m_vkDevice, &cmdBufferAllocInfo, &m_CommandBuffer) == VK_SUCCESS);
 
+    // Create a swap chain
     vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapchain, &m_SwapChainImageCount, VK_NULL_HANDLE);
     if (m_SwapChainImageCount)
     {
@@ -112,14 +136,103 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
 	}
     }
 
+    // Create fences
     VkFenceCreateInfo fenceCreateInfo = {};
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
-
     vkCreateFence(m_vkDevice, &fenceCreateInfo, nullptr, &m_vkFence);
     vkCreateFence(m_vkDevice, &fenceCreateInfo, VK_NULL_HANDLE, &m_vkCmdBufFence);
-    vkCmdBeginRenderingKHR = (PFN_vkCmdBeginRenderingKHR)vkGetInstanceProcAddr(m_vkInstance, "vkCmdBeginRenderingKHR");
-    vkCmdEndRenderingKHR = (PFN_vkCmdEndRenderingKHR)vkGetInstanceProcAddr(m_vkInstance, "vkCmdEndRenderingKHR");
+
+    // Load rendering extensions
+    vkCmdBeginRenderingKHR = reinterpret_cast<PFN_vkCmdBeginRenderingKHR>(vkGetInstanceProcAddr(m_vkInstance, "vkCmdBeginRenderingKHR"));
+    vkCmdEndRenderingKHR = reinterpret_cast<PFN_vkCmdEndRenderingKHR>(vkGetInstanceProcAddr(m_vkInstance, "vkCmdEndRenderingKHR"));
+
+    // Create descriptor set layouts
+    for (uint8_t i = 0; i < DescriptorSetCount; i++)
+    {
+	VkDescriptorSetLayoutCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+
+	createInfo.flags = 0;
+
+	switch (static_cast<DescriptorSetIndex>(i))
+	{
+	case DescriptorSetIndex_Global:
+	    // TODO: ensure these structs don't have any padding
+	    createInfo.bindingCount = sizeof(m_DescriptorSetLayoutBindings.global) / sizeof(VkDescriptorSetLayoutBinding);
+	    createInfo.pBindings = reinterpret_cast<VkDescriptorSetLayoutBinding*>(&m_DescriptorSetLayoutBindings.global);
+	    break;
+	case DescriptorSetIndex_PerPass:
+	    createInfo.bindingCount = 0;
+	    createInfo.pBindings = VK_NULL_HANDLE;
+	    break;
+	case DescriptorSetIndex_Material:
+	    createInfo.bindingCount = 0;
+	    createInfo.pBindings = VK_NULL_HANDLE;
+	    break;
+	case DescriptorSetIndex_Object:
+	    createInfo.bindingCount = 0;
+	    createInfo.pBindings = VK_NULL_HANDLE;
+	    break;
+	case DescriptorSetCount:
+	default:
+	    // GraphicsApiVk::DescriptorSetIndex enum is not valid!
+	    assert(false);
+	}
+
+	assert(vkCreateDescriptorSetLayout(m_vkDevice, &createInfo, nullptr, &m_Defaults.descriptorSetLayouts[i]) == VK_SUCCESS);
+    }
+
+    VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
+    descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    descriptorPoolCreateInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+    descriptorPoolCreateInfo.maxSets = DescriptorSetCount;
+    descriptorPoolCreateInfo.pNext = VK_NULL_HANDLE;
+    descriptorPoolCreateInfo.poolSizeCount = 0;
+    // Count how many descriptors there are
+    for (auto* binding = reinterpret_cast<VkDescriptorSetLayoutBinding*>(&m_DescriptorSetLayoutBindings); reinterpret_cast<unsigned long long>(binding) < reinterpret_cast<unsigned long long>(&m_DescriptorSetLayoutBindings) + sizeof(m_DescriptorSetLayoutBindings); binding++)
+    {
+	descriptorPoolCreateInfo.poolSizeCount++;
+    }
+    // Temporarily allocate on heap
+    auto* const sizes = new VkDescriptorPoolSize[descriptorPoolCreateInfo.poolSizeCount];
+    uint8_t poolSizeCounter = 0;
+    for (auto* binding = reinterpret_cast<VkDescriptorSetLayoutBinding*>(&m_DescriptorSetLayoutBindings); reinterpret_cast<unsigned long long>(binding) < reinterpret_cast<unsigned long long>(&m_DescriptorSetLayoutBindings) + sizeof(m_DescriptorSetLayoutBindings); binding++)
+    {
+	sizes[poolSizeCounter++] = {
+	    binding->descriptorType,
+	    binding->descriptorCount};
+    }
+    descriptorPoolCreateInfo.pPoolSizes = sizes;
+    vkCreateDescriptorPool(m_vkDevice, &descriptorPoolCreateInfo, nullptr, &m_vkDescriptorPool);
+
+    // Not needed once pool is created
+    delete[] sizes;
+
+    // Allocate the descriptor sets
+    VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
+    descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    descriptorSetAllocateInfo.descriptorSetCount = DescriptorSetCount;
+    descriptorSetAllocateInfo.descriptorPool = m_vkDescriptorPool;
+    descriptorSetAllocateInfo.pNext = VK_NULL_HANDLE;
+    descriptorSetAllocateInfo.pSetLayouts = m_Defaults.descriptorSetLayouts;
+    vkAllocateDescriptorSets(m_vkDevice, &descriptorSetAllocateInfo, m_vkDescriptorSets);
+
+    // Create a uniform buffer for the global descriptor set
+    const std::byte globalUboInit[sizeof(GlobalUniformBufferObject)] = {static_cast<std::byte>(0)};
+    VkDescriptorBufferInfo globalUboInfo = {CreateBuffer(UniformBuffer, &globalUboInit, sizeof(globalUboInit)), 0, sizeof(globalUboInit)};
+    VkWriteDescriptorSet globalSetWrite = {
+        VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+        VK_NULL_HANDLE,
+        m_vkDescriptorSets[DescriptorSetIndex_Global],
+        0,
+        0,
+        1,
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        VK_NULL_HANDLE,
+        &globalUboInfo,
+        VK_NULL_HANDLE};
+    vkUpdateDescriptorSets(m_vkDevice, 1, &globalSetWrite, 0, VK_NULL_HANDLE);
 
     m_Defaults.colourFormat = VK_FORMAT_B8G8R8A8_SRGB;
     m_Defaults.pipelineRenderingCreateInfo = {};
@@ -247,8 +360,8 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
         VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
         VK_NULL_HANDLE,
         0,
-        0,
-        VK_NULL_HANDLE,
+        DescriptorSetCount,
+        m_Defaults.descriptorSetLayouts,
         1,
         &m_Defaults.pushConstantRange};
     vkCreatePipelineLayout(m_vkDevice, &m_Defaults.pipelineLayoutCreateInfo, nullptr, &m_Defaults.pipelineLayout);
@@ -346,6 +459,11 @@ VkBuffer GraphicsApiVk::CreateBuffer(GraphicsApiVk::BufferType type, const void*
 	bufferCreateInfo.size *= sizeof(float) * 3;
 	bufferCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 	break;
+    case UniformBuffer:
+	buffers = &m_vkUniformBuffers;
+	bufferCreateInfo.size = vertexCount; // size of the uniform buffer in bytes
+	bufferCreateInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+	break;
     default:
 	assert(false);
 	break;
@@ -437,13 +555,23 @@ void GraphicsApiVk::UpdateUniforms(const SceneGraph& scene)
 
     auto* view = camera->BuildViewMatrix().data();
 
+    static GlobalUniformBufferObject globalUbo = {};
+    memcpy(globalUbo.projMatrix, proj.data(), sizeof(globalUbo.projMatrix));
+    memcpy(globalUbo.viewMatrix, view, sizeof(globalUbo.viewMatrix));
+
     // Update global uniforms (view & projection matrix, lights etc.) in all pipelines
     for (size_t i = 0; i < m_GraphicsPipelineCount; i++)
     {
 	vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vkGraphicsPipelines.Get(i));
-	auto pipelineLayout = m_vkGraphicsPipelineLayouts.Get(i);
-	vkCmdPushConstants(m_CommandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL, 0, sizeof(float) * 4 * 4, proj.data());
-	vkCmdPushConstants(m_CommandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL, sizeof(float) * 4 * 4, sizeof(float) * 4 * 4, view);
+	vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vkGraphicsPipelineLayouts.Get(i), 0, DescriptorSetCount, m_vkDescriptorSets, 0, VK_NULL_HANDLE);
+	void* globalUboMapped;
+	vmaMapMemory(m_vmaAllocator, m_vkUniformBuffers.Get(0).allocation, &globalUboMapped);
+	memcpy(globalUboMapped, &globalUbo, m_vkUniformBuffers.Get(0).allocation->GetSize());
+	vmaUnmapMemory(m_vmaAllocator, m_vkUniformBuffers.Get(0).allocation);
+
+	// auto pipelineLayout = m_vkGraphicsPipelineLayouts.Get(i);
+	// vkCmdPushConstants(m_CommandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL, 0, sizeof(float) * 4 * 4, proj.data());
+	// vkCmdPushConstants(m_CommandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL, sizeof(float) * 4 * 4, sizeof(float) * 4 * 4, view);
     }
 }
 
@@ -607,6 +735,15 @@ void GraphicsApiVk::Shutdown()
 	}
     }
     vkDestroyPipelineLayout(m_vkDevice, m_Defaults.pipelineLayout, nullptr);
+
+    vkFreeDescriptorSets(m_vkDevice, m_vkDescriptorPool, DescriptorSetCount, m_vkDescriptorSets);
+    vkDestroyDescriptorPool(m_vkDevice, m_vkDescriptorPool, nullptr);
+
+    for (const auto& layout : m_Defaults.descriptorSetLayouts)
+    {
+	vkDestroyDescriptorSetLayout(m_vkDevice, layout, nullptr);
+    }
+
     delete[] m_Images;
     delete[] m_ImageViews;
     vmaDestroyImage(m_vmaAllocator, m_vkDepthBuffer, m_vmaDepthBufAllocation);
@@ -624,6 +761,14 @@ void GraphicsApiVk::Shutdown()
 	if (indexBufAlloc.buffer != VK_NULL_HANDLE)
 	{
 	    vmaDestroyBuffer(m_vmaAllocator, indexBufAlloc.buffer, indexBufAlloc.allocation);
+	}
+    }
+    for (size_t i = 0; i < m_vkUniformBuffers.Count(); i++)
+    {
+	const VkBufferAlloc& uniformBufAlloc = m_vkUniformBuffers.Get(i);
+	if (uniformBufAlloc.buffer != VK_NULL_HANDLE)
+	{
+	    vmaDestroyBuffer(m_vmaAllocator, uniformBufAlloc.buffer, uniformBufAlloc.allocation);
 	}
     }
     vmaDestroyAllocator(m_vmaAllocator);

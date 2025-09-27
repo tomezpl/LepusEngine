@@ -96,7 +96,7 @@ namespace lepus
 
 	    void Setup();
 
-	    template <class TUniformModel = ShaderUniformModelBase>
+	    template <class TUniformModel = PushConstantModelBase>
 	    const AnyShader<TUniformModel>* RegisterShader(const char* name, const engine::ShaderAsset& vertexShader, const engine::ShaderAsset& fragmentShader)
 	    {
 		auto apiKind = m_Api->GetOptions<GraphicsApiOptions>().GetType();

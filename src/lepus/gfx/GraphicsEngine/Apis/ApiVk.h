@@ -18,6 +18,8 @@
 
 #include "ApiVk/Types/VkBufferAlloc.h"
 
+#include <map>
+
 namespace lepus::gfx
 {
     class GraphicsApiVkOptions : public GraphicsApiOptions
@@ -35,6 +37,35 @@ namespace lepus::gfx
 
     class GraphicsApiVk : public GraphicsApi
     {
+	public:
+	/**
+	 * Descriptor sets indices to use in the Vk pipeline.
+	 *
+	 * Taken from https://vkguide.dev/docs/chapter-4/descriptors/#mental-model
+	 */
+	enum DescriptorSetIndex
+	{
+	    DescriptorSetIndex_Global = 0,
+	    DescriptorSetIndex_PerPass,
+	    DescriptorSetIndex_Material,
+	    DescriptorSetIndex_Object,
+	    DescriptorSetCount
+	};
+
+	struct GlobalUniformBufferObject
+	{
+	    MaterialAttributeMatrix4 viewMatrix{};
+	    MaterialAttributeMatrix4 projMatrix{};
+	};
+
+	struct DescriptorSetLayoutBindings
+	{
+	    struct Global
+	    {
+		VkDescriptorSetLayoutBinding ubo{DescriptorSetIndex_Global, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, VK_NULL_HANDLE};
+	    } global;
+	};
+
 	private:
 	VkDevice m_vkDevice{VK_NULL_HANDLE};
 	VkQueue m_vkQueue{VK_NULL_HANDLE};
@@ -54,6 +85,7 @@ namespace lepus::gfx
 	PFN_vkCmdEndRenderingKHR vkCmdEndRenderingKHR{nullptr};
 	utility::List<VkBufferAlloc> m_vkVertBuffers{utility::List<VkBufferAlloc>()};
 	utility::List<VkBufferAlloc> m_vkIndexBuffers{utility::List<VkBufferAlloc>()};
+	utility::List<VkBufferAlloc> m_vkUniformBuffers{utility::List<VkBufferAlloc>()};
 	VkDeviceMemory m_vkMemory{VK_NULL_HANDLE};
 	VmaAllocator m_vmaAllocator{nullptr};
 	VmaAllocation m_vmaAllocation{nullptr};
@@ -62,6 +94,8 @@ namespace lepus::gfx
 	VkRenderingAttachmentInfo m_vkColourAttachmentInfo{{}}, m_vkDepthAttachmentInfo{{}};
 	VkImage m_vkDepthBuffer{VK_NULL_HANDLE};
 	VkImageView m_vkDepthBufferView{VK_NULL_HANDLE};
+
+	DescriptorSetLayoutBindings m_DescriptorSetLayoutBindings{};
 
 	struct VulkanDefaults
 	{
@@ -78,6 +112,7 @@ namespace lepus::gfx
 	    VkPipelineRasterizationStateCreateInfo rasterStateCreateInfo = {};
 	    VkPipelineColorBlendStateCreateInfo colorBlendStateCreateInfo = {};
 	    VkPipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo = {};
+	    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo[DescriptorSetCount] = {};
 	    VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
 	    VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
 	    VkPushConstantRange pushConstantRange = {};
@@ -88,12 +123,16 @@ namespace lepus::gfx
 	    /// @remarks When cleaning up resources, make sure this only gets disposed once
 	    /// (on each disposed pipeline, before disposing the layout check that it isn't this default one)
 	    VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
+	    VkDescriptorSetLayout descriptorSetLayouts[DescriptorSetCount] = {};
 	} m_Defaults;
 
 	utility::List<VkPipeline> m_vkGraphicsPipelines{utility::List<VkPipeline>()};
 	utility::List<VkPipelineLayout> m_vkGraphicsPipelineLayouts{utility::List<VkPipelineLayout>()};
 	utility::List<const lepus::gfx::VkShader*> m_vkGraphicsPipelineMetadata{utility::List<const lepus::gfx::VkShader*>()};
 	size_t m_GraphicsPipelineCount{0};
+
+	VkDescriptorPool m_vkDescriptorPool{VK_NULL_HANDLE};
+	VkDescriptorSet m_vkDescriptorSets[DescriptorSetCount]{};
 
 	inline void* GetUniformInternal(const char* name) override
 	{
@@ -117,7 +156,8 @@ namespace lepus::gfx
 	enum BufferType
 	{
 	    VertexBuffer,
-	    IndexBuffer
+	    IndexBuffer,
+	    UniformBuffer
 	};
 
 	GraphicsApiVk()

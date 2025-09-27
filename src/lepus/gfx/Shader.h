@@ -72,23 +72,21 @@ namespace lepus
 	    }
 	};
 
-	struct ShaderUniformModelBase
+	struct PushConstantModelBase
 	{
 	    lepus::gfx::MaterialAttributeMatrix4 MODEL;
-	    lepus::gfx::MaterialAttributeMatrix4 VIEW;
-	    lepus::gfx::MaterialAttributeMatrix4 PROJ;
 	};
 
 	/// @brief An API-specific shader class that implements a handle getter for that API's shader objects (e.g. shader handle integer in GL, objects in D3D/Vk etc.).
-	template <typename TApiNativeShaderHandle = void*, class TUniformModel = ShaderUniformModelBase>
+	template <typename TApiNativeShaderHandle = void*, class TPushConstantModel = PushConstantModelBase>
 	class Shader : public ShaderInfo
 	{
 	    public:
 	    virtual TApiNativeShaderHandle GetApiHandle() const = 0;
 
-	    static const type_info& GetUniformModel()
+	    static const type_info& GetPushConstantModel()
 	    {
-		return typeid(TUniformModel);
+		return typeid(TPushConstantModel);
 	    }
 
 	    explicit Shader(ShaderInfo&& other)
@@ -108,8 +106,8 @@ namespace lepus
 	    }
 	};
 
-	template <class UniformModel = ShaderUniformModelBase>
-	using AnyShader = Shader<void*, UniformModel>;
+	template <class PushConstantModel = PushConstantModelBase>
+	using AnyShader = Shader<void*, PushConstantModel>;
     } // namespace gfx
 } // namespace lepus
 
