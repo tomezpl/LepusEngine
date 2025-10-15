@@ -19,24 +19,37 @@
 #include "ApiVk/Types/VkBufferAlloc.h"
 
 #include <map>
+#include <limits>
 
 namespace lepus::gfx
 {
     class GraphicsApiVkOptions : public GraphicsApiOptions
     {
 	public:
+	std::shared_ptr<system::WindowingGLFW> windowingPtr;
+
 	inline GraphicsApiType GetType() override
 	{
 	    return GraphicsApiType::GraphicsApiVulkan;
 	}
 
-	std::shared_ptr<system::WindowingGLFW> windowingPtr;
+	inline system::Windowing* GetWindowing() override
+	{
+	    return windowingPtr.get();
+	}
     };
 
     template GraphicsApiVkOptions& GraphicsApi::GetOptions<GraphicsApiVkOptions>();
 
     class GraphicsApiVk : public GraphicsApi
     {
+	private:
+	template <class TDescSetLayoutBindings>
+	static constexpr uint32_t GetBindingCount()
+	{
+	    return sizeof(TDescSetLayoutBindings) / sizeof(VkDescriptorSetLayoutBinding);
+	}
+
 	public:
 	/**
 	 * Descriptor sets indices to use in the Vk pipeline.
@@ -52,6 +65,7 @@ namespace lepus::gfx
 	    DescriptorSetCount
 	};
 
+	public:
 	struct GlobalUniformBufferObject
 	{
 	    MaterialAttributeMatrix4 viewMatrix{};
@@ -62,8 +76,13 @@ namespace lepus::gfx
 	{
 	    struct Global
 	    {
-		VkDescriptorSetLayoutBinding ubo{DescriptorSetIndex_Global, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, VK_NULL_HANDLE};
+		VkDescriptorSetLayoutBinding ubo{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, VK_NULL_HANDLE};
 	    } global;
+
+	    struct Object
+	    {
+		VkDescriptorSetLayoutBinding ubo{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_ALL, VK_NULL_HANDLE};
+	    } object;
 	};
 
 	private:
@@ -203,6 +222,11 @@ namespace lepus::gfx
 
 	void Shutdown() override;
     };
+
+#define LEPUS_GENERATE_BINDING_COUNT(BindingCategory) template uint32_t GraphicsApiVk::GetBindingCount<GraphicsApiVk::DescriptorSetLayoutBindings::##BindingCategory>();
+    LEPUS_GENERATE_BINDING_COUNT(Global);
+    LEPUS_GENERATE_BINDING_COUNT(Object);
+#undef LEPUS_GENERATE_BINDING_COUNT
 } // namespace lepus::gfx
 
 #endif

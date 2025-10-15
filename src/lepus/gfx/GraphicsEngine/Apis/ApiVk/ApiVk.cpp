@@ -14,29 +14,9 @@
 
 using namespace lepus::gfx;
 
-// auto PrepareGlobalDescriptorSetLayoutCreateInfo(VkDescriptorSetLayoutCreateInfo& outCreateInfo)
-// {
-//     constexpr GraphicsApiVk::DescriptorSetLayoutBindings::Global globalBindings{};
-//     static VkDescriptorSetLayoutBinding bindings[] = {globalBindings.ubo};
-//
-//     return bindings;
-// }
-//
-// void PreparePassDescriptorSetLayoutCreateInfo(VkDescriptorSetLayoutCreateInfo& outCreateInfo)
-// {
-// }
-//
-// void PrepareMaterialDescriptorSetLayoutCreateInfo(VkDescriptorSetLayoutCreateInfo& outCreateInfo)
-// {
-// }
-//
-// void PrepareObjectDescriptorSetLayoutCreateInfo(VkDescriptorSetLayoutCreateInfo& outCreateInfo)
-// {
-// }
-
 void GraphicsApiVk::Init(GraphicsApiOptions* options)
 {
-    GraphicsApiVkOptions* vkOptions = static_cast<GraphicsApiVkOptions*>(options);
+    auto* vkOptions = static_cast<GraphicsApiVkOptions*>(options);
     InitInternal(vkOptions);
 
     vkb::InstanceBuilder builder;
@@ -45,7 +25,7 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     vkb::Instance vkbInstance = vkbInstanceWrapper.value();
 
     // Create surface from window
-    GLFWwindow* window = static_cast<GLFWwindow*>(vkOptions->windowingPtr->GetWindowPtr());
+    auto* window = static_cast<GLFWwindow*>(vkOptions->windowingPtr->GetWindowPtr());
     glfwCreateWindowSurface(vkbInstance.instance, window, nullptr, &m_vkSurface);
 
     vkb::PhysicalDeviceSelector deviceSelector(vkbInstance);
@@ -66,7 +46,7 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
     vkb::DeviceBuilder deviceBuilder(physDevWrapper.value());
     auto devWrapper = deviceBuilder.build();
     assert(devWrapper);
-    vkb::Device vkbDevice = devWrapper.value();
+    const vkb::Device& vkbDevice = devWrapper.value();
 
     VkDevice device = vkbDevice.device;
     auto graphicsQueueWrapper = vkbDevice.get_queue(vkb::QueueType::graphics);
@@ -159,7 +139,7 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
 	{
 	case DescriptorSetIndex_Global:
 	    // TODO: ensure these structs don't have any padding
-	    createInfo.bindingCount = sizeof(m_DescriptorSetLayoutBindings.global) / sizeof(VkDescriptorSetLayoutBinding);
+	    createInfo.bindingCount = GetBindingCount<DescriptorSetLayoutBindings::Global>();
 	    createInfo.pBindings = reinterpret_cast<VkDescriptorSetLayoutBinding*>(&m_DescriptorSetLayoutBindings.global);
 	    break;
 	case DescriptorSetIndex_PerPass:
@@ -171,8 +151,8 @@ void GraphicsApiVk::Init(GraphicsApiOptions* options)
 	    createInfo.pBindings = VK_NULL_HANDLE;
 	    break;
 	case DescriptorSetIndex_Object:
-	    createInfo.bindingCount = 0;
-	    createInfo.pBindings = VK_NULL_HANDLE;
+	    createInfo.bindingCount = GetBindingCount<DescriptorSetLayoutBindings::Object>();
+	    createInfo.pBindings = reinterpret_cast<VkDescriptorSetLayoutBinding*>(&m_DescriptorSetLayoutBindings.object);
 	    break;
 	case DescriptorSetCount:
 	default:

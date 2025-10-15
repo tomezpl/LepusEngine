@@ -25,16 +25,22 @@ namespace lepus
 	    GLuint m_FragmentShaders[ProgramCount];
 	    GLuint m_VertexShaders[ProgramCount];
 	    size_t m_ShaderCount = 0;
+	    std::shared_ptr<system::WindowingGLFW> m_Windowing;
 
 	    public:
 	    GraphicsApiType GetType() override { return GraphicsApiOpenGL; }
+	    inline system::Windowing* GetWindowing() override
+	    {
+		return m_Windowing.get();
+	    }
 
-	    GraphicsApiGLOptions()
+	    GraphicsApiGLOptions(std::shared_ptr<system::WindowingGLFW> windowing)
 	        : GraphicsApiOptions()
 	    {
 		// Zero the shader arrays.
 		memset(m_FragmentShaders, 0, ProgramCount * sizeof(GLuint));
 		memset(m_VertexShaders, 0, ProgramCount * sizeof(GLuint));
+		m_Windowing = windowing;
 	    }
 
 	    [[nodiscard]] inline GLuint GetFragmentShader(size_t index) const { return m_FragmentShaders[index]; }

@@ -106,8 +106,7 @@ namespace lepus
 	    }
 	};
 
-	template <class PushConstantModel = PushConstantModelBase>
-	using AnyShader = Shader<void*, PushConstantModel>;
+	typedef Shader<void*, PushConstantModelBase> AnyShader;
     } // namespace gfx
 } // namespace lepus
 

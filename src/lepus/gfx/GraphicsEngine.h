@@ -23,11 +23,23 @@ namespace lepus
 	{
 	    protected:
 	    /// @brief Graphics API wrapper (GL, Vk, D3D).
-	    GraphicsApi* m_Api;
+#if LEPUS_FORCE_API_OPENGL
+	    friend class GraphicsApiGL;
+	    using GraphicsApiClass = GraphicsApiGL;
+#elif LEPUS_FORCE_API_VK
+	    friend class GraphicsApiVk;
+	    using GraphicsApiClass = GraphicsApiVk;
+#elif LEPUS_USE_DYNAMIC_API
+	    using GraphicsApiClass = GraphicsApi;
+	    GraphicsApiClass* m_Api;
+#endif
+#if !LEPUS_USE_DYNAMIC_API
+	    GraphicsApiType m_Api;
+#endif
 
 	    /// @brief Windowing interface wrapper. This can be shared by multiple systems, not just graphics,
 	    /// and implemented through many platform-specific libraries.
-	    std::shared_ptr<lepus::system::Windowing> m_Windowing;
+	    lepus::system::Windowing* m_Windowing;
 
 	    struct
 	    {
@@ -40,7 +52,7 @@ namespace lepus
 	    struct
 	    {
 		std::forward_list<lepus::engine::objects::Mesh*> meshes;
-		utility::List<AnyShader<>*>* shaders;
+		utility::List<AnyShader*>* shaders;
 	    } m_Resources;
 
 	    void _InitDefault()
@@ -60,7 +72,7 @@ namespace lepus
 	    /// @brief Creates a GraphicsEngine using the provided API options and a windowing context.
 	    /// @param options API options. This will be used to create a GraphicsApi instance of the right type. The engine has ownership over the created API wrapper.
 	    /// @param windowing Windowing context containing a window handle, dimensions, image format, etc.
-	    GraphicsEngine(GraphicsApiOptions* options, std::shared_ptr<lepus::system::Windowing> windowing)
+	    GraphicsEngine(GraphicsApiOptions* options, lepus::system::Windowing* windowing)
 	    {
 		_InitDefault();
 
@@ -70,13 +82,11 @@ namespace lepus
 
 	    /// @brief Assigns a windowing context to use with this GraphicsEngine. This usually needs to be done before InitApi.
 	    /// @param windowing Created windowing context to use.
-	    void InitWindowing(std::shared_ptr<lepus::system::Windowing> windowing);
+	    void InitWindowing(lepus::system::Windowing* windowing);
 
 	    /// @brief Initialises the API library and creates an instance of the wrapper for the right API type.
 	    /// @param options API options used to initialise and create the API library wrapper. These are copied, so it is recommended to create options in stack.
 	    void InitApi(GraphicsApiOptions* options);
-
-#undef INIT_DEFAULT
 
 	    enum PixelFormat
 	    {
@@ -89,17 +99,24 @@ namespace lepus
 		return *((TGraphicsApi*)m_Api);
 	    }
 
-	    inline GraphicsApi* GetApi()
+	    inline GraphicsApiClass& GetApi()
 	    {
+#if LEPUS_USE_DYNAMIC_API
+		return *m_Api;
+#else
 		return m_Api;
+#endif
 	    }
 
 	    void Setup();
 
+	    // TODO: methods to get uniform buffer object (this should be mapped memory) and then flush it (unmap)
+	    // TODO: also allow specifying uniform buffer size at runtime
+
 	    template <class TUniformModel = PushConstantModelBase>
-	    const AnyShader<TUniformModel>* RegisterShader(const char* name, const engine::ShaderAsset& vertexShader, const engine::ShaderAsset& fragmentShader)
+	    const AnyShader* RegisterShader(const char* name, const engine::ShaderAsset& vertexShader, const engine::ShaderAsset& fragmentShader)
 	    {
-		auto apiKind = m_Api->GetOptions<GraphicsApiOptions>().GetType();
+		auto apiKind = GetApi().GetType();
 		ShaderInfo info = ShaderInfo(name, static_cast<ShaderStage>(ShaderStageVertex | ShaderStageFragment));
 
 		// Both shader assets need to be of the same target API type
@@ -109,16 +126,16 @@ namespace lepus
 
 		auto& spirvCompiler = ShaderCompilerVk::Singleton();
 
-		AnyShader<>* newShader = nullptr;
+		AnyShader* newShader = nullptr;
 
 		switch (apiKind)
 		{
 		case GraphicsApiOpenGL:
-		    newShader = (AnyShader<>*)(new GLShader(info));
+		    newShader = (AnyShader*)(new GLShader(info));
 		    ((GLShader*)newShader)->SetGLProgram(ShaderCompilerGLSL::Singleton().BuildProgram(ShaderCompilerGLSL::Singleton().CompileShader(fragmentShader.data, fragmentShader.szData, ShaderStageFragment), ShaderCompilerGLSL::Singleton().CompileShader(vertexShader.data, vertexShader.szData, ShaderStageVertex)));
 		    break;
 		case GraphicsApiVulkan:
-		    newShader = (AnyShader<>*)(new VkShader(info));
+		    newShader = (AnyShader*)(new VkShader(info));
 		    ((VkShader*)newShader)->SetShaderModule(spirvCompiler.CompileShader(fragmentShader.data, fragmentShader.szData, ShaderStageFragment).ShaderHandle, ShaderStageFragment);
 		    ((VkShader*)newShader)->SetShaderModule(spirvCompiler.CompileShader(vertexShader.data, vertexShader.szData, ShaderStageVertex).ShaderHandle, ShaderStageVertex);
 		    static_cast<GraphicsApiVk*>(m_Api)->AddShader((VkShader*)newShader);
@@ -132,7 +149,7 @@ namespace lepus
 
 		assert(newShader != nullptr);
 		m_Resources.shaders->Push(newShader);
-		return reinterpret_cast<AnyShader<TUniformModel>*>(newShader);
+		return reinterpret_cast<AnyShader*>(newShader);
 	    }
 
 	    /// @brief Renders the scene and performs buffer swap to display the results in the window.
@@ -161,6 +178,11 @@ namespace lepus
 	    lepus::engine::objects::Mesh* CreateMesh(const utility::Primitive& geometry);
 
 	    void Dispose();
+
+	    static GraphicsEngine Create(GraphicsApiOptions* options)
+	    {
+		return {options, options->GetWindowing()};
+	    }
 	};
     } // namespace gfx
 } // namespace lepus

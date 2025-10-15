@@ -10,7 +10,7 @@
 
 using namespace lepus::gfx;
 
-void GraphicsEngine::InitWindowing(std::shared_ptr<lepus::system::Windowing> windowing)
+void GraphicsEngine::InitWindowing(lepus::system::Windowing* windowing)
 {
     m_Windowing = windowing;
 }
@@ -27,11 +27,11 @@ void GraphicsEngine::InitApi(GraphicsApiOptions* options)
     {
     case GraphicsApiType::GraphicsApiOpenGL:
 	m_Api = new GraphicsApiGL(*static_cast<GraphicsApiGLOptions*>(options));
-	m_Resources.shaders = (utility::List<AnyShader<>*>*)(new utility::List<GLShader*>());
+	m_Resources.shaders = (utility::List<AnyShader*>*)(new utility::List<GLShader*>());
 	break;
     case GraphicsApiType::GraphicsApiVulkan:
 	m_Api = new GraphicsApiVk(options);
-	m_Resources.shaders = (utility::List<AnyShader<>*>*)(new utility::List<VkShader*>());
+	m_Resources.shaders = (utility::List<AnyShader*>*)(new utility::List<VkShader*>());
 	// TODO
 	break;
     case GraphicsApiType::GraphicsApiTest:
