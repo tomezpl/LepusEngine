@@ -145,7 +145,7 @@ void GraphicsApiGL::UpdateUniforms(const SceneGraph& scene, const GLRenderable* 
 	    glUniform1f(location, materialAttribs.Get<GLfloat>(i));
 	    break;
 	case lepus::gfx::UniformType::VEC3:
-	    glUniform3fv(location, 1, materialAttribs.Get<GLfloat*>(i));
+	    glUniform3fv(location, 1, static_cast<GLfloat*>(materialAttribs.GetRaw(i)));
 	    break;
 	case lepus::gfx::UniformType::INVALID:
 	default:

@@ -1,3 +1,5 @@
+#define LEPUS_FORCE_API_OPENGL 1
+
 #ifdef _DEBUG
 #define LEPUS_ALLOW_STDOUT
 #endif
@@ -8,7 +10,7 @@ using namespace lepus;
 
 int main()
 {
-	DemoApp app;
+    DemoApp app;
 
-	return app.Run();
+    return app.Run();
 }

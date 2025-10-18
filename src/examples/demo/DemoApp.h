@@ -121,9 +121,18 @@ class DemoApp : public system::BaseApp
     inline int Run() override
     {
 	const uint32_t width = 1280, height = 720;
-	auto windowing = std::make_shared<system::WindowingGLFW>(width, height, false);
+	bool isOpenGl = false;
+#if LEPUS_FORCE_API_OPENGL
+	isOpenGl = true;
+#endif
+	auto windowing = std::make_shared<system::WindowingGLFW>(width, height, isOpenGl);
 
-	auto apiOptions = gfx::GraphicsApiOptions::Create(windowing.get(), gfx::GraphicsApiVulkan);
+	if (isOpenGl)
+	{
+	    windowing->SetAsCurrentContext();
+	}
+
+	auto apiOptions = gfx::GraphicsApiOptions::Create(windowing.get(), isOpenGl ? gfx::GraphicsApiOpenGL : gfx::GraphicsApiVulkan);
 	auto engine = gfx::GraphicsEngine::Create(apiOptions);
 	auto& api = engine.GetApi();
 

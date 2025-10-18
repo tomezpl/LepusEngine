@@ -31,11 +31,8 @@ namespace lepus
 	    using GraphicsApiClass = GraphicsApiVk;
 #elif LEPUS_USE_DYNAMIC_API
 	    using GraphicsApiClass = GraphicsApi;
+#endif
 	    GraphicsApiClass* m_Api;
-#endif
-#if !LEPUS_USE_DYNAMIC_API
-	    GraphicsApiType m_Api;
-#endif
 
 	    /// @brief Windowing interface wrapper. This can be shared by multiple systems, not just graphics,
 	    /// and implemented through many platform-specific libraries.
@@ -93,19 +90,19 @@ namespace lepus
 		RGBA32 = 256
 	    };
 
-	    template <class TGraphicsApi>
-	    inline TGraphicsApi& GetApi()
-	    {
-		return *((TGraphicsApi*)m_Api);
-	    }
+	    // 	    template <class TGraphicsApi>
+	    // 	    inline TGraphicsApi& GetApi()
+	    // 	    {
+	    // #if LEPUS_USE_DYNAMIC_API
+	    // 		return *((TGraphicsApi*)m_Api);
+	    // #else
+	    // 		return *reinterpret_cast<GraphicsApiClass*>(&m_Api);
+	    // #endif
+	    // 	    }
 
 	    inline GraphicsApiClass& GetApi()
 	    {
-#if LEPUS_USE_DYNAMIC_API
 		return *m_Api;
-#else
-		return m_Api;
-#endif
 	    }
 
 	    void Setup();
@@ -135,10 +132,12 @@ namespace lepus
 		    ((GLShader*)newShader)->SetGLProgram(ShaderCompilerGLSL::Singleton().BuildProgram(ShaderCompilerGLSL::Singleton().CompileShader(fragmentShader.data, fragmentShader.szData, ShaderStageFragment), ShaderCompilerGLSL::Singleton().CompileShader(vertexShader.data, vertexShader.szData, ShaderStageVertex)));
 		    break;
 		case GraphicsApiVulkan:
+#if !LEPUS_FORCE_API_OPENGL
 		    newShader = (AnyShader*)(new VkShader(info));
 		    ((VkShader*)newShader)->SetShaderModule(spirvCompiler.CompileShader(fragmentShader.data, fragmentShader.szData, ShaderStageFragment).ShaderHandle, ShaderStageFragment);
 		    ((VkShader*)newShader)->SetShaderModule(spirvCompiler.CompileShader(vertexShader.data, vertexShader.szData, ShaderStageVertex).ShaderHandle, ShaderStageVertex);
-		    static_cast<GraphicsApiVk*>(m_Api)->AddShader((VkShader*)newShader);
+		    static_cast<GraphicsApiVk*>(&GetApi())->AddShader((VkShader*)newShader);
+#endif
 		    break;
 		case GraphicsApiTest:
 		case GraphicsApiUnknown:

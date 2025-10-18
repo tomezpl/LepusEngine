@@ -163,7 +163,7 @@ namespace lepus
 
 	template lepus::gfx::GLUniformBinding<void*>* GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(const char* name);
 
-	template GraphicsApiGL& GraphicsEngine::GetApi<GraphicsApiGL>();
+	// template GraphicsApiGL& GraphicsEngine::GetApi<GraphicsApiGL>();
     } // namespace gfx
 } // namespace lepus
 

@@ -224,7 +224,8 @@ if (MSVC)
     # 5262: implicit switch fallback
     # 4191: unsafe reinterpret_casts are needed for vulkan PFNs
     # 4583: VkBootstrap destructors are not implicitly called
-    set(MSVCDisabledWarnings 4100 4514 4464 4820 4263 4625 5026 4626 5027 5045 5262 4191 4583)
+    # 4668: need to be able to implicitly replace undefined macros with 0 for the API settings
+    set(MSVCDisabledWarnings 4100 4514 4464 4820 4263 4625 5026 4626 5027 5045 5262 4191 4583 4668)
 
     set(MSVCDisabledWarningsFormatted "")
     foreach (Warning IN LISTS MSVCDisabledWarnings)
