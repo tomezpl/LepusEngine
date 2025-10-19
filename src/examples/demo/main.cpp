@@ -1,4 +1,4 @@
-#define LEPUS_FORCE_API_OPENGL 1
+#define LEPUS_FORCE_API_VK 1
 
 #ifdef _DEBUG
 #define LEPUS_ALLOW_STDOUT
