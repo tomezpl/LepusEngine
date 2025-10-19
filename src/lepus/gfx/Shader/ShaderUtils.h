@@ -7,9 +7,7 @@ namespace lepus::gfx
 // This macro defines shader's uniform/pushConstant model as a struct, and stores the members in a reflection string for the engine to be able to provide metadata.
 #define DEFINE_SHADER_MODEL(name, members) \
     struct name                            \
-    {                                      \
-	members                            \
-    };                                     \
+        members;                           \
     const char __lepus_gfx_shadermodel_def_##name##__[] = ## #members;
 
 #define USE_SHADER_MODEL(modelName, attribName, value)                                                             \

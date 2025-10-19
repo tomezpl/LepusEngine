@@ -5,6 +5,7 @@
 
 #include <cstring>
 #include <utility>
+#include <typeinfo>
 
 namespace lepus
 {

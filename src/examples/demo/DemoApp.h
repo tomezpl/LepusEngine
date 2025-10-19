@@ -120,7 +120,7 @@ class DemoApp : public system::BaseApp
 
     inline int Run() override
     {
-	const uint32_t width = 1280, height = 720;
+	constexpr uint32_t width = 1280, height = 720;
 	bool isOpenGl = false;
 #if LEPUS_FORCE_API_OPENGL
 	isOpenGl = true;
@@ -155,11 +155,13 @@ class DemoApp : public system::BaseApp
 	REGISTER_SHADER(
 	    engine,
 	    SolidColour,
-	    gfx::MaterialAttributeMatrix4 MODEL;
-	    gfx::MaterialAttributeMatrix4 VIEW;
-	    gfx::MaterialAttributeMatrix4 PROJ;
-	    gfx::MaterialAttributeVector3 colour;,
-	                                         solidColourVertShader, solidColourFragShader);
+	    {
+	        gfx::MaterialAttributeMatrix4 MODEL;
+	        gfx::MaterialAttributeMatrix4 VIEW;
+	        gfx::MaterialAttributeMatrix4 PROJ;
+	        gfx::MaterialAttributeVector3 colour;
+	    },
+	    solidColourVertShader, solidColourFragShader);
 
 	lepus::gfx::Material baseMaterial, otherMaterial;
 

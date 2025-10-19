@@ -223,7 +223,7 @@ namespace lepus::gfx
 	void Shutdown() override;
     };
 
-#define LEPUS_GENERATE_BINDING_COUNT(BindingCategory) template uint32_t GraphicsApiVk::GetBindingCount<GraphicsApiVk::DescriptorSetLayoutBindings::##BindingCategory>();
+#define LEPUS_GENERATE_BINDING_COUNT(BindingCategory) template uint32_t GraphicsApiVk::GetBindingCount<GraphicsApiVk::DescriptorSetLayoutBindings::BindingCategory>();
     LEPUS_GENERATE_BINDING_COUNT(Global);
     LEPUS_GENERATE_BINDING_COUNT(Object);
 #undef LEPUS_GENERATE_BINDING_COUNT
