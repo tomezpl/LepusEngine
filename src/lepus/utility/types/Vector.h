@@ -177,8 +177,8 @@ namespace lepus
 
 	    inline float x() const { return m_Components[0]; }
 	    inline float y() const { return m_Components[1]; }
-	    inline float x(float newX) { m_Components[0] = newX; }
-	    inline float y(float newY) { m_Components[1] = newY; }
+	    inline float x(float newX) { return m_Components[0] = newX; }
+	    inline float y(float newY) { return m_Components[1] = newY; }
 
 	    inline Vector2 operator-(const Vector2& b)
 	    {

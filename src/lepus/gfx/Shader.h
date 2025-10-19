@@ -61,6 +61,7 @@ namespace lepus
 	    ShaderInfo& operator=(const ShaderInfo& copy)
 	    {
 		_InitShaderName(copy.m_ShaderName);
+		return *this;
 	    }
 
 	    virtual ~ShaderInfo()

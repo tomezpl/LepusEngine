@@ -273,7 +273,7 @@ namespace lepus
 	{
 	    protected:
 	    template <typename TValue>
-	    static inline utility::List<TValue>& getData(const MaterialAttributes& attribs, UniformType& outType)
+	    static inline utility::List<TValue>& getData(const MaterialAttributes& attribs)
 	    {
 		return attribs.getDataList<TValue>(attribs.getDataType<TValue>());
 	    }
@@ -311,7 +311,7 @@ namespace lepus
 	    MaterialAttributeView(const MaterialAttributes& materialAttributes, MaterialAttributeHandle handle)
 	    {
 		m_Handle = handle;
-		m_Data = (getData<TRaw>(materialAttributes, m_Type).Raw() + getIndex(materialAttributes, handle));
+		m_Data = (getData<TRaw>(materialAttributes).Raw() + getIndex(materialAttributes, handle));
 		m_Initialised = true;
 	    }
 
