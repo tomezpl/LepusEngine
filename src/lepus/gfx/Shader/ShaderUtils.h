@@ -8,7 +8,7 @@ namespace lepus::gfx
 #define DEFINE_SHADER_MODEL(name, members) \
     struct name                            \
         members;                           \
-    const char __lepus_gfx_shadermodel_def_##name##__[] = ## #members;
+    const char __lepus_gfx_shadermodel_def_##name##__[] = #members;
 
 #define USE_SHADER_MODEL(modelName, attribName, value)                                                             \
     #attribName, value,                                                                                            \
@@ -23,7 +23,7 @@ namespace lepus::gfx
     // 2. fragment shader
 #define REGISTER_SHADER(engineObject, shaderName, shaderModelMembers, ...)     \
     DEFINE_SHADER_MODEL(generatedShaderModel_##shaderName, shaderModelMembers) \
-    const auto* shaderName##_shader = engineObject##.RegisterShader<generatedShaderModel_##shaderName>(#shaderName, __VA_ARGS__)
+    const auto* shaderName##_shader = engineObject.RegisterShader<generatedShaderModel_##shaderName>(#shaderName, __VA_ARGS__)
 
 } // namespace lepus::gfx
 
