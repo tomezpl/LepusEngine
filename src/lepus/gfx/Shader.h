@@ -85,7 +85,7 @@ namespace lepus
 	    public:
 	    virtual TApiNativeShaderHandle GetApiHandle() const = 0;
 
-	    static const type_info& GetPushConstantModel()
+	    static const std::type_info& GetPushConstantModel()
 	    {
 		return typeid(TPushConstantModel);
 	    }
