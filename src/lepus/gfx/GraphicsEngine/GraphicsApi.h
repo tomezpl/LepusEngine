@@ -50,6 +50,12 @@ namespace lepus
 	    GraphicsApiVulkan
 	};
 
+#if LEPUS_FORCE_API_OPENGL
+	class GraphicsApiGLOptions;
+#elif LEPUS_FORCE_API_VK
+	class GraphicsApiVkOptions;
+#endif
+
 	class GraphicsApiOptions
 	{
 	    public:
@@ -86,13 +92,9 @@ namespace lepus
 
 	    public:
 #if LEPUS_FORCE_API_OPENGL == 1
-	    friend class GraphicsApiGLOptions;
 	    using GraphicsApiOptionsClass = GraphicsApiGLOptions;
-	    // static GraphicsApiGLOptions Create(const system::Windowing* windowing);
 #elif LEPUS_FORCE_API_VK == 1
-	    friend class GraphicsApiVkOptions;
 	    using GraphicsApiOptionsClass = GraphicsApiVkOptions;
-	    // static GraphicsApiVkOptions Create(const system::Windowing* windowing);
 #elif LEPUS_USE_DYNAMIC_API == 1
 	    // TODO: template?
 	    using GraphicsApiOptionsClass = GraphicsApiOptions;
