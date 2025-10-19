@@ -5,10 +5,15 @@
 
 class GraphicsApiStubOptions : public lepus::gfx::GraphicsApiOptions
 {
-	public:
-	lepus::gfx::GraphicsApiType GetType() override { return lepus::gfx::GraphicsApiType::GraphicsApiTest; }
+    public:
+    lepus::gfx::GraphicsApiType GetType() override { return lepus::gfx::GraphicsApiType::GraphicsApiTest; }
+    lepus::system::Windowing* GetWindowing() override
+    {
+	assert(false);
+	return nullptr;
+    };
 
-	long long testValue = 0;
+    long long testValue = 0;
 };
 
 #endif
