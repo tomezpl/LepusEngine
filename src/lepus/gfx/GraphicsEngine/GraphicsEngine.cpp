@@ -6,7 +6,6 @@
 #include "Apis/ApiVk.h"
 #include "Apis/ApiGL/Types/GLShader.h"
 #include "Apis/ApiVk/Types/VkShader.h"
-#include "ShaderCompilers/ShaderCompilerVk.h"
 
 using namespace lepus::gfx;
 
@@ -47,7 +46,25 @@ void GraphicsEngine::InitApi(GraphicsApiOptions* options)
 
 void GraphicsEngine::Setup()
 {
-    m_Api->CreatePipeline();
+    GetApi().CreatePipeline();
+}
+
+GraphicsEngine::TextureHandle GraphicsEngine::AddTexture(const engine::TextureAsset& asset)
+{
+    m_TextureAssets.push_back(asset);
+    // GetApi().AllocateTexture(asset.width, asset.height, 3, asset.data);
+    auto apiHandle = GetApi().AddTexture(asset);
+    return std::make_tuple(static_cast<uint8_t>(m_TextureAssets.size() - 1), apiHandle);
+}
+
+GraphicsEngine::TextureHandle GraphicsEngine::AddTexture(const engine::TextureAsset& asset, MaterialAttributeTexture& materialAttrib)
+{
+    auto handle = AddTexture(asset);
+
+    const auto [_, apiHandle] = handle;
+    materialAttrib.handle = apiHandle;
+
+    return handle;
 }
 
 void GraphicsEngine::Render(const float r, const float g, const float b)
@@ -91,11 +108,6 @@ lepus::engine::objects::Mesh* GraphicsEngine::CreateMesh(const utility::Primitiv
 
     return createdMesh;
 }
-
-// template <class TUniformModel>
-// const AnyShader<TUniformModel>* GraphicsEngine::RegisterShader(const char* name, const engine::ShaderAsset& vertexShader, const engine::ShaderAsset& fragmentShader)
-// {
-// }
 
 void GraphicsEngine::Dispose()
 {

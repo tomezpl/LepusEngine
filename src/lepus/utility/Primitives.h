@@ -18,8 +18,8 @@ namespace lepus
 	    size_t m_IndexCount;
 
 	    public:
-	    /// @brief Number of floats for each vertex. Currently, we only store position (XYZ).
-	    static const unsigned char NbComponents = 3;
+	    /// @brief Number of floats for each vertex. Currently, we only store position (XYZ), and UV (ST)
+	    static const unsigned char NbComponents = 5;
 
 	    // Move constructor
 	    Primitive(Primitive&& other)
@@ -150,24 +150,84 @@ namespace lepus
 	    public:
 	    static const inline Primitive CreateCubeUnindexed()
 	    {
-		float cubeVertices[3 * 2 * 6 * 3] = {};
-		memset(cubeVertices, 0, sizeof(cubeVertices));
-		uint32_t indices[3 * 2 * 6] = {0};
+		constexpr auto k_FloatsPerVertex = Primitive::NbComponents;
+		// float cubeVertices[3 * 2 * 6 * (k_FloatsPerVertex)] = {};
+		// memset(cubeVertices, 0, sizeof(cubeVertices));
 
-		Primitive indexedCube = CreateCube();
-		const uint32_t* cubeIndices = indexedCube.GetIndices();
-		size_t nbIndices = indexedCube.IndexCount();
-		const float* indexedVerts = indexedCube.GetVertices();
-		for (uint8_t i = 0; i < (uint8_t)nbIndices; i++)
+		// Primitive indexedCube = CreateCube();
+		// const uint32_t* cubeIndices = indexedCube.GetIndices();
+		// size_t nbIndices = indexedCube.IndexCount();
+		// const float* indexedVerts = indexedCube.GetVertices();
+		// for (uint8_t i = 0; i < (uint8_t)nbIndices; i++)
+		// {
+		//     // cubeVertices[3 * i] = indexedVerts[cubeIndices[i] * 3];
+		//     // cubeVertices[3 * i + 1] = indexedVerts[cubeIndices[i] * 3 + 1];
+		//     // cubeVertices[3 * i + 2] = indexedVerts[cubeIndices[i] * 3 + 2];
+		//     memcpy(&cubeVertices[k_FloatsPerVertex * i], &indexedVerts[cubeIndices[i] * k_FloatsPerVertex], sizeof(float) * 3);
+		//
+		//     indices[i] = i;
+		// }
+
+		// Assuming negative left and negative up
+		const float cubeVertices[] = {
+		    // Front:
+		    0.5f, 0.5f, -0.5f, 1.f, 1.f,   // top-right (1)
+		    0.5f, -0.5f, -0.5f, 1.f, 0.f,  // bottom-right (3)
+		    -0.5f, 0.5f, -0.5f, 0.f, 1.f,  // top-left (0)
+		    0.5f, -0.5f, -0.5f, 1.f, 0.f,  // bottom-right (3)
+		    -0.5f, -0.5f, -0.5f, 0.f, 0.f, // bottom-left (2)
+		    -0.5f, 0.5f, -0.5f, 0.f, 1.f,  // top-left (0)
+
+		    // Left:
+		    -0.5f, 0.5f, -0.5f, 1.f, 1.f,  // top-right
+		    -0.5f, -0.5f, -0.5f, 1.f, 0.f, // bottom-right
+		    -0.5f, 0.5f, 0.5f, 0.f, 1.f,   // top-left (4)
+		    -0.5f, -0.5f, -0.5f, 1.f, 0.f, // bottom-right
+		    -0.5f, -0.5f, 0.5f, 0.f, 0.f,  // bottom-left (5)
+		    -0.5f, 0.5f, 0.5f, 0.f, 1.f,   // top-left (4)
+
+		    // Back:
+		    -0.5f, 0.5f, 0.5f, 1.f, 1.f,  // top-right
+		    -0.5f, -0.5f, 0.5f, 1.f, 0.f, // bottom-right
+		    0.5f, 0.5f, 0.5f, 0.f, 1.f,   // top-left (6)
+		    -0.5f, -0.5f, 0.5f, 1.f, 0.f, // bottom-right
+		    0.5f, -0.5f, 0.5f, 0.f, 0.f,  // bottom-left (7)
+		    0.5f, 0.5f, 0.5f, 0.f, 1.f,   // top-left (6)
+
+		    // Top:
+		    0.5f, 0.5f, 0.5f, 1.f, 1.f,   // top-right
+		    0.5f, 0.5f, -0.5f, 1.f, 0.f,  // bottom-right
+		    -0.5f, 0.5f, 0.5f, 0.f, 1.f,  // top-left
+		    0.5f, 0.5f, -0.5f, 1.f, 0.f,  // bottom-right
+		    -0.5f, 0.5f, -0.5f, 0.f, 0.f, // bottom-left
+		    -0.5f, 0.5f, 0.5f, 0.f, 1.f,  // top-left
+
+		    // Right:
+		    0.5f, 0.5f, 0.5f, 1.f, 1.f,   // top-right
+		    0.5f, -0.5f, 0.5f, 1.f, 0.f,  // bottom-right
+		    0.5f, 0.5f, -0.5f, 0.f, 1.f,  // top-left
+		    0.5f, -0.5f, 0.5f, 1.f, 0.f,  // bottom-right
+		    0.5f, -0.5f, -0.5f, 0.f, 0.f, // bottom-left
+		    0.5f, 0.5f, -0.5f, 0.f, 1.f,  // top-left
+
+		    // Bottom:
+		    0.5f, -0.5f, -0.5f, 1.f, 1.f,  // top-right
+		    0.5f, -0.5f, 0.5f, 1.f, 0.f,   // bottom-right
+		    -0.5f, -0.5f, -0.5f, 0.f, 1.f, // top-left
+		    0.5f, -0.5f, 0.5f, 1.f, 0.f,   // bottom-right
+		    -0.5f, -0.5f, 0.5f, 0.f, 0.f,  // bottom-left
+		    -0.5f, -0.5f, -0.5f, 0.f, 1.f, // top-left
+		};
+
+		const uint32_t nbVertices = sizeof(cubeVertices) / sizeof(float) / k_FloatsPerVertex;
+		uint32_t indices[nbVertices] = {0};
+
+		for (uint32_t i = 0; i < nbVertices; i++)
 		{
-		    // cubeVertices[3 * i] = indexedVerts[cubeIndices[i] * 3];
-		    // cubeVertices[3 * i + 1] = indexedVerts[cubeIndices[i] * 3 + 1];
-		    // cubeVertices[3 * i + 2] = indexedVerts[cubeIndices[i] * 3 + 2];
-		    memcpy(&cubeVertices[3 * i], &indexedVerts[cubeIndices[i] * 3], sizeof(float) * 3);
 		    indices[i] = i;
 		}
 
-		return Primitive(cubeVertices, sizeof(cubeVertices) / sizeof(float) / 3, indices, sizeof(indices) / sizeof(uint32_t));
+		return Primitive(cubeVertices, nbVertices, indices, sizeof(indices) / sizeof(uint32_t));
 	    }
 
 	    static const inline Primitive CreateCube()
@@ -175,21 +235,21 @@ namespace lepus
 		// Assuming negative left and negative up
 		const float cubeVertices[] = {
 		    // Front:
-		    -0.5f, 0.5f, -0.5f,  // top-left (0)
-		    0.5f, 0.5f, -0.5f,   // top-right (1)
-		    -0.5f, -0.5f, -0.5f, // bottom-left (2)
-		    0.5f, -0.5f, -0.5f,  // bottom-right (3)
+		    -0.5f, 0.5f, -0.5f, 0.f, 1.f,  // top-left (0)
+		    0.5f, 0.5f, -0.5f, 1.f, 1.f,   // top-right (1)
+		    -0.5f, -0.5f, -0.5f, 0.f, 0.f, // bottom-left (2)
+		    0.5f, -0.5f, -0.5f, 1.f, 0.f,  // bottom-right (3)
 
 		    // Left:
-		    -0.5f, 0.5f, 0.5f, // top-left (4)
+		    -0.5f, 0.5f, 0.5f, 0.f, 1.f, // top-left (4)
 		    // use front top-left (0) as top-right
-		    -0.5f, -0.5f, 0.5f, // bottom-left (5)
+		    -0.5f, -0.5f, 0.5f, 0.f, 0.f, // bottom-left (5)
 		    // use front bottom-left (2) as bottom-right
 
 		    // Back:
-		    0.5f, 0.5f, 0.5f, // top-left (6)
+		    0.5f, 0.5f, 0.5f, 0.f, 1.f, // top-left (6)
 		    // reuse left top-left (4) as top-right
-		    0.5f, -0.5f, 0.5f, // bottom-left (7)
+		    0.5f, -0.5f, 0.5f, 0.f, 0.f, // bottom-left (7)
 		    // use left bottom-left (5) as bottom-right
 
 		    // Top:
@@ -236,7 +296,7 @@ namespace lepus
 		    7, 2, 3,
 		    7, 5, 2};
 
-		return Primitive(cubeVertices, sizeof(cubeVertices) / sizeof(float) / 3, indices, sizeof(indices) / sizeof(uint32_t));
+		return Primitive(cubeVertices, sizeof(cubeVertices) / sizeof(float) / Primitive::NbComponents, indices, sizeof(indices) / sizeof(uint32_t));
 	    }
 
 	    LEPUS_UTILITY_PRIMITIVE_SHARED(Cube);

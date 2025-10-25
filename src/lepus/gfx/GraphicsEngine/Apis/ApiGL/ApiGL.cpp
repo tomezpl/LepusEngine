@@ -74,6 +74,7 @@ void GraphicsApiGL::CreatePipeline()
     SetupBuffers();
     // SetupShaders();
     // SetupUniforms();
+    SetupSamplers();
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -83,9 +84,61 @@ void GraphicsApiGL::CreatePipeline()
     glEnable(GL_FRAMEBUFFER_SRGB);
 }
 
+void GraphicsApiGL::SetupSamplers()
+{
+    constexpr auto samplerCount = _countof(m_TextureTypes);
+    GLuint samplers[samplerCount] = {0};
+
+    glGenSamplers(samplerCount, samplers);
+    uint8_t count = 0;
+    for (GLenum textureType : m_TextureTypes)
+    {
+	glSamplerParameteri(samplers[count], GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glSamplerParameteri(samplers[count], GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glSamplerParameteri(samplers[count], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glSamplerParameteri(samplers[count], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	m_Pipeline.samplers.emplace_back(textureType, samplers[count]);
+
+	count++;
+    }
+}
+
+GraphicsApi::TextureHandle GraphicsApiGL::AddTexture(const engine::TextureAsset& textureAsset)
+{
+    GLuint texture;
+    glGenTextures(1, &texture);
+    m_Textures.insert({texture, GL_TEXTURE_2D});
+    const auto [_, sampler] = m_Pipeline.samplers.at(0);
+    m_TextureSamplers.insert({texture, sampler});
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureAsset.width, textureAsset.height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureAsset.data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    DynamicApiTextureHandle handle{};
+    handle.gl = texture;
+    return handle;
+}
+
 void GraphicsApiGL::UpdateUniforms(const SceneGraph& scene)
 {
     // TODO: this method should only update "global" uniforms that aren't specific to any renderable in particular.
+}
+
+GLuint GetOpenGLTextureHandle(const MaterialAttributeTexture& texture)
+{
+    auto handle = texture.handle;
+
+    return *reinterpret_cast<GLuint*>(&handle);
+}
+
+void SetOpenGLTexture(GLint location, const MaterialAttributeTexture& textureAttrib, const std::map<GLuint, GLuint>& textureSamplers)
+{
+    GLuint handle = textureAttrib.handle.gl;
+    // GLint sampler = static_cast<GLint>(textureSamplers.at(handle));
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, handle);
+    glUniform1i(location, 0);
 }
 
 void GraphicsApiGL::UpdateUniforms(const SceneGraph& scene, const GLRenderable* const renderable, MaterialAttributes& materialAttribs, const GLuint program, const lepus::math::Matrix4x4& worldMatrix)
@@ -146,6 +199,9 @@ void GraphicsApiGL::UpdateUniforms(const SceneGraph& scene, const GLRenderable* 
 	    break;
 	case lepus::gfx::UniformType::VEC3:
 	    glUniform3fv(location, 1, static_cast<GLfloat*>(materialAttribs.GetRaw(i)));
+	    break;
+	case lepus::gfx::UniformType::TEXTURE2D:
+	    SetOpenGLTexture(location, materialAttribs.Get<MaterialAttributeTexture>(i), m_TextureSamplers);
 	    break;
 	case lepus::gfx::UniformType::INVALID:
 	default:

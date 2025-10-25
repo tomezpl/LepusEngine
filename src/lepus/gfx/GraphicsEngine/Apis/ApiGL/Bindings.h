@@ -32,6 +32,18 @@ namespace lepus
 
 	    inline UniformType Type() override { return UniformType::FLOAT; }
 	};
+
+	class GLTextureUniformBinding : public GLUniformBinding<GLuint>
+	{
+	    public:
+	    explicit GLTextureUniformBinding(GLint location)
+	        : GLUniformBinding(location)
+	    {
+		Value(0);
+	    }
+
+	    inline UniformType Type() override { return UniformType::TEXTURE2D; }
+	};
     } // namespace gfx
 } // namespace lepus
 

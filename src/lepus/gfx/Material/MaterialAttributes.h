@@ -1,5 +1,7 @@
 #ifndef LEPUS_GFX_MATERIAL_ATTRIBUTES
 #define LEPUS_GFX_MATERIAL_ATTRIBUTES
+#include "lepus/engine/AssetManager/TextureAssetManager.h"
+#include "lepus/gfx/GraphicsEngine/GraphicsApi.h"
 #include "lepus/gfx/GraphicsEngine/GraphicsApi/Uniforms.h"
 #include "lepus/utility/types/List.h"
 #include "lepus/utility/types/Matrix4x4.h"
@@ -14,6 +16,7 @@
 
 // Helper macro to quickly define collections of material attributes of different types.
 #define MAT_ATTRIBUTE(type, name) lepus::utility::List<type> name{lepus::utility::List<type>()};
+#define MAT_ATTRIBUTE_WEAK(type, name) lepus::utility::List<type, false> name{lepus::utility::List<type, false>()};
 
 namespace lepus
 {
@@ -24,6 +27,14 @@ namespace lepus
 	typedef float MaterialAttributeVector3[3];
 	typedef float MaterialAttributeVector2[2];
 	typedef float MaterialAttributeScalar;
+	typedef struct TextureSampler
+	{
+	    uint16_t width{0};
+	    uint16_t height{0};
+	    std::shared_ptr<uint8_t[]> data{{}};
+	    lepus::gfx::GraphicsApi::TextureHandle handle{};
+	    bool dirty{false};
+	} MaterialAttributeTexture;
 
 	class AttributeTypes
 	{
@@ -41,6 +52,7 @@ namespace lepus
 		case MATRIX4:
 		    return sizeof(MaterialAttributeMatrix4);
 		case INVALID:
+		case TEXTURE2D:
 		default:
 		    return 0;
 		}
@@ -70,6 +82,7 @@ namespace lepus
 		MAT_ATTRIBUTE(MaterialAttributeVector2, vec2)
 		MAT_ATTRIBUTE(MaterialAttributeVector3, vec3)
 		MAT_ATTRIBUTE(MaterialAttributeVector4, vec4)
+		MAT_ATTRIBUTE_WEAK(MaterialAttributeTexture, texture)
 	    } m_AttribData;
 
 	    public:
@@ -119,6 +132,8 @@ namespace lepus
 		    return (utility::List<TValue>&)(m_AttribData.mat4);
 		case FLOAT:
 		    return (utility::List<TValue>&)(m_AttribData.scalar);
+		case TEXTURE2D:
+		    return (utility::List<TValue>&)(m_AttribData.texture);
 		case INVALID:
 		default:
 		    assert(false);
@@ -136,6 +151,8 @@ namespace lepus
 	    /// @brief Adds an attribute and returns its index.
 	    template <typename TValue, typename TRaw = void*>
 	    MaterialAttributeView<TValue, TRaw> Add(const char* name, TValue value, const MaterialAttributes::BindingHint&& bindingHint = {});
+
+	    MaterialAttributeView<MaterialAttributeTexture, void*> Add(const char* name, engine::TextureAsset& value, const MaterialAttributes::BindingHint&& bindingHint = {});
 
 	    template <typename TValue = const void*>
 	    void Set(MaterialAttributeHandle handle, TValue value)
@@ -228,6 +245,12 @@ namespace lepus
 	}
 
 	template <>
+	inline constexpr UniformType MaterialAttributes::getDataType<MaterialAttributeTexture>()
+	{
+	    return TEXTURE2D;
+	}
+
+	template <>
 	inline void MaterialAttributes::Set<float>(MaterialAttributeHandle handle, float value)
 	{
 	    auto index = m_AttribIndex.Get(handle);
@@ -251,6 +274,31 @@ namespace lepus
 
 	    m_AttribTypes.Set(handle, UniformType::VEC3);
 	    memcpy(m_AttribData.vec3.Raw()[index], value.GetData(), sizeof(MaterialAttributeVector3));
+	}
+
+	template <>
+	inline void MaterialAttributes::Set<const MaterialAttributeTexture&>(MaterialAttributeHandle handle, const MaterialAttributeTexture& value)
+	{
+	    auto index = m_AttribIndex.Get(handle);
+
+	    m_AttribTypes.Set(handle, TEXTURE2D);
+	    auto& tex = m_AttribData.texture.Get(index);
+	    tex.data = value.data;
+	    tex.width = value.width;
+	    tex.handle = value.handle;
+	    tex.height = value.height;
+	}
+
+	template <>
+	inline void MaterialAttributes::Set<engine::TextureAsset&&>(MaterialAttributeHandle handle, engine::TextureAsset&& asset)
+	{
+	    auto index = m_AttribIndex.Get(handle);
+
+	    m_AttribTypes.Set(handle, TEXTURE2D);
+	    auto& tex = m_AttribData.texture.Get(index);
+	    tex.data = std::shared_ptr<uint8_t[]>(reinterpret_cast<uint8_t*>(asset.data));
+	    tex.width = asset.width;
+	    tex.height = asset.height;
 	}
 
 	template <>
@@ -344,6 +392,11 @@ namespace lepus
 	    TInput Get()
 	    {
 		return TInput(*m_Data);
+	    }
+
+	    [[nodiscard]] MaterialAttributeHandle GetHandle() const
+	    {
+		return m_Handle;
 	    }
 	};
 

@@ -152,6 +152,22 @@ class DemoApp : public system::BaseApp
 	// Register shader with the API.
 	const gfx::AnyShader* rgbVertexShader = engine.RegisterShader("RGBVertex", rgbIndexVertShader, rgbIndexFragShader);
 
+	auto testTexture = engine::AssetManager::Singleton().Textures().LoadTextureFromContent("texture.png");
+
+	auto texturedVertShader = shaderManager.AddShader(api.GetShaderFileName("Unlit/Textured", gfx::ShaderStageVertex), shaderAssetType);
+	auto texturedFragShader = shaderManager.AddShader(api.GetShaderFileName("Unlit/Textured", gfx::ShaderStageFragment), shaderAssetType);
+
+	REGISTER_SHADER(
+	    engine,
+	    Textured,
+	    {
+	        gfx::MaterialAttributeMatrix4 MODEL;
+	        gfx::MaterialAttributeMatrix4 VIEW;
+	        gfx::MaterialAttributeMatrix4 PROJ;
+	        gfx::MaterialAttributeTexture MyTexture;
+	    },
+	    texturedVertShader, texturedFragShader);
+
 	REGISTER_SHADER(
 	    engine,
 	    SolidColour,
@@ -163,10 +179,19 @@ class DemoApp : public system::BaseApp
 	    },
 	    solidColourVertShader, solidColourFragShader);
 
-	lepus::gfx::Material baseMaterial, otherMaterial;
+	lepus::gfx::Material baseMaterial, otherMaterial, texturedMaterial;
 
 	baseMaterial.SetShader(rgbVertexShader);
 	otherMaterial.SetShader(SolidColour_shader);
+	texturedMaterial.SetShader(Textured_shader);
+
+	// Set up engine for drawing.
+	engine.Setup();
+
+	auto textureAttrib = texturedMaterial.Attributes().Add(USE_REGISTERED_SHADER_MODEL(Textured, MyTexture, testTexture));
+	auto textureAttribValue = texturedMaterial.Attributes().Get<gfx::MaterialAttributeTexture>(textureAttrib.GetHandle());
+	engine.AddTexture(testTexture, textureAttribValue);
+	texturedMaterial.Attributes().Set<const gfx::MaterialAttributeTexture&>(textureAttrib.GetHandle(), textureAttribValue);
 
 	types::Vector3 baseColour(1.f, 1.f, 1.f);
 
@@ -174,13 +199,11 @@ class DemoApp : public system::BaseApp
 
 	engine.GetSceneGraph().SetCamera(&m_Camera);
 
-	// Set up engine for drawing.
-	engine.Setup();
 	m_Camera.Transform().Origin(m_Camera.Transform().Forward() * -2.f);
 
 	// Instantiate two Renderables in the scene graph, each with its own transform, using the same cube mesh data.
-	auto cubeMesh = engine.CreateMesh(lepus::utility::Primitives::Cube());
-	auto cube = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), baseMaterial);
+	auto cubeMesh = engine.CreateMesh(lepus::utility::Primitives::CubeUnindexed());
+	auto cube = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), texturedMaterial);
 	auto cube2 = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), otherMaterial);
 	auto cube3 = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), otherMaterial);
 	auto cube4 = lepus::gfx::Renderable(cubeMesh, lepus::math::Transform(), baseMaterial);

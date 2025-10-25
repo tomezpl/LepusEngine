@@ -17,6 +17,7 @@
 #include "lepus/utility/types/List.h"
 
 #include "ApiVk/Types/VkBufferAlloc.h"
+#include <lepus/gfx/SceneGraph.h>
 
 #include <map>
 #include <limits>
@@ -219,6 +220,13 @@ namespace lepus::gfx
 	{
 	    m_GraphicsPipelineCount = m_vkGraphicsPipelineMetadata.Push(shader);
 	}
+
+	TextureHandle AddTexture(const engine::TextureAsset& textureAsset) override
+	{
+	    // TODO: not implemented yet
+	    assert(false);
+	    return {};
+	};
 
 	void Shutdown() override;
     };

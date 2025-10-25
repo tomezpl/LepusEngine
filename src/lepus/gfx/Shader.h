@@ -1,6 +1,7 @@
 #ifndef LEPUS_GFX_SHADER
 #define LEPUS_GFX_SHADER
 #include "Material/MaterialAttributes.h"
+#include "Shader/ShaderStage.h"
 #include "Shader/ShaderUtils.h"
 
 #include <cstring>
@@ -11,12 +12,6 @@ namespace lepus
 {
     namespace gfx
     {
-	enum ShaderStage
-	{
-	    ShaderStageInvalid = 0,
-	    ShaderStageVertex = 1 << 0,
-	    ShaderStageFragment = 1 << 1
-	};
 
 	/// @brief A base class for any shader. Defines metadata about the shader, such as its name.
 	class ShaderInfo

@@ -13,7 +13,7 @@ namespace lepus
 	 *
 	 * @todo Refactor this to just use a std::vector<TElement> internally because there's no reason for lepus to implement its own vector-like storage
 	 */
-	template <typename TElement>
+	template <typename TElement, bool OwnsData = true>
 	class List
 	{
 	    private:
@@ -129,7 +129,10 @@ namespace lepus
 
 	    ~List()
 	    {
-		delete[] m_Data;
+		if (OwnsData)
+		{
+		    delete[] m_Data;
+		}
 	    }
 	};
     } // namespace utility

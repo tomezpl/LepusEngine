@@ -4,7 +4,6 @@
 #include <lepus/gfx/GraphicsEngine/GraphicsApi.h>
 #include "../ShaderCompilers/ShaderCompilerGLSL.h"
 #include <lepus/gfx/GraphicsEngine.h>
-#include <lepus/utility/Primitives.h>
 #include <forward_list>
 #include <unordered_map>
 
@@ -19,11 +18,11 @@ namespace lepus
 	class GraphicsApiGLOptions : public GraphicsApiOptions
 	{
 	    public:
-	    static constexpr size_t ProgramCount = 8;
+	    static constexpr size_t s_ProgramCount = 8;
 
 	    private:
-	    GLuint m_FragmentShaders[ProgramCount];
-	    GLuint m_VertexShaders[ProgramCount];
+	    GLuint m_FragmentShaders[s_ProgramCount];
+	    GLuint m_VertexShaders[s_ProgramCount];
 	    size_t m_ShaderCount = 0;
 	    std::shared_ptr<system::WindowingGLFW> m_Windowing;
 
@@ -38,8 +37,8 @@ namespace lepus
 	        : GraphicsApiOptions()
 	    {
 		// Zero the shader arrays.
-		memset(m_FragmentShaders, 0, ProgramCount * sizeof(GLuint));
-		memset(m_VertexShaders, 0, ProgramCount * sizeof(GLuint));
+		memset(m_FragmentShaders, 0, s_ProgramCount * sizeof(GLuint));
+		memset(m_VertexShaders, 0, s_ProgramCount * sizeof(GLuint));
 		m_Windowing = windowing;
 	    }
 
@@ -48,7 +47,7 @@ namespace lepus
 
 	    size_t RegisterShader(GLShaderCompiledResult const* vertexShader = nullptr, GLShaderCompiledResult const* fragShader = nullptr, GLShaderCompiledResult const* geomShader = nullptr)
 	    {
-		assert(m_ShaderCount < ProgramCount);
+		assert(m_ShaderCount < s_ProgramCount);
 
 		if (vertexShader)
 		{
@@ -91,19 +90,26 @@ namespace lepus
 		/// @brief Uniform map to update the values.
 		// TODO: Move to a Material class?
 		std::unordered_map<const char*, lepus::gfx::GLUniformBinding<void*>*> uniformMap;
+
+		std::vector<std::tuple<GLenum, GLuint>> samplers{};
 	    } m_Pipeline;
 
-	    GLuint m_Programs[GraphicsApiGLOptions::ProgramCount];
+	    GLuint m_Programs[GraphicsApiGLOptions::s_ProgramCount];
 
 	    bool m_DrawStarted;
 
 	    GLuint m_ActiveProgram;
+
+	    GLenum m_TextureTypes[1] = {GL_TEXTURE_2D};
+	    std::map<GLuint, GLuint> m_TextureSamplers{};
+	    std::map<GLuint, GLenum> m_Textures{};
 
 	    private:
 	    void SetupVertexArrays();
 	    void SetupBuffers();
 	    void SetupShaders();
 	    void SetupUniforms();
+	    void SetupSamplers();
 
 	    private:
 	    inline void* GetUniformInternal(const char* name) override
@@ -159,6 +165,8 @@ namespace lepus
 	    }
 
 	    inline engine::objects::Mesh* WrapMesh(engine::objects::Mesh* mesh) override { return new GLMesh((void*)mesh->GetVertices(), mesh->VertexBufferSize(), mesh->GetFormat(), (uint32_t*)mesh->GetIndices(), mesh->IndexCount(), true); }
+
+	    TextureHandle AddTexture(const engine::TextureAsset& textureAsset) override;
 	};
 
 	template lepus::gfx::GLUniformBinding<void*>* GraphicsApi::GetUniform<lepus::gfx::GLUniformBinding<void*>*>(const char* name);

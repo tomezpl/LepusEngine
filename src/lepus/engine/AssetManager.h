@@ -2,6 +2,7 @@
 #define LEPUS_ENGINE_ASSETMANAGER
 
 #include "AssetManager/ShaderAssetManager.h"
+#include "AssetManager/TextureAssetManager.h"
 
 #include <cassert>
 
@@ -13,6 +14,7 @@ namespace lepus
 	{
 	    private:
 	    ShaderAssetManager m_ShaderAssetManager;
+	    TextureAssetManager m_TextureAssetManager;
 
 	    static AssetManager m_Instance;
 
@@ -29,10 +31,18 @@ namespace lepus
 		return m_ShaderAssetManager;
 	    }
 
+	    [[nodiscard]] inline TextureAssetManager& Textures()
+	    {
+		return m_TextureAssetManager;
+	    }
+
 	    inline void Dispose()
 	    {
 		assert(!m_Disposed);
 		m_ShaderAssetManager.Dispose();
+		m_TextureAssetManager.Dispose();
+
+		m_Disposed = true;
 	    }
 
 	    ~AssetManager()

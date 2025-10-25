@@ -19,20 +19,25 @@
 #define LEPUS_USE_DYNAMIC_API 1
 #endif
 
+#include "Apis/ApiGL/Types.h"
+
 #include <lepus/utility/types/Viewport.h>
 #include <memory>
 #include <cstring>
 #include <cassert>
 #include "GraphicsApi/BaseBindings.h"
 #include "lepus/engine/AssetManager/ShaderAssetManager.h"
+#include "lepus/engine/AssetManager/TextureAssetManager.h"
 #include "lepus/engine/Objects/Mesh.h"
-#include "lepus/gfx/SceneGraph.h"
+#include "lepus/gfx/Shader/ShaderStage.h"
 #include "lepus/system/Windowing.h"
 
 namespace lepus
 {
     namespace gfx
     {
+	class SceneGraph;
+
 	/// @brief Types of graphics APIs.
 	/// These are passed in GraphicsApiOptions structs to indicate which API should be initialised by the GraphicsEngine.
 	enum GraphicsApiType
@@ -108,6 +113,18 @@ namespace lepus
 	/// not a variety of D3D/GL/VK methods.
 	class GraphicsApi
 	{
+	    public:
+	    union DynamicApiTextureHandle
+	    {
+		GLuint gl;
+		void* vk;
+	    };
+#if LEPUS_USE_DYNAMIC_API == 1
+	    using TextureHandle = DynamicApiTextureHandle;
+#elif LEPUS_FORCE_API_OPENGL == 1
+	    using TextureHandle = GLuint;
+#endif
+
 	    private:
 	    bool m_ShutdownCalled{false};
 
@@ -215,6 +232,8 @@ namespace lepus
 	    /// @brief Wraps the provided mesh object in an API-specific subclass.
 	    /// @remarks The API implementation MUST by default copy the data from the mesh rather than reference it.
 	    virtual engine::objects::Mesh* WrapMesh(engine::objects::Mesh* mesh) = 0;
+
+	    virtual TextureHandle AddTexture(const engine::TextureAsset& textureAsset) = 0;
 
 	    /// @brief Returns the API-and-shaderstage-specific filename for a given shader name.
 	    /// @remarks The return value of this function is transient; it is designed to be used for loading shaders using ShaderAssetManager, which copies the filename string.

@@ -9,6 +9,7 @@
 #include "GraphicsEngine/Apis/ApiVk/Types/VkShader.h"
 #include "GraphicsEngine/ShaderCompilers/ShaderCompilerGLSL.h"
 #include "GraphicsEngine/ShaderCompilers/ShaderCompilerVk.h"
+#include "lepus/engine/AssetManager/TextureAssetManager.h"
 #include "lepus/utility/types/List.h"
 
 #include <forward_list>
@@ -89,16 +90,6 @@ namespace lepus
 	    {
 		RGBA32 = 256
 	    };
-
-	    // 	    template <class TGraphicsApi>
-	    // 	    inline TGraphicsApi& GetApi()
-	    // 	    {
-	    // #if LEPUS_USE_DYNAMIC_API
-	    // 		return *((TGraphicsApi*)m_Api);
-	    // #else
-	    // 		return *reinterpret_cast<GraphicsApiClass*>(&m_Api);
-	    // #endif
-	    // 	    }
 
 	    inline GraphicsApiClass& GetApi()
 	    {
@@ -182,6 +173,27 @@ namespace lepus
 	    {
 		return {options, options->GetWindowing()};
 	    }
+
+	    using TextureHandle = std::tuple<uint8_t, GraphicsApi::DynamicApiTextureHandle>;
+
+	    private:
+	    std::vector<engine::TextureAsset> m_TextureAssets{};
+
+	    public:
+	    /**
+	     * Registers a texture asset with the engine and underlying API.
+	     * @param asset Texture asset to register
+	     * @return
+	     */
+	    GraphicsEngine::TextureHandle AddTexture(const engine::TextureAsset& asset);
+
+	    /**
+	     * Registers a texture asset with the engine and underlying API, and populates the handle on the MaterialAttributeTexture.
+	     * @param asset Texture asset to register
+	     * @param materialAttrib Texture attribute from a material to update with the API handle
+	     * @return
+	     */
+	    GraphicsEngine::TextureHandle AddTexture(const engine::TextureAsset& asset, MaterialAttributeTexture& materialAttrib);
 	};
     } // namespace gfx
 } // namespace lepus
